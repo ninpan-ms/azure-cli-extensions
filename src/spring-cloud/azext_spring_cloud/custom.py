@@ -38,6 +38,8 @@ APP_CREATE_OR_UPDATE_SLEEP_INTERVAL = 2
 
 # pylint: disable=line-too-long
 NO_PRODUCTION_DEPLOYMENT_ERROR = "No production deployment found, use --deployment to specify deployment or create deployment with: az spring-cloud app deployment create"
+NO_PRODUCTION_DEPLOYMENT_SET_ERROR = "This app has no production deployment, use \"az spring-cloud app deployment create\" to create a deployment and \"az spring-cloud app set-deployment\" to set production deployment."
+DELETE_PRODUCTION_DEPLOYMENT_WARNING = "You are going to delete production deployment, the app will be inaccessible after this operation."
 LOG_RUNNING_PROMPT = "This command usually takes minutes to run. Add '--verbose' parameter if needed."
 
 
@@ -172,6 +174,8 @@ def list_keys(cmd, client, resource_group, name, app=None, deployment=None):
                 keys.primary_test_endpoint, app, deployment)
             keys.secondary_test_endpoint = "{}/{}/{}/".format(
                 keys.secondary_test_endpoint, app, deployment)
+        else:
+            logger.warning(NO_PRODUCTION_DEPLOYMENT_SET_ERROR)
     return keys
 
 
@@ -264,6 +268,12 @@ def app_create(cmd, client, resource_group, service, name,
     return app
 
 
+def _check_active_deployment_exist(client, resource_group, service, app):
+    active_deployment_name = client.apps.get(resource_group, service, app).properties.active_deployment_name
+    if not active_deployment_name:
+        logger.warning(NO_PRODUCTION_DEPLOYMENT_SET_ERROR)
+
+
 def app_update(cmd, client, resource_group, service, name,
                is_public=None,
                deployment=None,
@@ -273,6 +283,7 @@ def app_update(cmd, client, resource_group, service, name,
                env=None,
                enable_persistent_storage=None,
                https_only=None):
+    _check_active_deployment_exist(client, resource_group, service, name)
     resource = client.services.get(resource_group, service)
     location = resource.location
 
@@ -301,7 +312,7 @@ def app_update(cmd, client, resource_group, service, name,
         deployment = client.apps.get(
             resource_group, service, name).properties.active_deployment_name
         if deployment is None:
-            logger.warning("No deployment found for update")
+            logger.warning("No production deployment found for update")
             return app_updated
 
     logger.warning("[2/2] Updating deployment '{}'".format(deployment))
@@ -342,8 +353,9 @@ def app_start(cmd, client,
     if deployment is None:
         deployment = client.apps.get(
             resource_group, service, name).properties.active_deployment_name
-    if deployment is None:
-        raise CLIError(NO_PRODUCTION_DEPLOYMENT_ERROR)
+        if deployment is None:
+            logger.warning(NO_PRODUCTION_DEPLOYMENT_SET_ERROR)
+            raise CLIError(NO_PRODUCTION_DEPLOYMENT_ERROR)
     return sdk_no_wait(no_wait, client.deployments.start,
                        resource_group, service, name, deployment)
 
@@ -357,8 +369,9 @@ def app_stop(cmd, client,
     if deployment is None:
         deployment = client.apps.get(
             resource_group, service, name).properties.active_deployment_name
-    if deployment is None:
-        raise CLIError(NO_PRODUCTION_DEPLOYMENT_ERROR)
+        if deployment is None:
+            logger.warning(NO_PRODUCTION_DEPLOYMENT_SET_ERROR)
+            raise CLIError(NO_PRODUCTION_DEPLOYMENT_ERROR)
     return sdk_no_wait(no_wait, client.deployments.stop,
                        resource_group, service, name, deployment)
 
@@ -372,8 +385,9 @@ def app_restart(cmd, client,
     if deployment is None:
         deployment = client.apps.get(
             resource_group, service, name).properties.active_deployment_name
-    if deployment is None:
-        raise CLIError(NO_PRODUCTION_DEPLOYMENT_ERROR)
+        if deployment is None:
+            logger.warning(NO_PRODUCTION_DEPLOYMENT_SET_ERROR)
+            raise CLIError(NO_PRODUCTION_DEPLOYMENT_ERROR)
     return sdk_no_wait(no_wait, client.deployments.restart,
                        resource_group, service, name, deployment)
 
@@ -403,6 +417,8 @@ def app_get(cmd, client,
         deployment = client.deployments.get(
             resource_group, service, name, deployment_name)
         app.properties.active_deployment = deployment
+    else:
+        logger.warning(NO_PRODUCTION_DEPLOYMENT_SET_ERROR)
 
     return app
 
@@ -422,6 +438,7 @@ def app_deploy(cmd, client, resource_group, service, name,
         deployment = client.apps.get(
             resource_group, service, name).properties.active_deployment_name
         if not deployment:
+            logger.warning(NO_PRODUCTION_DEPLOYMENT_SET_ERROR)
             raise CLIError(NO_PRODUCTION_DEPLOYMENT_ERROR)
 
     client.deployments.get(resource_group, service, name, deployment)
@@ -457,8 +474,9 @@ def app_scale(cmd, client, resource_group, service, name,
     if deployment is None:
         deployment = client.apps.get(
             resource_group, service, name).properties.active_deployment_name
-    if deployment is None:
-        raise CLIError(NO_PRODUCTION_DEPLOYMENT_ERROR)
+        if deployment is None:
+            logger.warning(NO_PRODUCTION_DEPLOYMENT_SET_ERROR)
+            raise CLIError(NO_PRODUCTION_DEPLOYMENT_ERROR)
 
     resource = client.services.get(resource_group, service)
     _validate_instance_count(resource.sku.tier, instance_count)
@@ -542,6 +560,7 @@ def app_tail_log(cmd, client, resource_group, service, name, instance=None, foll
 
 
 def app_identity_assign(cmd, client, resource_group, service, name, role=None, scope=None):
+    _check_active_deployment_exist(client, resource_group, service, name)
     app_resource = models.AppResource()
     identity = models.ManagedIdentityProperties(type="systemassigned")
     properties = models.AppResourceProperties()
@@ -599,6 +618,7 @@ def app_identity_remove(cmd, client, resource_group, service, name):
 
 
 def app_identity_show(cmd, client, resource_group, service, name):
+    _check_active_deployment_exist(client, resource_group, service, name)
     app = client.apps.get(resource_group, service, name)
     return app.identity
 
@@ -615,6 +635,24 @@ def app_set_deployment(cmd, client, resource_group, service, name, deployment):
                        "' not found, please use 'az spring-cloud app deployment create' to create the new deployment")
     properties = models.AppResourceProperties(
         active_deployment_name=deployment)
+
+    resource = client.services.get(resource_group, service)
+    location = resource.location
+
+    app_resource = models.AppResource()
+    app_resource.properties = properties
+    app_resource.location = location
+
+    return client.apps.update(resource_group, service, name, app_resource)
+
+
+def app_unset_deployment(cmd, client, resource_group, service, name):
+    active_deployment_name = client.apps.get(
+        resource_group, service, name).properties.active_deployment_name
+    if not active_deployment_name:
+        raise CLIError(NO_PRODUCTION_DEPLOYMENT_SET_ERROR)
+
+    properties = models.AppResourceProperties(active_deployment_name="")
 
     resource = client.services.get(resource_group, service)
     location = resource.location
@@ -651,16 +689,17 @@ def deployment_create(cmd, client, resource_group, service, app, name,
         active_deployment_name = client.apps.get(
             resource_group, service, app).properties.active_deployment_name
         if not active_deployment_name:
-            raise CLIError("No production deployment found, use --skip-clone-settings to skip copying settings from "
+            logger.warning("No production deployment found, use --skip-clone-settings to skip copying settings from "
                            "production deployment.")
-        active_deployment = client.deployments.get(
-            resource_group, service, app, active_deployment_name)
-        if active_deployment:
-            cpu = cpu or active_deployment.properties.deployment_settings.cpu
-            memory = memory or active_deployment.properties.deployment_settings.memory_in_gb
-            instance_count = instance_count or active_deployment.sku.capacity
-            jvm_options = jvm_options or active_deployment.properties.deployment_settings.jvm_options
-            env = env or active_deployment.properties.deployment_settings.environment_variables
+        else:
+            active_deployment = client.deployments.get(
+                resource_group, service, app, active_deployment_name)
+            if active_deployment:
+                cpu = cpu or active_deployment.properties.deployment_settings.cpu
+                memory = memory or active_deployment.properties.deployment_settings.memory_in_gb
+                instance_count = instance_count or active_deployment.sku.capacity
+                jvm_options = jvm_options or active_deployment.properties.deployment_settings.jvm_options
+                env = env or active_deployment.properties.deployment_settings.environment_variables
     else:
         cpu = cpu or 1
         memory = memory or 1
@@ -702,6 +741,9 @@ def deployment_get(cmd, client, resource_group, service, app, name):
 
 
 def deployment_delete(cmd, client, resource_group, service, app, name):
+    active_deployment_name = client.apps.get(resource_group, service, app).properties.active_deployment_name
+    if active_deployment_name == name:
+        logger.warning(DELETE_PRODUCTION_DEPLOYMENT_WARNING)
     client.deployments.get(resource_group, service, app, name)
     return client.deployments.delete(resource_group, service, app, name)
 
@@ -963,10 +1005,12 @@ def config_repo_list(cmd, client, resource_group, name):
 
 
 def binding_list(cmd, client, resource_group, service, app):
+    _check_active_deployment_exist(client, resource_group, service, app)
     return client.list(resource_group, service, app)
 
 
 def binding_get(cmd, client, resource_group, service, app, name):
+    _check_active_deployment_exist(client, resource_group, service, app)
     return client.get(resource_group, service, app, name)
 
 
@@ -980,6 +1024,7 @@ def binding_cosmos_add(cmd, client, resource_group, service, app, name,
                        database_name=None,
                        key_space=None,
                        collection_name=None):
+    _check_active_deployment_exist(client, resource_group, service, app)
     resource_id_dict = parse_resource_id(resource_id)
     resource_type = resource_id_dict['resource_type']
     resource_name = resource_id_dict['resource_name']
@@ -1012,6 +1057,7 @@ def binding_cosmos_update(cmd, client, resource_group, service, app, name,
                           database_name=None,
                           key_space=None,
                           collection_name=None):
+    _check_active_deployment_exist(client, resource_group, service, app)
     binding = client.get(resource_group, service, app, name).properties
     resource_id = binding.resource_id
     resource_name = binding.resource_name
@@ -1038,6 +1084,7 @@ def binding_mysql_add(cmd, client, resource_group, service, app, name,
                       key,
                       username,
                       database_name):
+    _check_active_deployment_exist(client, resource_group, service, app)
     resource_id_dict = parse_resource_id(resource_id)
     resource_type = resource_id_dict['resource_type']
     resource_name = resource_id_dict['resource_name']
@@ -1059,6 +1106,7 @@ def binding_mysql_update(cmd, client, resource_group, service, app, name,
                          key=None,
                          username=None,
                          database_name=None):
+    _check_active_deployment_exist(client, resource_group, service, app)
     binding_parameters = {}
     binding_parameters['username'] = username
     binding_parameters['databaseName'] = database_name
@@ -1073,6 +1121,7 @@ def binding_mysql_update(cmd, client, resource_group, service, app, name,
 def binding_redis_add(cmd, client, resource_group, service, app, name,
                       resource_id,
                       disable_ssl=None):
+    _check_active_deployment_exist(client, resource_group, service, app)
     use_ssl = not disable_ssl
     resource_id_dict = parse_resource_id(resource_id)
     resource_type = resource_id_dict['resource_type']
@@ -1099,6 +1148,7 @@ def binding_redis_add(cmd, client, resource_group, service, app, name,
 
 def binding_redis_update(cmd, client, resource_group, service, app, name,
                          disable_ssl=None):
+    _check_active_deployment_exist(client, resource_group, service, app)
     binding = client.get(resource_group, service, app, name).properties
     resource_id = binding.resource_id
     resource_name = binding.resource_name
@@ -1308,6 +1358,7 @@ def certificate_remove(cmd, client, resource_group, service, name):
 def domain_bind(cmd, client, resource_group, service, app,
                 domain_name,
                 certificate=None):
+    _check_active_deployment_exist(client, resource_group, service, app)
     properties = models.CustomDomainProperties()
     if certificate is not None:
         certificate_response = client.certificates.get(resource_group, service, certificate)
@@ -1319,16 +1370,19 @@ def domain_bind(cmd, client, resource_group, service, app,
 
 
 def domain_show(cmd, client, resource_group, service, app, domain_name):
+    _check_active_deployment_exist(client, resource_group, service, app)
     return client.custom_domains.get(resource_group, service, app, domain_name)
 
 
 def domain_list(cmd, client, resource_group, service, app):
+    _check_active_deployment_exist(client, resource_group, service, app)
     return client.custom_domains.list(resource_group, service, app)
 
 
 def domain_update(cmd, client, resource_group, service, app,
                   domain_name,
                   certificate=None):
+    _check_active_deployment_exist(client, resource_group, service, app)
     properties = models.CustomDomainProperties()
     if certificate is not None:
         certificate_response = client.certificates.get(resource_group, service, certificate)
