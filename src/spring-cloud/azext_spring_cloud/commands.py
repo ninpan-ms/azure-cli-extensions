@@ -20,6 +20,9 @@ def load_command_table(self, _):
         client_factory=cf_tanzu
     )
 
+    with self.command_group('spring-cloud tanzu', tanzu_util) as g:
+        g.command('show', 'tanzu_get')
+
     with self.command_group('spring-cloud', client_factory=cf_app_services) as g:
         g.custom_command('create', 'spring_cloud_create', supports_no_wait=True, client_factory=cf_spring_cloud)
         g.custom_command('update', 'spring_cloud_update', supports_no_wait=True, client_factory=cf_spring_cloud)
