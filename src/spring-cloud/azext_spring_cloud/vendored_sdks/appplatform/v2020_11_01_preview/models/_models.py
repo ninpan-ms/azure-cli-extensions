@@ -163,10 +163,9 @@ class AppResourceProperties(Model):
     :type active_deployment_name: str
     :param fqdn: Fully qualified dns Name.
     :type fqdn: str
-    :param https_only: Indicate if only https is allowed.
+    :param https_only: Indicate if only https is allowed. Default value: False
+     .
     :type https_only: bool
-    :param enable_end_to_end_tls: Indicate if end to end TLS is enabled.
-    :type enable_end_to_end_tls: bool
     :ivar created_time: Date time when the resource is created
     :vartype created_time: datetime
     :param temporary_disk: Temporary disk settings
@@ -175,6 +174,9 @@ class AppResourceProperties(Model):
     :param persistent_disk: Persistent disk settings
     :type persistent_disk:
      ~azure.mgmt.appplatform.v2020_11_01_preview.models.PersistentDisk
+    :param enable_end_to_end_tls: Indicate if end to end TLS is enabled.
+     Default value: False .
+    :type enable_end_to_end_tls: bool
     """
 
     _validation = {
@@ -190,10 +192,10 @@ class AppResourceProperties(Model):
         'active_deployment_name': {'key': 'activeDeploymentName', 'type': 'str'},
         'fqdn': {'key': 'fqdn', 'type': 'str'},
         'https_only': {'key': 'httpsOnly', 'type': 'bool'},
-        'enable_end_to_end_tls': {'key': 'enableEndToEndTLS', 'type': 'bool'},
         'created_time': {'key': 'createdTime', 'type': 'iso-8601'},
         'temporary_disk': {'key': 'temporaryDisk', 'type': 'TemporaryDisk'},
         'persistent_disk': {'key': 'persistentDisk', 'type': 'PersistentDisk'},
+        'enable_end_to_end_tls': {'key': 'enableEndToEndTLS', 'type': 'bool'},
     }
 
     def __init__(self, **kwargs):
@@ -203,11 +205,11 @@ class AppResourceProperties(Model):
         self.provisioning_state = None
         self.active_deployment_name = kwargs.get('active_deployment_name', None)
         self.fqdn = kwargs.get('fqdn', None)
-        self.https_only = kwargs.get('https_only', None)
-        self.enable_end_to_end_tls = kwargs.get('enable_end_to_end_tls', None)
+        self.https_only = kwargs.get('https_only', False)
         self.created_time = None
         self.temporary_disk = kwargs.get('temporary_disk', None)
         self.persistent_disk = kwargs.get('persistent_disk', None)
+        self.enable_end_to_end_tls = kwargs.get('enable_end_to_end_tls', False)
 
 
 class AvailableRuntimeVersions(Model):
@@ -994,7 +996,7 @@ class DeploymentSettings(Model):
     :param environment_variables: Collection of environment variables
     :type environment_variables: dict[str, str]
     :param runtime_version: Runtime version. Possible values include:
-     'Java_8', 'Java_11', 'NetCore_31'
+     'Java_8', 'Java_11', 'NetCore_31'. Default value: "Java_8" .
     :type runtime_version: str or
      ~azure.mgmt.appplatform.v2020_11_01_preview.models.RuntimeVersion
     """
@@ -1015,7 +1017,7 @@ class DeploymentSettings(Model):
         self.jvm_options = kwargs.get('jvm_options', None)
         self.net_core_main_entry_path = kwargs.get('net_core_main_entry_path', None)
         self.environment_variables = kwargs.get('environment_variables', None)
-        self.runtime_version = kwargs.get('runtime_version', None)
+        self.runtime_version = kwargs.get('runtime_version', "Java_8")
 
 
 class Error(Model):
@@ -1951,9 +1953,9 @@ class ServiceSpecification(Model):
 class Sku(Model):
     """Sku of Azure Spring Cloud.
 
-    :param name: Name of the Sku
+    :param name: Name of the Sku. Default value: "S0" .
     :type name: str
-    :param tier: Tier of the Sku
+    :param tier: Tier of the Sku. Default value: "Standard" .
     :type tier: str
     :param capacity: Current capacity of the target resource
     :type capacity: int
@@ -1967,8 +1969,8 @@ class Sku(Model):
 
     def __init__(self, **kwargs):
         super(Sku, self).__init__(**kwargs)
-        self.name = kwargs.get('name', None)
-        self.tier = kwargs.get('tier', None)
+        self.name = kwargs.get('name', "S0")
+        self.tier = kwargs.get('tier', "Standard")
         self.capacity = kwargs.get('capacity', None)
 
 

@@ -9,5 +9,14 @@
 # regenerated.
 # --------------------------------------------------------------------------
 
-VERSION = "1.2.0"
+from ._tanzu_services_operations import TanzuServicesOperations
+from ._apps_operations import AppsOperations
+from ._deployments_operations import DeploymentsOperations
+from ._build_service_operations import BuildServiceOperations
 
+__all__ = [
+    'TanzuServicesOperations',
+    'AppsOperations',
+    'DeploymentsOperations',
+    'BuildServiceOperations',
+]

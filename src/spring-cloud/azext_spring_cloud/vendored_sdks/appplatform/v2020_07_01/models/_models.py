@@ -140,7 +140,8 @@ class AppResourceProperties(Model):
     :type active_deployment_name: str
     :param fqdn: Fully qualified dns Name.
     :type fqdn: str
-    :param https_only: Indicate if only https is allowed.
+    :param https_only: Indicate if only https is allowed. Default value: False
+     .
     :type https_only: bool
     :ivar created_time: Date time when the resource is created
     :vartype created_time: datetime
@@ -177,7 +178,7 @@ class AppResourceProperties(Model):
         self.provisioning_state = None
         self.active_deployment_name = kwargs.get('active_deployment_name', None)
         self.fqdn = kwargs.get('fqdn', None)
-        self.https_only = kwargs.get('https_only', None)
+        self.https_only = kwargs.get('https_only', False)
         self.created_time = None
         self.temporary_disk = kwargs.get('temporary_disk', None)
         self.persistent_disk = kwargs.get('persistent_disk', None)
@@ -965,7 +966,7 @@ class DeploymentSettings(Model):
     :param environment_variables: Collection of environment variables
     :type environment_variables: dict[str, str]
     :param runtime_version: Runtime version. Possible values include:
-     'Java_8', 'Java_11', 'NetCore_31'
+     'Java_8', 'Java_11', 'NetCore_31'. Default value: "Java_8" .
     :type runtime_version: str or
      ~azure.mgmt.appplatform.v2020_07_01.models.RuntimeVersion
     """
@@ -986,7 +987,7 @@ class DeploymentSettings(Model):
         self.jvm_options = kwargs.get('jvm_options', None)
         self.net_core_main_entry_path = kwargs.get('net_core_main_entry_path', None)
         self.environment_variables = kwargs.get('environment_variables', None)
-        self.runtime_version = kwargs.get('runtime_version', None)
+        self.runtime_version = kwargs.get('runtime_version', "Java_8")
 
 
 class Error(Model):
@@ -1368,10 +1369,15 @@ class NetworkProfile(Model):
      instance.
     :vartype outbound_ips:
      ~azure.mgmt.appplatform.v2020_07_01.models.NetworkProfileOutboundIPs
+    :ivar required_traffics: Required inbound or outbound traffics for Azure
+     Spring Cloud instance.
+    :vartype required_traffics:
+     list[~azure.mgmt.appplatform.v2020_07_01.models.RequiredTraffic]
     """
 
     _validation = {
         'outbound_ips': {'readonly': True},
+        'required_traffics': {'readonly': True},
     }
 
     _attribute_map = {
@@ -1381,6 +1387,7 @@ class NetworkProfile(Model):
         'service_runtime_network_resource_group': {'key': 'serviceRuntimeNetworkResourceGroup', 'type': 'str'},
         'app_network_resource_group': {'key': 'appNetworkResourceGroup', 'type': 'str'},
         'outbound_ips': {'key': 'outboundIPs', 'type': 'NetworkProfileOutboundIPs'},
+        'required_traffics': {'key': 'requiredTraffics', 'type': '[RequiredTraffic]'},
     }
 
     def __init__(self, **kwargs):
@@ -1391,6 +1398,7 @@ class NetworkProfile(Model):
         self.service_runtime_network_resource_group = kwargs.get('service_runtime_network_resource_group', None)
         self.app_network_resource_group = kwargs.get('app_network_resource_group', None)
         self.outbound_ips = None
+        self.required_traffics = None
 
 
 class NetworkProfileOutboundIPs(Model):
@@ -1548,6 +1556,51 @@ class RegenerateTestKeyRequestPayload(Model):
     def __init__(self, **kwargs):
         super(RegenerateTestKeyRequestPayload, self).__init__(**kwargs)
         self.key_type = kwargs.get('key_type', None)
+
+
+class RequiredTraffic(Model):
+    """Required inbound or outbound traffic for Azure Spring Cloud instance.
+
+    Variables are only populated by the server, and will be ignored when
+    sending a request.
+
+    :ivar protocol: The protocol of required traffic
+    :vartype protocol: str
+    :ivar port: The port of required traffic
+    :vartype port: int
+    :ivar ips: The ip list of required traffic
+    :vartype ips: list[str]
+    :ivar fqdns: The FQDN list of required traffic
+    :vartype fqdns: list[str]
+    :ivar direction: The direction of required traffic. Possible values
+     include: 'Inbound', 'Outbound'
+    :vartype direction: str or
+     ~azure.mgmt.appplatform.v2020_07_01.models.TrafficDirection
+    """
+
+    _validation = {
+        'protocol': {'readonly': True},
+        'port': {'readonly': True},
+        'ips': {'readonly': True},
+        'fqdns': {'readonly': True},
+        'direction': {'readonly': True},
+    }
+
+    _attribute_map = {
+        'protocol': {'key': 'protocol', 'type': 'str'},
+        'port': {'key': 'port', 'type': 'int'},
+        'ips': {'key': 'ips', 'type': '[str]'},
+        'fqdns': {'key': 'fqdns', 'type': '[str]'},
+        'direction': {'key': 'direction', 'type': 'str'},
+    }
+
+    def __init__(self, **kwargs):
+        super(RequiredTraffic, self).__init__(**kwargs)
+        self.protocol = None
+        self.port = None
+        self.ips = None
+        self.fqdns = None
+        self.direction = None
 
 
 class ResourceSku(Model):
