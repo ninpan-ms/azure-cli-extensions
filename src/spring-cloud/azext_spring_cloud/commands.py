@@ -4,7 +4,8 @@
 # --------------------------------------------------------------------------------------------
 
 # pylint: disable=line-too-long
-from ._client_factory import (cf_app_services, cf_spring_cloud, cf_spring_cloud_20201101preview, cf_bindings, cf_config_servers)
+from azure.cli.core.commands import CliCommandType
+from ._client_factory import (cf_app_services, cf_spring_cloud, cf_spring_cloud_20201101preview, cf_bindings, cf_config_servers, cf_tanzu)
 from ._transformers import (transform_spring_cloud_table_output,
                             transform_app_table_output,
                             transform_spring_cloud_deployment_output,
@@ -14,6 +15,11 @@ from ._transformers import (transform_spring_cloud_table_output,
 
 # pylint: disable=too-many-statements
 def load_command_table(self, _):
+    tanzu_util = CliCommandType(
+        operations_tmpl='azext_spring_cloud.tanzu#{}',
+        client_factory=cf_tanzu
+    )
+
     with self.command_group('spring-cloud', client_factory=cf_app_services) as g:
         g.custom_command('create', 'spring_cloud_create', supports_no_wait=True, client_factory=cf_spring_cloud)
         g.custom_command('update', 'spring_cloud_update', supports_no_wait=True, client_factory=cf_spring_cloud)
