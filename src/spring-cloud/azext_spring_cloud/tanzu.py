@@ -112,6 +112,46 @@ def tanzu_app_update(cmd, client, resource_group, service, name,
     return _app_create_or_update(cmd, client, resource_group, service, name, deployment_name,
             app_properties, deployment_properties, sku, no_wait)
 
+def tanzu_app_start(cmd, client, resource_group, service, name, no_wait=None):
+    '''tanzu_app_start
+    Start deployment under the existing app.
+    Throw exception if app or deployment not found
+    '''
+    deployment_name = _assert_deployment_exist_and_retrieve_name(cmd, client, resource_group, service, name)
+    return client.deployments.start(resource_group, service, name, deployment_name)
+
+def tanzu_app_restart(cmd, client, resource_group, service, name, no_wait=None):
+    '''tanzu_app_restart
+    Restart deployment under the existing app.
+    Throw exception if app or deployment not found
+    '''
+    deployment_name = _assert_deployment_exist_and_retrieve_name(cmd, client, resource_group, service, name)
+    return client.deployments.restart(resource_group, service, name, deployment_name)
+
+def tanzu_app_stop(cmd, client, resource_group, service, name, no_wait=None):
+    '''tanzu_app_stop
+    Stop deployment under the existing app.
+    Throw exception if app or deployment not found
+    '''
+    deployment_name = _assert_deployment_exist_and_retrieve_name(cmd, client, resource_group, service, name)
+    return client.deployments.stop(resource_group, service, name, deployment_name)
+
+def tanzu_app_deploy(cmd, client, resource_group, service, name, artifact_path, no_wait=None):
+    '''tanzu_app_deploy
+    Deploy artifact to deployment under the existing app.
+    Throw exception if app or deployment not found.
+    This method does:
+    1. Call build service to get upload url
+    2. Upload artifact to given Storage file url
+    3. Send the url to build service
+    4. Query build result from build service
+    5. Send build result id to deployment
+    '''
+    deployment_name = _assert_deployment_exist_and_retrieve_name(cmd, client, resource_group, service, name)
+    # todo (qingyi)
+    build_result_id = ''
+    return client.deployments.deploy(resource_group, service, name, deployment_name, build_iteration_id=build_result_id)
+
 def _app_create_or_update(cmd, client, resource_group, service, app_name, deployment_name,
                           app_properties, deployment_properties, deployment_sku,
                           no_wait, operation_name='Updating'):
@@ -143,3 +183,10 @@ def _get_default_deployment(cmd, client, resource_group, service, app_name):
     '''
     deployments = client.deployments.list(resource_group, service, app_name).get(0) or []
     return deployments[0] if deployments else None
+
+def _assert_deployment_exist_and_retrieve_name(cmd, client, resource_group, service, name):
+    app = _app_get(cmd, client, resource_group, service, name)
+    deployment = app.properties.deployment
+    if not deployment:
+        raise CLIError('Deployment not found, create one by running "az spring-cloud tanzu app update -g {} -s {} -n {}"'.format(resource_group, service, name))
+    return deployment.name

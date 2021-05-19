@@ -38,8 +38,7 @@ def load_arguments(self, _):
     
     with self.argument_context('spring-cloud tanzu app create') as c:
         c.argument('assign_endpoint', arg_type=get_three_state_flag(),
-                   help='If true, assign endpoint URL for direct access.', default=False,
-                   options_list=['--assign-endpoint', c.deprecate(target='--is-public', redirect='--assign-endpoint', hide=True)])
+                   help='If true, assign endpoint URL for direct access.', default=False)
         c.argument('cpu', default='1',
                    help='Number of virtual cpu cores per instance.')
         c.argument('memory', default='1Gi',
@@ -50,12 +49,14 @@ def load_arguments(self, _):
 
     with self.argument_context('spring-cloud tanzu app update') as c:
         c.argument('assign_endpoint', arg_type=get_three_state_flag(),
-                   help='If true, assign endpoint URL for direct access.', default=False,
-                   options_list=['--assign-endpoint', c.deprecate(target='--is-public', redirect='--assign-endpoint', hide=True)])
+                   help='If true, assign endpoint URL for direct access.', default=False)
         c.argument('cpu', help='Number of virtual cpu cores per instance.')
         c.argument('memory', help='Number of GB of memory per instance.')
         c.argument('instance_count', type=int, help='Number of instance.', validator=validate_instance_count)
         c.argument('env', env_type)
+    
+    with self.argument_context('spring-cloud tanzu app deploy') as c:
+        c.argument('artifact-path', help='artifact path to deploy to this deployment')
 
     with self.argument_context('spring-cloud create') as c:
         c.argument('location', arg_type=get_location_type(self.cli_ctx), validator=validate_location)
