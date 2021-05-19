@@ -11,6 +11,7 @@ from ._transformers import (transform_spring_cloud_table_output,
                             transform_spring_cloud_deployment_output,
                             transform_spring_cloud_certificate_output,
                             transform_spring_cloud_custom_domain_output)
+from ._tanzu_transformer import (tanzu_app_table_output)
 
 
 # pylint: disable=too-many-statements
@@ -22,6 +23,13 @@ def load_command_table(self, _):
 
     with self.command_group('spring-cloud tanzu', tanzu_util) as g:
         g.command('show', 'tanzu_get')
+
+    with self.command_group('spring-cloud tanzu app', tanzu_util) as g:
+        g.command('list', 'tanzu_app_list', table_transformer=tanzu_app_table_output)
+        g.command('show', 'tanzu_app_get', table_transformer=tanzu_app_table_output)
+        g.command('delete', 'tanzu_app_delete',  supports_no_wait=True)
+        g.command('create', 'tanzu_app_create', table_transformer=tanzu_app_table_output, supports_no_wait=True)
+        g.command('update', 'tanzu_app_update', table_transformer=tanzu_app_table_output, supports_no_wait=True)
 
     with self.command_group('spring-cloud', client_factory=cf_app_services) as g:
         g.custom_command('create', 'spring_cloud_create', supports_no_wait=True, client_factory=cf_spring_cloud)

@@ -33,6 +33,30 @@ def load_arguments(self, _):
         c.argument('name', options_list=[
             '--name', '-n'], help='Name of Azure Spring Cloud.')
 
+    with self.argument_context('spring-cloud tanzu app') as c:
+        c.argument('service', service_name_type)
+    
+    with self.argument_context('spring-cloud tanzu app create') as c:
+        c.argument('assign_endpoint', arg_type=get_three_state_flag(),
+                   help='If true, assign endpoint URL for direct access.', default=False,
+                   options_list=['--assign-endpoint', c.deprecate(target='--is-public', redirect='--assign-endpoint', hide=True)])
+        c.argument('cpu', default='1',
+                   help='Number of virtual cpu cores per instance.')
+        c.argument('memory', default='1Gi',
+                   help='Number of GB of memory per instance.')
+        c.argument('instance_count', type=int,
+                   default=1, help='Number of instance.', validator=validate_instance_count)
+        c.argument('env', env_type)
+
+    with self.argument_context('spring-cloud tanzu app update') as c:
+        c.argument('assign_endpoint', arg_type=get_three_state_flag(),
+                   help='If true, assign endpoint URL for direct access.', default=False,
+                   options_list=['--assign-endpoint', c.deprecate(target='--is-public', redirect='--assign-endpoint', hide=True)])
+        c.argument('cpu', help='Number of virtual cpu cores per instance.')
+        c.argument('memory', help='Number of GB of memory per instance.')
+        c.argument('instance_count', type=int, help='Number of instance.', validator=validate_instance_count)
+        c.argument('env', env_type)
+
     with self.argument_context('spring-cloud create') as c:
         c.argument('location', arg_type=get_location_type(self.cli_ctx), validator=validate_location)
         c.argument('sku', type=str, validator=validate_sku, help='Name of SKU, the value is "Basic" or "Standard"')
