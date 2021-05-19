@@ -171,6 +171,172 @@ class AppResourceProperties(Model):
         self.provisioning_state = None
 
 
+class Build(ProxyResource):
+    """Build resource payload.
+
+    Variables are only populated by the server, and will be ignored when
+    sending a request.
+
+    :ivar id: Fully qualified resource Id for the resource.
+    :vartype id: str
+    :ivar name: The name of the resource.
+    :vartype name: str
+    :ivar type: The type of the resource.
+    :vartype type: str
+    :param properties: Properties of the build resource
+    :type properties:
+     ~azure.mgmt.appplatform.v2021_03_01_preview.models.BuildProperties
+    """
+
+    _validation = {
+        'id': {'readonly': True},
+        'name': {'readonly': True},
+        'type': {'readonly': True},
+    }
+
+    _attribute_map = {
+        'id': {'key': 'id', 'type': 'str'},
+        'name': {'key': 'name', 'type': 'str'},
+        'type': {'key': 'type', 'type': 'str'},
+        'properties': {'key': 'properties', 'type': 'BuildProperties'},
+    }
+
+    def __init__(self, *, properties=None, **kwargs) -> None:
+        super(Build, self).__init__(**kwargs)
+        self.properties = properties
+
+
+class BuildContainerImageReference(Model):
+    """The generated container image reference.
+
+    :param acr_name: The name of ACR
+    :type acr_name: str
+    :param image_name: The name of image
+    :type image_name: str
+    :param digest: The digest of this acr image
+    :type digest: str
+    :param tag: The tag of this acr image
+    :type tag: str
+    """
+
+    _attribute_map = {
+        'acr_name': {'key': 'AcrName', 'type': 'str'},
+        'image_name': {'key': 'ImageName', 'type': 'str'},
+        'digest': {'key': 'Digest', 'type': 'str'},
+        'tag': {'key': 'Tag', 'type': 'str'},
+    }
+
+    def __init__(self, *, acr_name: str=None, image_name: str=None, digest: str=None, tag: str=None, **kwargs) -> None:
+        super(BuildContainerImageReference, self).__init__(**kwargs)
+        self.acr_name = acr_name
+        self.image_name = image_name
+        self.digest = digest
+        self.tag = tag
+
+
+class BuildProperties(Model):
+    """Build resource properties payload.
+
+    :param builder: The name of builder to build the source code
+    :type builder: str
+    :param name: The name of this build
+    :type name: str
+    :param relative_path: The relative path of source code
+    :type relative_path: str
+    :param env: The environment variables for this build
+    :type env: dict[str, str]
+    :param triggered_build_result:  The build result triggered by this build
+    :type triggered_build_result:
+     ~azure.mgmt.appplatform.v2021_03_01_preview.models.TriggeredBuildResult
+    """
+
+    _attribute_map = {
+        'builder': {'key': 'Builder', 'type': 'str'},
+        'name': {'key': 'Name', 'type': 'str'},
+        'relative_path': {'key': 'RelativePath', 'type': 'str'},
+        'env': {'key': 'Env', 'type': '{str}'},
+        'triggered_build_result': {'key': 'TriggeredBuildResult', 'type': 'TriggeredBuildResult'},
+    }
+
+    def __init__(self, *, builder: str=None, name: str=None, relative_path: str=None, env=None, triggered_build_result=None, **kwargs) -> None:
+        super(BuildProperties, self).__init__(**kwargs)
+        self.builder = builder
+        self.name = name
+        self.relative_path = relative_path
+        self.env = env
+        self.triggered_build_result = triggered_build_result
+
+
+class BuildResult(ProxyResource):
+    """Build result resource payload.
+
+    Variables are only populated by the server, and will be ignored when
+    sending a request.
+
+    :ivar id: Fully qualified resource Id for the resource.
+    :vartype id: str
+    :ivar name: The name of the resource.
+    :vartype name: str
+    :ivar type: The type of the resource.
+    :vartype type: str
+    :param properties: Properties of the build result resource
+    :type properties:
+     ~azure.mgmt.appplatform.v2021_03_01_preview.models.BuildResultProperties
+    """
+
+    _validation = {
+        'id': {'readonly': True},
+        'name': {'readonly': True},
+        'type': {'readonly': True},
+    }
+
+    _attribute_map = {
+        'id': {'key': 'id', 'type': 'str'},
+        'name': {'key': 'name', 'type': 'str'},
+        'type': {'key': 'type', 'type': 'str'},
+        'properties': {'key': 'properties', 'type': 'BuildResultProperties'},
+    }
+
+    def __init__(self, *, properties=None, **kwargs) -> None:
+        super(BuildResult, self).__init__(**kwargs)
+        self.properties = properties
+
+
+class BuildResultProperties(Model):
+    """Build result resource properties payload.
+
+    Variables are only populated by the server, and will be ignored when
+    sending a request.
+
+    :param name: The name of this build result
+    :type name: str
+    :ivar status: Provisioning state of the KPack build result. Possible
+     values include: 'Queuing', 'Building', 'Succeeded', 'Failed', 'Deleting',
+     'Deleted'
+    :vartype status: str or
+     ~azure.mgmt.appplatform.v2021_03_01_preview.models.BuildResultProvisioningState
+    :param container_image_reference: The generated container image reference
+    :type container_image_reference:
+     ~azure.mgmt.appplatform.v2021_03_01_preview.models.BuildContainerImageReference
+    """
+
+    _validation = {
+        'status': {'readonly': True},
+    }
+
+    _attribute_map = {
+        'name': {'key': 'Name', 'type': 'str'},
+        'status': {'key': 'Status', 'type': 'str'},
+        'container_image_reference': {'key': 'ContainerImageReference', 'type': 'BuildContainerImageReference'},
+    }
+
+    def __init__(self, *, name: str=None, container_image_reference=None, **kwargs) -> None:
+        super(BuildResultProperties, self).__init__(**kwargs)
+        self.name = name
+        self.status = None
+        self.container_image_reference = container_image_reference
+
+
 class CloudError(Model):
     """An error response from the service.
 
@@ -230,6 +396,168 @@ class CloudErrorBody(Model):
         self.message = message
         self.target = target
         self.details = details
+
+
+class ConfigurationServiceGitPropertyValidateResult(Model):
+    """Validation result for configuration service settings.
+
+    :param is_valid: Indicate if the configuration service settings are valid
+    :type is_valid: bool
+    :param git_repos_validate_result: The detail validation results
+    :type git_repos_validate_result:
+     list[~azure.mgmt.appplatform.v2021_03_01_preview.models.ValidateMessages]
+    """
+
+    _attribute_map = {
+        'is_valid': {'key': 'isValid', 'type': 'bool'},
+        'git_repos_validate_result': {'key': 'gitReposValidateResult', 'type': '[ValidateMessages]'},
+    }
+
+    def __init__(self, *, is_valid: bool=None, git_repos_validate_result=None, **kwargs) -> None:
+        super(ConfigurationServiceGitPropertyValidateResult, self).__init__(**kwargs)
+        self.is_valid = is_valid
+        self.git_repos_validate_result = git_repos_validate_result
+
+
+class ConfigurationServiceProperties(Model):
+    """Application Configuration Service properties payload.
+
+    Variables are only populated by the server, and will be ignored when
+    sending a request.
+
+    :ivar provisioning_state: State of the Application Configuration Service.
+     Possible values include: 'Creating', 'Updating', 'Succeeded', 'Failed',
+     'Deleting', 'Deleted'
+    :vartype provisioning_state: str or
+     ~azure.mgmt.appplatform.v2021_03_01_preview.models.ConfigurationServiceProvisioningState
+    :param runtime_state:
+    :type runtime_state:
+     ~azure.mgmt.appplatform.v2021_03_01_preview.models.ConfigurationServiceRuntimeState
+    :param configuration_service_settings:
+    :type configuration_service_settings:
+     ~azure.mgmt.appplatform.v2021_03_01_preview.models.ConfigurationServiceSettings
+    """
+
+    _validation = {
+        'provisioning_state': {'readonly': True},
+    }
+
+    _attribute_map = {
+        'provisioning_state': {'key': 'provisioningState', 'type': 'str'},
+        'runtime_state': {'key': 'runtimeState', 'type': 'ConfigurationServiceRuntimeState'},
+        'configuration_service_settings': {'key': 'configurationServiceSettings', 'type': 'ConfigurationServiceSettings'},
+    }
+
+    def __init__(self, *, runtime_state=None, configuration_service_settings=None, **kwargs) -> None:
+        super(ConfigurationServiceProperties, self).__init__(**kwargs)
+        self.provisioning_state = None
+        self.runtime_state = runtime_state
+        self.configuration_service_settings = configuration_service_settings
+
+
+class ConfigurationServiceResource(ProxyResource):
+    """Application Configuration Service resource.
+
+    Variables are only populated by the server, and will be ignored when
+    sending a request.
+
+    :ivar id: Fully qualified resource Id for the resource.
+    :vartype id: str
+    :ivar name: The name of the resource.
+    :vartype name: str
+    :ivar type: The type of the resource.
+    :vartype type: str
+    :param properties:
+    :type properties:
+     ~azure.mgmt.appplatform.v2021_03_01_preview.models.ConfigurationServiceProperties
+    """
+
+    _validation = {
+        'id': {'readonly': True},
+        'name': {'readonly': True},
+        'type': {'readonly': True},
+    }
+
+    _attribute_map = {
+        'id': {'key': 'id', 'type': 'str'},
+        'name': {'key': 'name', 'type': 'str'},
+        'type': {'key': 'type', 'type': 'str'},
+        'properties': {'key': 'properties', 'type': 'ConfigurationServiceProperties'},
+    }
+
+    def __init__(self, *, properties=None, **kwargs) -> None:
+        super(ConfigurationServiceResource, self).__init__(**kwargs)
+        self.properties = properties
+
+
+class ConfigurationServiceRuntimeState(Model):
+    """Runtime state of the Application Configuration Service.
+
+    Variables are only populated by the server, and will be ignored when
+    sending a request.
+
+    :ivar cpu: Cpu allocated to each Application Configuration Service
+     instance
+    :vartype cpu: str
+    :ivar memory: Memory allocated to each Application Configuration Service
+     instance
+    :vartype memory: str
+    :ivar instance_count: Instance count of the Application Configuration
+     Service
+    :vartype instance_count: int
+    """
+
+    _validation = {
+        'cpu': {'readonly': True},
+        'memory': {'readonly': True},
+        'instance_count': {'readonly': True},
+    }
+
+    _attribute_map = {
+        'cpu': {'key': 'cpu', 'type': 'str'},
+        'memory': {'key': 'memory', 'type': 'str'},
+        'instance_count': {'key': 'instanceCount', 'type': 'int'},
+    }
+
+    def __init__(self, **kwargs) -> None:
+        super(ConfigurationServiceRuntimeState, self).__init__(**kwargs)
+        self.cpu = None
+        self.memory = None
+        self.instance_count = None
+
+
+class ConfigurationServiceSettings(Model):
+    """The settings of Application Configuration Service.
+
+    :param git_properties:
+    :type git_properties:
+     list[~azure.mgmt.appplatform.v2021_03_01_preview.models.GitPatternRepository]
+    """
+
+    _attribute_map = {
+        'git_properties': {'key': 'gitProperties', 'type': '[GitPatternRepository]'},
+    }
+
+    def __init__(self, *, git_properties=None, **kwargs) -> None:
+        super(ConfigurationServiceSettings, self).__init__(**kwargs)
+        self.git_properties = git_properties
+
+
+class ConfigurationServiceSettingsValidateResult(Model):
+    """Validation result for configuration service settings.
+
+    :param git_property_validate_result:
+    :type git_property_validate_result:
+     ~azure.mgmt.appplatform.v2021_03_01_preview.models.ConfigurationServiceGitPropertyValidateResult
+    """
+
+    _attribute_map = {
+        'git_property_validate_result': {'key': 'gitPropertyValidateResult', 'type': 'ConfigurationServiceGitPropertyValidateResult'},
+    }
+
+    def __init__(self, *, git_property_validate_result=None, **kwargs) -> None:
+        super(ConfigurationServiceSettingsValidateResult, self).__init__(**kwargs)
+        self.git_property_validate_result = git_property_validate_result
 
 
 class DeploymentInstance(Model):
@@ -387,6 +715,66 @@ class DeploymentSettings(Model):
         self.addon_config = addon_config
 
 
+class GitPatternRepository(Model):
+    """Git pattern repository property payload.
+
+    All required parameters must be populated in order to send to Azure.
+
+    :param uri: Required. URI of the repository
+    :type uri: str
+    :param patterns: Required. Collection of patterns of the repository, such
+     as {application}/{profile}
+    :type patterns: list[str]
+    :param label: Label of the repository
+    :type label: str
+    :param search_paths: Searching path of the repository
+    :type search_paths: list[str]
+    :param username: Username of git repository basic auth.
+    :type username: str
+    :param password: Password of git repository basic auth.
+    :type password: str
+    :param host_key: Public sshKey of git repository.
+    :type host_key: str
+    :param host_key_algorithm: SshKey algorithm of git repository.
+    :type host_key_algorithm: str
+    :param private_key: Private sshKey algorithm of git repository.
+    :type private_key: str
+    :param strict_host_key_checking: Strict host key checking or not.
+    :type strict_host_key_checking: bool
+    """
+
+    _validation = {
+        'uri': {'required': True},
+        'patterns': {'required': True},
+    }
+
+    _attribute_map = {
+        'uri': {'key': 'uri', 'type': 'str'},
+        'patterns': {'key': 'patterns', 'type': '[str]'},
+        'label': {'key': 'label', 'type': 'str'},
+        'search_paths': {'key': 'searchPaths', 'type': '[str]'},
+        'username': {'key': 'username', 'type': 'str'},
+        'password': {'key': 'password', 'type': 'str'},
+        'host_key': {'key': 'hostKey', 'type': 'str'},
+        'host_key_algorithm': {'key': 'hostKeyAlgorithm', 'type': 'str'},
+        'private_key': {'key': 'privateKey', 'type': 'str'},
+        'strict_host_key_checking': {'key': 'strictHostKeyChecking', 'type': 'bool'},
+    }
+
+    def __init__(self, *, uri: str, patterns, label: str=None, search_paths=None, username: str=None, password: str=None, host_key: str=None, host_key_algorithm: str=None, private_key: str=None, strict_host_key_checking: bool=None, **kwargs) -> None:
+        super(GitPatternRepository, self).__init__(**kwargs)
+        self.uri = uri
+        self.patterns = patterns
+        self.label = label
+        self.search_paths = search_paths
+        self.username = username
+        self.password = password
+        self.host_key = host_key
+        self.host_key_algorithm = host_key_algorithm
+        self.private_key = private_key
+        self.strict_host_key_checking = strict_host_key_checking
+
+
 class ResourceUploadDefinition(Model):
     """Resource upload definition payload.
 
@@ -410,9 +798,9 @@ class ResourceUploadDefinition(Model):
 class Sku(Model):
     """Sku of Azure Spring Cloud Tanzu.
 
-    :param name: Name of the Sku. Default value: "S0" .
+    :param name: Name of the Sku
     :type name: str
-    :param tier: Tier of the Sku. Default value: "Standard" .
+    :param tier: Tier of the Sku
     :type tier: str
     :param capacity: Current capacity of the target resource
     :type capacity: int
@@ -424,7 +812,7 @@ class Sku(Model):
         'capacity': {'key': 'capacity', 'type': 'int'},
     }
 
-    def __init__(self, *, name: str="S0", tier: str="Standard", capacity: int=None, **kwargs) -> None:
+    def __init__(self, *, name: str=None, tier: str=None, capacity: int=None, **kwargs) -> None:
         super(Sku, self).__init__(**kwargs)
         self.name = name
         self.tier = tier
@@ -538,6 +926,22 @@ class TanzuClusterResourceProperties(Model):
         self.provisioning_state = None
 
 
+class TriggeredBuildResult(Model):
+    """The build result triggered by a build.
+
+    :param id: The unique build id of this build result
+    :type id: str
+    """
+
+    _attribute_map = {
+        'id': {'key': 'Id', 'type': 'str'},
+    }
+
+    def __init__(self, *, id: str=None, **kwargs) -> None:
+        super(TriggeredBuildResult, self).__init__(**kwargs)
+        self.id = id
+
+
 class UserSourceInfo(Model):
     """Source information for a deployment.
 
@@ -553,3 +957,19 @@ class UserSourceInfo(Model):
     def __init__(self, *, build_iteration_id: str=None, **kwargs) -> None:
         super(UserSourceInfo, self).__init__(**kwargs)
         self.build_iteration_id = build_iteration_id
+
+
+class ValidateMessages(Model):
+    """Validate messages of the configuration service git repositories.
+
+    :param messages:
+    :type messages: list[str]
+    """
+
+    _attribute_map = {
+        'messages': {'key': 'messages', 'type': '[str]'},
+    }
+
+    def __init__(self, *, messages=None, **kwargs) -> None:
+        super(ValidateMessages, self).__init__(**kwargs)
+        self.messages = messages

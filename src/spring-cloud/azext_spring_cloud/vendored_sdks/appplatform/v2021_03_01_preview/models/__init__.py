@@ -13,10 +13,22 @@ try:
     from ._models_py3 import AddonProfile
     from ._models_py3 import AppResource
     from ._models_py3 import AppResourceProperties
+    from ._models_py3 import Build
+    from ._models_py3 import BuildContainerImageReference
+    from ._models_py3 import BuildProperties
+    from ._models_py3 import BuildResult
+    from ._models_py3 import BuildResultProperties
+    from ._models_py3 import ConfigurationServiceGitPropertyValidateResult
+    from ._models_py3 import ConfigurationServiceProperties
+    from ._models_py3 import ConfigurationServiceResource
+    from ._models_py3 import ConfigurationServiceRuntimeState
+    from ._models_py3 import ConfigurationServiceSettings
+    from ._models_py3 import ConfigurationServiceSettingsValidateResult
     from ._models_py3 import DeploymentInstance
     from ._models_py3 import DeploymentResource
     from ._models_py3 import DeploymentResourceProperties
     from ._models_py3 import DeploymentSettings
+    from ._models_py3 import GitPatternRepository
     from ._models_py3 import ProxyResource
     from ._models_py3 import Resource
     from ._models_py3 import ResourceUploadDefinition
@@ -24,15 +36,29 @@ try:
     from ._models_py3 import TanzuClusterResource
     from ._models_py3 import TanzuClusterResourceProperties
     from ._models_py3 import TrackedResource
+    from ._models_py3 import TriggeredBuildResult
     from ._models_py3 import UserSourceInfo
+    from ._models_py3 import ValidateMessages
 except (SyntaxError, ImportError):
     from ._models import AddonProfile
     from ._models import AppResource
     from ._models import AppResourceProperties
+    from ._models import Build
+    from ._models import BuildContainerImageReference
+    from ._models import BuildProperties
+    from ._models import BuildResult
+    from ._models import BuildResultProperties
+    from ._models import ConfigurationServiceGitPropertyValidateResult
+    from ._models import ConfigurationServiceProperties
+    from ._models import ConfigurationServiceResource
+    from ._models import ConfigurationServiceRuntimeState
+    from ._models import ConfigurationServiceSettings
+    from ._models import ConfigurationServiceSettingsValidateResult
     from ._models import DeploymentInstance
     from ._models import DeploymentResource
     from ._models import DeploymentResourceProperties
     from ._models import DeploymentSettings
+    from ._models import GitPatternRepository
     from ._models import ProxyResource
     from ._models import Resource
     from ._models import ResourceUploadDefinition
@@ -40,7 +66,9 @@ except (SyntaxError, ImportError):
     from ._models import TanzuClusterResource
     from ._models import TanzuClusterResourceProperties
     from ._models import TrackedResource
+    from ._models import TriggeredBuildResult
     from ._models import UserSourceInfo
+    from ._models import ValidateMessages
 from ._paged_models import AppResourcePaged
 from ._paged_models import DeploymentResourcePaged
 from ._app_platform_management_client_enums import (
@@ -48,16 +76,30 @@ from ._app_platform_management_client_enums import (
     AppResourceProvisioningState,
     DeploymentResourceProvisioningState,
     DeploymentResourceStatus,
+    ConfigurationServiceProvisioningState,
+    BuildResultProvisioningState,
 )
 
 __all__ = [
     'AddonProfile',
     'AppResource',
     'AppResourceProperties',
+    'Build',
+    'BuildContainerImageReference',
+    'BuildProperties',
+    'BuildResult',
+    'BuildResultProperties',
+    'ConfigurationServiceGitPropertyValidateResult',
+    'ConfigurationServiceProperties',
+    'ConfigurationServiceResource',
+    'ConfigurationServiceRuntimeState',
+    'ConfigurationServiceSettings',
+    'ConfigurationServiceSettingsValidateResult',
     'DeploymentInstance',
     'DeploymentResource',
     'DeploymentResourceProperties',
     'DeploymentSettings',
+    'GitPatternRepository',
     'ProxyResource',
     'Resource',
     'ResourceUploadDefinition',
@@ -65,11 +107,15 @@ __all__ = [
     'TanzuClusterResource',
     'TanzuClusterResourceProperties',
     'TrackedResource',
+    'TriggeredBuildResult',
     'UserSourceInfo',
+    'ValidateMessages',
     'AppResourcePaged',
     'DeploymentResourcePaged',
     'ProvisioningState',
     'AppResourceProvisioningState',
     'DeploymentResourceProvisioningState',
     'DeploymentResourceStatus',
+    'ConfigurationServiceProvisioningState',
+    'BuildResultProvisioningState',
 ]

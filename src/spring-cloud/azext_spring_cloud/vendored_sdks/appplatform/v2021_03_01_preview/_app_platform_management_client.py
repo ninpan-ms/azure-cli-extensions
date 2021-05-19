@@ -17,6 +17,7 @@ from .operations import TanzuServicesOperations
 from .operations import AppsOperations
 from .operations import DeploymentsOperations
 from .operations import BuildServiceOperations
+from .operations import ConfigurationServicesOperations
 from . import models
 
 
@@ -34,6 +35,8 @@ class AppPlatformManagementClient(SDKClient):
     :vartype deployments: azure.mgmt.appplatform.v2021_03_01_preview.operations.DeploymentsOperations
     :ivar build_service: BuildService operations
     :vartype build_service: azure.mgmt.appplatform.v2021_03_01_preview.operations.BuildServiceOperations
+    :ivar configuration_services: ConfigurationServices operations
+    :vartype configuration_services: azure.mgmt.appplatform.v2021_03_01_preview.operations.ConfigurationServicesOperations
 
     :param credentials: Credentials needed for the client to connect to Azure.
     :type credentials: :mod:`A msrestazure Credentials
@@ -63,4 +66,6 @@ class AppPlatformManagementClient(SDKClient):
         self.deployments = DeploymentsOperations(
             self._client, self.config, self._serialize, self._deserialize)
         self.build_service = BuildServiceOperations(
+            self._client, self.config, self._serialize, self._deserialize)
+        self.configuration_services = ConfigurationServicesOperations(
             self._client, self.config, self._serialize, self._deserialize)

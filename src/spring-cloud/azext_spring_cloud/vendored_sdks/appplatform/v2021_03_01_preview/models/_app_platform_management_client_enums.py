@@ -45,3 +45,23 @@ class DeploymentResourceStatus(str, Enum):
 
     stopped = "Stopped"
     running = "Running"
+
+
+class ConfigurationServiceProvisioningState(str, Enum):
+
+    creating = "Creating"
+    updating = "Updating"
+    succeeded = "Succeeded"
+    failed = "Failed"
+    deleting = "Deleting"
+    deleted = "Deleted"
+
+
+class BuildResultProvisioningState(str, Enum):
+
+    queuing = "Queuing"
+    building = "Building"
+    succeeded = "Succeeded"
+    failed = "Failed"
+    deleting = "Deleting"
+    deleted = "Deleted"
