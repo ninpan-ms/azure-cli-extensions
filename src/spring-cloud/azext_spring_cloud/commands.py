@@ -27,7 +27,7 @@ def load_command_table(self, _):
     with self.command_group('spring-cloud tanzu app', tanzu_util) as g:
         g.command('list', 'tanzu_app_list', table_transformer=tanzu_app_table_output)
         g.command('show', 'tanzu_app_get', table_transformer=tanzu_app_table_output)
-        g.command('delete', 'tanzu_app_delete',  supports_no_wait=True)
+        g.command('delete', 'tanzu_app_delete', supports_no_wait=True)
         g.command('create', 'tanzu_app_create', table_transformer=tanzu_app_table_output, supports_no_wait=True)
         g.command('update', 'tanzu_app_update', table_transformer=tanzu_app_table_output, supports_no_wait=True)
         g.command('start', 'tanzu_app_start', supports_no_wait=True)

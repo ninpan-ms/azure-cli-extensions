@@ -6,6 +6,7 @@ from knack.log import get_logger
 
 logger = get_logger(__name__)
 
+
 # pylint: disable=line-too-long
 def tanzu_app_table_output(result):
     is_list = isinstance(result, list)
@@ -29,6 +30,4 @@ def tanzu_app_table_output(result):
             item['CPU'] = deployment['properties']['deploymentSettings']['cpu']
             item['Memory'] = deployment['properties']['deploymentSettings']['memory']
             item['Running Instance'] = "{}/{}".format(running_number, instance_count) if isStarted else "Stopped"
-            item['Registered Instance'] = "{}/{}".format(up_number, instance_count) if isStarted else "Stopped"
-
     return result if is_list else result[0]

@@ -35,7 +35,7 @@ def load_arguments(self, _):
 
     with self.argument_context('spring-cloud tanzu app') as c:
         c.argument('service', service_name_type)
-    
+
     with self.argument_context('spring-cloud tanzu app create') as c:
         c.argument('assign_endpoint', arg_type=get_three_state_flag(),
                    help='If true, assign endpoint URL for direct access.', default=False)
@@ -54,7 +54,7 @@ def load_arguments(self, _):
         c.argument('memory', help='Number of GB of memory per instance.')
         c.argument('instance_count', type=int, help='Number of instance.', validator=validate_instance_count)
         c.argument('env', env_type)
-    
+
     with self.argument_context('spring-cloud tanzu app deploy') as c:
         c.argument('artifact-path', help='artifact path to deploy to this deployment.')
 
