@@ -56,7 +56,7 @@ def load_arguments(self, _):
         c.argument('env', env_type)
     
     with self.argument_context('spring-cloud tanzu app deploy') as c:
-        c.argument('artifact-path', help='artifact path to deploy to this deployment')
+        c.argument('artifact-path', help='artifact path to deploy to this deployment.')
 
     with self.argument_context('spring-cloud create') as c:
         c.argument('location', arg_type=get_location_type(self.cli_ctx), validator=validate_location)

@@ -25,10 +25,10 @@ def tanzu_app_list(cmd, client, resource_group, service):
     '''tanzu_app_list
     List app under a Tanzu service, together with the deployment 
     '''
-    apps = client.apps.list(resource_group, service)
-    deployments = client.deployments.list_for_cluster(resource_group, service)
+    apps = client.apps.list(resource_group, service).get(0) or []
+    deployments = client.deployments.list_for_cluster(resource_group, service).get(0) or []
     for app in apps:
-        app.properties.deployment = next(x for x in deployments if x.id.startswith(app.id))
+        app.properties.deployment = next((x for x in deployments if x.id.startswith(app.id)), None)
     return apps
 
 def tanzu_app_get(cmd, client, resource_group, service, name):
