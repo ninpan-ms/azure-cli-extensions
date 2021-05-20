@@ -19,7 +19,6 @@ from ._utils import _get_rg_location
 
 logger = get_logger(__name__)
 
-
 def validate_env(namespace):
     """ Extracts multiple space-separated envs in key[=value] format """
     if isinstance(namespace.env, list):
@@ -412,6 +411,17 @@ def validate_node_resource_group(namespace):
     _validate_resource_group_name(namespace.app_network_resource_group, 'app-network-resource-group')
 
 
+def validate_patterns(namespace):
+    pattern_list = namespace.patterns.split(',')
+    invalid_list = []
+    for pattern in pattern_list:
+        if not _is_valid_pattern(pattern):
+            invalid_list.append(pattern)
+    if len(invalid_list) > 0:
+        logger.warning('patterns "{}" are invalid'.format(','.join(invalid_list)))
+        raise CLIError('--patterns should be the collection of patterns separated by comma, each pattern in the format of \'application\' or \'application/profile\'')
+
+
 def _validate_resource_group_name(name, message_name):
     if not name:
         return
@@ -436,3 +446,21 @@ def _validate_route_table(namespace, vnet_obj):
             or (not app_route_table_id and runtime_route_table_id):
         raise CLIError(
             '--service-runtime-subnet and --app-subnet should both associate with different route tables or neither.')
+
+
+def _is_valid_pattern(pattern):
+    return _is_valid_app_name(pattern) or _is_valid_app_and_profile_name(pattern)
+
+
+def _is_valid_app_name(pattern):
+    matchObj = match(r"^[a-zA-Z][-_a-zA-Z0-9]*$", pattern)
+    return matchObj != None
+
+
+def _is_valid_profile_name(profile):
+    return profile == "*" or _is_valid_app_name(profile)
+
+
+def _is_valid_app_and_profile_name(pattern):
+    parts = pattern.split('/')
+    return len(parts) == 2 and _is_valid_app_name(parts[0]) and _is_valid_profile_name(parts[1])

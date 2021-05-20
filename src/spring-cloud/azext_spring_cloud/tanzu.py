@@ -14,6 +14,8 @@ logger = get_logger(__name__)
 DEFAULT_DEPLOYMENT_NAME = "default"
 DEPLOYMENT_CREATE_OR_UPDATE_SLEEP_INTERVAL = 5
 APP_CREATE_OR_UPDATE_SLEEP_INTERVAL = 2
+TANZU_CONFIGURATION_SERVICE_NAME = "ApplicationConfigurationService"
+TANZU_CONFIGURATION_SERVICE_PROPERTY_PATTERN = "pattern"
 
 
 def tanzu_get(cmd, client, resource_group, name):
@@ -84,6 +86,7 @@ def tanzu_app_update(cmd, client, resource_group, service, name,
                      memory=None,
                      instance_count=None,
                      env=None,
+                     patterns=None,
                      no_wait=False):
     '''tanzu_app_update
     Update an existing app, if the app doesn't exist, this command exit with error.
@@ -122,6 +125,10 @@ def tanzu_app_update(cmd, client, resource_group, service, name,
         deployment_properties.deployment_settings.memory = memory
     if env:
         deployment_properties.deployment_settings.environment_variables = env
+    if patterns:
+        deployment_properties.deployment_settings.addon_config = _set_pattern_for_deployment(patterns)
+    deployment_name = app.properties.deployment.name if app.properties.deployment else DEFAULT_DEPLOYMENT_NAME
+    sku = app_properties.deployment.sku if app_properties.deployment else models.Sku(capacity=1)
     if instance_count:
         deployment_sku.capacity = instance_count
     return _app_create_or_update(cmd, client, resource_group, service, name, deployment_name,
@@ -171,6 +178,22 @@ def tanzu_app_deploy(cmd, client, resource_group, service, name, artifact_path, 
     # todo (qingyi)
     build_result_id = ''
     return client.deployments.deploy(resource_group, service, name, deployment_name, build_result_id=build_result_id)
+
+
+def tanzu_configuration_service_bind_app(cmd, client, resource_group, service, app_name):
+    '''tanzu_configuration_service_bind_app
+    Bind Application Configuration Service to an existing app to enable functionality.
+    If the app doesn't exist, this command exit with error.
+    '''
+    _tcs_bind_or_unbind_app(cmd, client, resource_group, service, app_name, True)
+
+
+def tanzu_configuration_service_unbind_app(cmd, client, resource_group, service, app_name):
+    '''tanzu_configuration_service_unbind_app
+    Unbind Application Configuration Service to an existing app to disable functionality.
+    If the app doesn't exist, this command exit with error.
+    '''
+    _tcs_bind_or_unbind_app(cmd, client, resource_group, service, app_name, False)
 
 
 def _app_create_or_update(cmd, client, resource_group, service, app_name, deployment_name,
@@ -233,3 +256,30 @@ def _assert_deployment_exist_and_retrieve_name(cmd, client, resource_group, serv
         raise CLIError('Deployment not found, create one by running "az spring-cloud tanzu app '
                        'update -g {} -s {} -n {}"'.format(resource_group, service, name))
     return deployment.name
+
+
+def _set_pattern_for_deployment(patterns):
+    return {
+        TANZU_CONFIGURATION_SERVICE_NAME: models.AddonProfile(
+            properties = {
+                TANZU_CONFIGURATION_SERVICE_PROPERTY_PATTERN: patterns
+            }
+        )
+    }
+
+
+def _tcs_bind_or_unbind_app(cmd, client, resource_group, service, app_name, enabled):
+    try:
+        app = _app_get(cmd, client, resource_group, service, app_name)
+        previous = app.properties.addon_config[TANZU_CONFIGURATION_SERVICE_NAME].enabled
+        app.properties.addon_config[TANZU_CONFIGURATION_SERVICE_NAME] = models.AddonProfile(
+            enabled=enabled
+        )
+        if (enabled != previous):
+            return client.apps.create_or_update(resource_group, service, app_name, app.properties)
+        elif (enabled):
+            logger.warning('app {} has been binded'.format(app_name))
+        else:
+            logger.warning('app {} has been unbinded'.format(app_name))
+    except CloudError:
+        raise CLIError('App {} not exists'.format(app_name))
