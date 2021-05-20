@@ -411,14 +411,11 @@ def validate_node_resource_group(namespace):
     _validate_resource_group_name(namespace.app_network_resource_group, 'app-network-resource-group')
 
 
-def validate_patterns(namespace):
+def validate_tanzu_configuration_service_patterns(namespace):
     pattern_list = namespace.patterns.split(',')
-    invalid_list = []
-    for pattern in pattern_list:
-        if not _is_valid_pattern(pattern):
-            invalid_list.append(pattern)
-    if len(invalid_list) > 0:
-        logger.warning('patterns "{}" are invalid'.format(','.join(invalid_list)))
+    invalid_list = [p for p in pattern_list if not _is_valid_pattern(p)]
+    if invalid_list:
+        logger.warning('patterns "%s" are invalid', ','.join(invalid_list))
         raise CLIError('--patterns should be the collection of patterns separated by comma, each pattern in the format of \'application\' or \'application/profile\'')
 
 
@@ -453,8 +450,7 @@ def _is_valid_pattern(pattern):
 
 
 def _is_valid_app_name(pattern):
-    matchObj = match(r"^[a-zA-Z][-_a-zA-Z0-9]*$", pattern)
-    return matchObj != None
+    return match(r"^[a-zA-Z][-_a-zA-Z0-9]*$", pattern) is not None
 
 
 def _is_valid_profile_name(profile):

@@ -269,17 +269,15 @@ def _set_pattern_for_deployment(patterns):
 
 
 def _tcs_bind_or_unbind_app(cmd, client, resource_group, service, app_name, enabled):
-    try:
-        app = _app_get(cmd, client, resource_group, service, app_name)
-        previous = app.properties.addon_config[TANZU_CONFIGURATION_SERVICE_NAME].enabled
-        app.properties.addon_config[TANZU_CONFIGURATION_SERVICE_NAME] = models.AddonProfile(
-            enabled=enabled
-        )
-        if (enabled != previous):
-            return client.apps.create_or_update(resource_group, service, app_name, app.properties)
-        elif (enabled):
-            logger.warning('app {} has been binded'.format(app_name))
-        else:
-            logger.warning('app {} has been unbinded'.format(app_name))
-    except CloudError:
-        raise CLIError('App {} not exists'.format(app_name))
+    # todo: replace put with patch for app update
+    app = _app_get(cmd, client, resource_group, service, app_name)
+    app.properties.addon_config = {
+        TANZU_CONFIGURATION_SERVICE_NAME: models.AddonProfile()
+    } if app.properties.addon_config is None else app.properties.addon_config
+
+    if app.properties.addon_config.get(TANZU_CONFIGURATION_SERVICE_NAME).enabled == enabled:
+        logger.warning('App {} has been {}binded'.format(app_name, '' if enabled else 'un'))
+        return
+
+    app.properties.addon_config[TANZU_CONFIGURATION_SERVICE_NAME].enabled = enabled
+    return client.apps.create_or_update(resource_group, service, app_name, app.properties)
