@@ -570,27 +570,27 @@ class DeploymentInstance(Model):
     :vartype name: str
     :ivar status: Status of the deployment instance
     :vartype status: str
-    :ivar deployed_time: Deployed time of the deployment instance
-    :vartype deployed_time: str
+    :ivar start_time: Deployed time of the deployment instance
+    :vartype start_time: str
     """
 
     _validation = {
         'name': {'readonly': True},
         'status': {'readonly': True},
-        'deployed_time': {'readonly': True},
+        'start_time': {'readonly': True},
     }
 
     _attribute_map = {
         'name': {'key': 'name', 'type': 'str'},
         'status': {'key': 'status', 'type': 'str'},
-        'deployed_time': {'key': 'deployedTime', 'type': 'str'},
+        'start_time': {'key': 'startTime', 'type': 'str'},
     }
 
     def __init__(self, **kwargs) -> None:
         super(DeploymentInstance, self).__init__(**kwargs)
         self.name = None
         self.status = None
-        self.deployed_time = None
+        self.start_time = None
 
 
 class DeploymentResource(ProxyResource):
@@ -945,18 +945,18 @@ class TriggeredBuildResult(Model):
 class UserSourceInfo(Model):
     """Source information for a deployment.
 
-    :param build_iteration_id: Resource id of a succeeded build iteration to
-     deploy to this deployment.
-    :type build_iteration_id: str
+    :param build_result_id: Resource id of a succeeded build result to deploy
+     to this deployment.
+    :type build_result_id: str
     """
 
     _attribute_map = {
-        'build_iteration_id': {'key': 'buildIterationId', 'type': 'str'},
+        'build_result_id': {'key': 'buildResultId', 'type': 'str'},
     }
 
-    def __init__(self, *, build_iteration_id: str=None, **kwargs) -> None:
+    def __init__(self, *, build_result_id: str=None, **kwargs) -> None:
         super(UserSourceInfo, self).__init__(**kwargs)
-        self.build_iteration_id = build_iteration_id
+        self.build_result_id = build_result_id
 
 
 class ValidateMessages(Model):

@@ -748,8 +748,8 @@ class DeploymentsOperations(object):
 
 
     def _deploy_initial(
-            self, resource_group_name, service_name, app_name, deployment_name, build_iteration_id=None, custom_headers=None, raw=False, **operation_config):
-        deployment_deploy_request = models.UserSourceInfo(build_iteration_id=build_iteration_id)
+            self, resource_group_name, service_name, app_name, deployment_name, build_result_id=None, custom_headers=None, raw=False, **operation_config):
+        deployment_deploy_request = models.UserSourceInfo(build_result_id=build_result_id)
 
         # Construct URL
         url = self.deploy.metadata['url']
@@ -793,7 +793,7 @@ class DeploymentsOperations(object):
             return client_raw_response
 
     def deploy(
-            self, resource_group_name, service_name, app_name, deployment_name, build_iteration_id=None, custom_headers=None, raw=False, polling=True, **operation_config):
+            self, resource_group_name, service_name, app_name, deployment_name, build_result_id=None, custom_headers=None, raw=False, polling=True, **operation_config):
         """Restart the deployment.
 
         :param resource_group_name: The name of the resource group that
@@ -806,9 +806,9 @@ class DeploymentsOperations(object):
         :type app_name: str
         :param deployment_name: The name of the Deployment resource.
         :type deployment_name: str
-        :param build_iteration_id: Resource id of a succeeded build iteration
-         to deploy to this deployment.
-        :type build_iteration_id: str
+        :param build_result_id: Resource id of a succeeded build result to
+         deploy to this deployment.
+        :type build_result_id: str
         :param dict custom_headers: headers that will be added to the request
         :param bool raw: The poller return type is ClientRawResponse, the
          direct response alongside the deserialized response
@@ -825,7 +825,7 @@ class DeploymentsOperations(object):
             service_name=service_name,
             app_name=app_name,
             deployment_name=deployment_name,
-            build_iteration_id=build_iteration_id,
+            build_result_id=build_result_id,
             custom_headers=custom_headers,
             raw=True,
             **operation_config

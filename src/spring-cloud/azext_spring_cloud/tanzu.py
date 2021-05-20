@@ -170,7 +170,7 @@ def tanzu_app_deploy(cmd, client, resource_group, service, name, artifact_path, 
     deployment_name = _assert_deployment_exist_and_retrieve_name(cmd, client, resource_group, service, name)
     # todo (qingyi)
     build_result_id = ''
-    return client.deployments.deploy(resource_group, service, name, deployment_name, build_iteration_id=build_result_id)
+    return client.deployments.deploy(resource_group, service, name, deployment_name, build_result_id=build_result_id)
 
 
 def _app_create_or_update(cmd, client, resource_group, service, app_name, deployment_name,
