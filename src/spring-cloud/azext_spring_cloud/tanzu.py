@@ -193,14 +193,18 @@ def _app_create_or_update(cmd, client, resource_group, service, app_name, deploy
         sleep(APP_CREATE_OR_UPDATE_SLEEP_INTERVAL)
     logger.warning('[2/{}] {} deployment {} under app {}. This may take a few minutes.'
                    .format(total_step, operation, deployment_name, app_name))
-    poller = client.deployments.create_or_update(resource_group, service, app_name, deployment_name,
+    deployment_poller = client.deployments.create_or_update(resource_group, service, app_name, deployment_name,
                                                  properties=deployment_properties, sku=deployment_sku)
     # Finally set the app.properties.public as requested
     if is_public and create_deployment:
         logger.warning('[3/{}] Assign endpoint for app {}.'.format(total_step, app_name))
         app_properties.public = True
-        client.apps.create_or_update(resource_group, service, app_name, app_properties)
-    return poller
+        poller = client.apps.create_or_update(resource_group, service, app_name, app_properties)
+    if no_wait:
+        return deployment_poller
+    while not poller.done() or not deployment_poller.done():
+        sleep(APP_CREATE_OR_UPDATE_SLEEP_INTERVAL)
+    return _app_get(cmd, client, resource_group, service, app_name)
 
 
 def _app_get(cmd, client, resource_group, service, name):
