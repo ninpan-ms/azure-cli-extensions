@@ -103,20 +103,30 @@ def tanzu_app_update(cmd, client, resource_group, service, name,
     app_properties = app.properties
     if assign_endpoint is not None:
         app_properties.public = assign_endpoint
-    deployment_properties = app_properties.deployment.properties \
-        if app_properties.deployment else _get_default_settings()
+
+    # Create new deployment if not exist
+    create_deployment = True
+    deployment_name = DEFAULT_DEPLOYMENT_NAME
+    deployment_properties = _get_default_settings()
+    deployment_sku = models.Sku(capacity=1)
+    if app.properties.deployment:
+        # Found existing deployment
+        create_deployment = False
+        deployment_name = app.properties.deployment.name
+        deployment_properties = app.properties.deployment.properties
+        deployment_sku = app.properties.deployment.sku
+    # Merge properties from argument
     if cpu:
         deployment_properties.deployment_settings.cpu = cpu
     if memory:
         deployment_properties.deployment_settings.memory = memory
     if env:
         deployment_properties.deployment_settings.environment_variables = env
-    deployment_name = app.properties.deployment.name if app.properties.deployment else DEFAULT_DEPLOYMENT_NAME
-    sku = app_properties.deployment.sku if app_properties.deployment else models.Sku(capacity=1)
     if instance_count:
-        sku.capacity = sku
+        deployment_sku.capacity = instance_count
     return _app_create_or_update(cmd, client, resource_group, service, name, deployment_name,
-                                 app_properties, deployment_properties, sku, no_wait)
+                                 app_properties, deployment_properties, deployment_sku, no_wait,
+                                 create_deployment=create_deployment)
 
 
 def tanzu_app_start(cmd, client, resource_group, service, name, no_wait=None):
@@ -165,18 +175,32 @@ def tanzu_app_deploy(cmd, client, resource_group, service, name, artifact_path, 
 
 def _app_create_or_update(cmd, client, resource_group, service, app_name, deployment_name,
                           app_properties, deployment_properties, deployment_sku,
-                          no_wait, operation_name='Updating'):
+                          no_wait, operation='Updating', create_deployment=True):
     '''_app_create_or_update
     Create or Update an app and deployment under that app
     '''
-    logger.warning('[1/2] {} app {}'.format(operation_name, app_name))
+    total_step = 2
+    # app.properties.public can be set to True only if there is a deployment exist
+    is_public = app_properties.public
+    if is_public and create_deployment:
+        logger.debug("There is no deployment under app {}, temp set app.public to False".format(app_name))
+        total_step = 3
+        app_properties.public = False
+    logger.warning('[1/{}] {} app {}'.format(total_step, operation, app_name))
     poller = client.apps.create_or_update(
         resource_group, service, app_name, app_properties)
     while not poller.done():
         sleep(APP_CREATE_OR_UPDATE_SLEEP_INTERVAL)
-    logger.warning('[2/2] {} deployment {} under app {}'.format(operation_name, deployment_name, app_name))
-    return client.deployments.create_or_update(resource_group, service, app_name, deployment_name,
-                                               properties=deployment_properties, sku=deployment_sku)
+    logger.warning('[2/{}] {} deployment {} under app {}. This may take a few minutes.'
+                   .format(total_step, operation, deployment_name, app_name))
+    poller = client.deployments.create_or_update(resource_group, service, app_name, deployment_name,
+                                                 properties=deployment_properties, sku=deployment_sku)
+    # Finally set the app.properties.public as requested
+    if is_public and create_deployment:
+        logger.warning('[3/{}] Assign endpoint for app {}.'.format(total_step, app_name))
+        app_properties.public = True
+        client.apps.create_or_update(resource_group, service, app_name, app_properties)
+    return poller
 
 
 def _app_get(cmd, client, resource_group, service, name):
@@ -202,6 +226,6 @@ def _assert_deployment_exist_and_retrieve_name(cmd, client, resource_group, serv
     app = _app_get(cmd, client, resource_group, service, name)
     deployment = app.properties.deployment
     if not deployment:
-        raise CLIError('Deployment not found, create one by running "az spring-cloud tanzu app " \
-            "update -g {} -s {} -n {}"'.format(resource_group, service, name))
+        raise CLIError('Deployment not found, create one by running "az spring-cloud tanzu app '
+                       'update -g {} -s {} -n {}"'.format(resource_group, service, name))
     return deployment.name

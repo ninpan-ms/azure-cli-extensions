@@ -11,6 +11,81 @@ helps['spring-cloud'] = """
     short-summary: Commands to manage Azure Spring Cloud.
 """
 
+helps['spring-cloud tanzu'] = """
+    type: group
+    short-summary: Commands to manage Azure Spring Cloud Tanzu.
+"""
+
+helps['spring-cloud tanzu show'] = """
+    type: command
+    short-summary: Show Azure Spring Cloud Tanzu Tier.
+"""
+
+helps['spring-cloud tanzu app'] = """
+    type: group
+    short-summary: Commands to manage Azure Spring Cloud Tanzu apps.
+"""
+
+helps['spring-cloud tanzu app create'] = """
+    type: command
+    short-summary: Create Azure Spring Cloud Tanzu app together with deployment.
+    examples:
+    - name: Create a default Tanzu app
+      text: az spring-cloud tanzu app create -g myresourcegroup -s myservice -n myapp
+    - name: Create a Tanzu app with specific Cpu
+      text: az spring-cloud tanzu app create -g myresourcegroup -s myservice -n myapp --cpu 2
+"""
+
+helps['spring-cloud tanzu app update'] = """
+    type: command
+    short-summary: Update Azure Spring Cloud Tanzu app together with deployment.
+    examples:
+    - name: Update a default Tanzu app
+      text: az spring-cloud tanzu app update -g myresourcegroup -s myservice -n myapp
+    - name: Update a Tanzu app with specific Cpu
+      text: az spring-cloud tanzu app update -g myresourcegroup -s myservice -n myapp --cpu 2
+    - name: Expose a Tanzu app to Internet
+      text: az spring-cloud tanzu app update -g myresourcegroup -s myservice -n myapp --assign-endpoint True
+"""
+
+helps['spring-cloud tanzu app show'] = """
+    type: command
+    short-summary: Show Azure Spring Cloud Tanzu app with deployment.
+"""
+
+helps['spring-cloud tanzu app delete'] = """
+    type: command
+    short-summary: Delete Azure Spring Cloud Tanzu app with deployment.
+"""
+
+helps['spring-cloud tanzu app list'] = """
+    type: command
+    short-summary: List Azure Spring Cloud Tanzu apps with deployments.
+"""
+
+helps['spring-cloud tanzu app start'] = """
+    type: command
+    short-summary: Start Azure Spring Cloud Tanzu app's deployment.
+"""
+
+helps['spring-cloud tanzu app stop'] = """
+    type: command
+    short-summary: Stop Azure Spring Cloud Tanzu app's deployment.
+"""
+
+helps['spring-cloud tanzu app restart'] = """
+    type: command
+    short-summary: Restart Azure Spring Cloud Tanzu app's deployment.
+"""
+
+helps['spring-cloud tanzu app deploy'] = """
+    type: command
+    short-summary: Deploy local artifact to Azure Spring Cloud Tanzu app's deployment.
+    examples:
+    - name: Deploy a Tanzu app's deployment with Jar file
+      text: az spring-cloud tanzu app deploy -g myresourcegroup -s myservice -n myapp --artifact-path <my-Jar>
+"""
+
 helps['spring-cloud create'] = """
     type: command
     short-summary: Create an Azure Spring Cloud.
