@@ -86,6 +86,27 @@ helps['spring-cloud tanzu app deploy'] = """
       text: az spring-cloud tanzu app deploy -g myresourcegroup -s myservice -n myapp --artifact-path <my-Jar>
 """
 
+helps['spring-cloud tanzu application-configuration-service'] = """
+    type: group
+    short-summary: Commands to manage Azure Spring Cloud Tanzu application-configuration-service.
+"""
+
+helps['spring-cloud tanzu application-configuration-service bind'] = """
+    type: command
+    short-summary: Bind app to Tanzu Application Configuration Service.
+    examples:
+    - name: Bind an app to Tanzu Application Configuration Service
+      text: az spring-cloud tanzu application-configuration-service bind -g myresourcegroup -s myservice --app myapp
+"""
+
+helps['spring-cloud tanzu application-configuration-service unbind'] = """
+    type: command
+    short-summary: Unbind app to Tanzu Application Configuration Service.
+    examples:
+    - name: Unbind an app to Tanzu Application Configuration Service
+      text: az spring-cloud tanzu application-configuration-service unbind -g myresourcegroup -s myservice --app myapp
+"""
+
 helps['spring-cloud create'] = """
     type: command
     short-summary: Create an Azure Spring Cloud.

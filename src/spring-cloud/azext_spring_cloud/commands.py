@@ -35,6 +35,10 @@ def load_command_table(self, _):
         g.command('restart', 'tanzu_app_restart', supports_no_wait=True)
         g.command('deploy', 'tanzu_app_deploy', supports_no_wait=True)
 
+    with self.command_group('spring-cloud tanzu application-configuration-service', tanzu_util) as g:
+        g.command('bind', 'tanzu_configuration_service_bind_app')
+        g.command('unbind', 'tanzu_configuration_service_unbind_app')
+
     with self.command_group('spring-cloud', client_factory=cf_app_services) as g:
         g.custom_command('create', 'spring_cloud_create', supports_no_wait=True, client_factory=cf_spring_cloud)
         g.custom_command('update', 'spring_cloud_update', supports_no_wait=True, client_factory=cf_spring_cloud)

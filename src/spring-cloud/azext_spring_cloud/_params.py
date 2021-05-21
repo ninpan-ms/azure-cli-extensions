@@ -12,7 +12,7 @@ from ._validators import (validate_env, validate_cosmos_type, validate_resource_
                           validate_log_limit, validate_log_since, validate_sku, validate_jvm_options,
                           validate_vnet, validate_vnet_required_parameters, validate_node_resource_group,
                           validate_tracing_parameters, validate_app_insights_parameters, validate_java_agent_parameters,
-                          validate_instance_count)
+                          validate_instance_count, validate_tanzu_configuration_service_patterns)
 from ._utils import ApiType
 
 from .vendored_sdks.appplatform.v2020_07_01.models import RuntimeVersion, TestKeyType
@@ -54,9 +54,19 @@ def load_arguments(self, _):
         c.argument('memory', help='Number of GB of memory per instance.')
         c.argument('instance_count', type=int, help='Number of instance.', validator=validate_instance_count)
         c.argument('env', env_type)
+        c.argument('patterns', type=str, help='Collection of patterns separate with \',\'', validator=validate_tanzu_configuration_service_patterns)
 
     with self.argument_context('spring-cloud tanzu app deploy') as c:
         c.argument('artifact-path', help='artifact path to deploy to this deployment.')
+
+    with self.argument_context('spring-cloud tanzu application-configuration-service') as c:
+        c.argument('service', service_name_type)
+
+    with self.argument_context('spring-cloud tanzu application-configuration-service bind') as c:
+        c.argument('app', app_name_type, help='Name of app to be binded with Application Configuration Service.', validator=validate_app_name)
+
+    with self.argument_context('spring-cloud tanzu application-configuration-service unbind') as c:
+        c.argument('app', app_name_type, help='Name of app to be unbinded with Application Configuration Service.', validator=validate_app_name)
 
     with self.argument_context('spring-cloud create') as c:
         c.argument('location', arg_type=get_location_type(self.cli_ctx), validator=validate_location)
