@@ -19,6 +19,7 @@ from ._utils import _get_rg_location
 
 logger = get_logger(__name__)
 
+
 def validate_env(namespace):
     """ Extracts multiple space-separated envs in key[=value] format """
     if isinstance(namespace.env, list):
