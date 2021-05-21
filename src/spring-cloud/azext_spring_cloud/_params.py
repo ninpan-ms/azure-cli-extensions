@@ -57,7 +57,9 @@ def load_arguments(self, _):
         c.argument('patterns', type=str, help='Collection of patterns separate with \',\'', validator=validate_tanzu_configuration_service_patterns)
 
     with self.argument_context('spring-cloud tanzu app deploy') as c:
-        c.argument('artifact-path', help='artifact path to deploy to this deployment.')
+        c.argument('artifact-path', help='artifact path to deploy to this deployment')
+        c.argument(
+                'target_module', help='Child module to be deployed, required for multiple jar packages built from source code.')
 
     with self.argument_context('spring-cloud tanzu application-configuration-service') as c:
         c.argument('service', service_name_type)

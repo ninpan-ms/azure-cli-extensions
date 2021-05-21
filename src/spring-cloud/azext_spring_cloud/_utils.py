@@ -20,6 +20,10 @@ from ._client_factory import cf_resource_groups
 
 logger = get_logger(__name__)
 
+def _get_tanzu_upload_local_file():
+    file_path = os.path.join(tempfile.gettempdir(), 'build_archive_{}.tar.gz'.format(uuid.uuid4().hex))
+    _pack_source_code(os.getcwd(), file_path)
+    return file_path
 
 def _get_upload_local_file(runtime_version, artifact_path=None):
     file_path = artifact_path

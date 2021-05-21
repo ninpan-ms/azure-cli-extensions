@@ -9,6 +9,9 @@ from knack.util import CLIError
 from knack.log import get_logger
 from msrestazure.azure_exceptions import CloudError
 from .vendored_sdks.appplatform.v2021_03_01_preview import models
+from ._utils import _get_tanzu_upload_local_file, get_azure_files_info
+from .azure_storage_file import FileService
+from msrestazure.tools import parse_resource_id
 
 logger = get_logger(__name__)
 DEFAULT_DEPLOYMENT_NAME = "default"
@@ -162,8 +165,7 @@ def tanzu_app_stop(cmd, client, resource_group, service, name, no_wait=None):
     deployment_name = _assert_deployment_exist_and_retrieve_name(cmd, client, resource_group, service, name)
     return client.deployments.stop(resource_group, service, name, deployment_name)
 
-
-def tanzu_app_deploy(cmd, client, resource_group, service, name, artifact_path, no_wait=None):
+def tanzu_app_deploy(cmd, client, resource_group, service, name, artifact_path=None, target_module=None, no_wait=None):
     '''tanzu_app_deploy
     Deploy artifact to deployment under the existing app.
     Throw exception if app or deployment not found.
@@ -175,8 +177,52 @@ def tanzu_app_deploy(cmd, client, resource_group, service, name, artifact_path, 
     5. Send build result id to deployment
     '''
     deployment_name = _assert_deployment_exist_and_retrieve_name(cmd, client, resource_group, service, name)
-    # todo (qingyi)
-    build_result_id = ''
+    # get upload url
+    upload_url = None
+    relative_path = None
+    logger.warning("[1/5] Requesting for upload URL")
+    try:
+        response = client.build_service.get_upload_url(resource_group, service)
+        upload_url = response.upload_url
+        relative_path = response.relative_path
+    except (AttributeError, CloudError) as e:
+        raise CLIError("Failed to get a SAS URL to upload context. Error: {}".format(e.message))
+    # upload file
+    if not upload_url:
+        raise CLIError("Failed to get a SAS URL to upload context.")
+    account_name, endpoint_suffix, share_name, relative_name, sas_token = get_azure_files_info(upload_url)
+    logger.warning("[2/5] Uploading package to blob")
+    path = None
+    if artifact_path:
+        path = artifact_path
+    else:
+        path = _get_tanzu_upload_local_file()
+    file_service = FileService(account_name, sas_token=sas_token, endpoint_suffix=endpoint_suffix)
+    file_service.create_file_from_path(share_name, None, relative_name, path)
+    properties = models.BuildProperties(
+        builder="default-tanzu-builder",
+        name=name,
+        relative_path=relative_path,
+        env={"BP_JVM_VERSION": "8.*", "BP_MAVEN_BUILT_MODULE": target_module} if target_module else None)
+    # create or update build
+    logger.warning("[3/5] Creating or Updating build '{}' (this operation can take a while to complete)".format(name))
+    build_result_id = None
+    try:
+        response = client.build_service.create_or_update_build(resource_group, service, name, properties)
+        build_result_id = response.properties.triggered_build_result.id
+        build_result_name = parse_resource_id(build_result_id)["resource_name"]
+    except (AttributeError, CloudError) as e:
+        raise CLIError("Failed to create or update a build. Error: {}".format(e.message))
+    # get build result
+    logger.warning("[4/5] Waiting build finish")
+    result = client.build_service.get_build_result(resource_group, service, name, build_result_name)
+    while result.properties.status == "Building" or result.properties.status == "Queuing":
+        sleep(5)
+        result = client.build_service.get_build_result(resource_group, service, name, build_result_name)
+    if result.properties.status != "Succeeded":
+        raise CLIError("Failed to get a successful build result.")
+
+    logger.warning("[5/5] Deploying build result to deployment {} under app {}".format(deployment_name, name))
     return client.deployments.deploy(resource_group, service, name, deployment_name, build_result_id=build_result_id)
 
 

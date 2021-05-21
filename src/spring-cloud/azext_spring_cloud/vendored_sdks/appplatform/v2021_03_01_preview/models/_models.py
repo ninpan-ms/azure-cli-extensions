@@ -220,10 +220,10 @@ class BuildContainerImageReference(Model):
     """
 
     _attribute_map = {
-        'acr_name': {'key': 'AcrName', 'type': 'str'},
-        'image_name': {'key': 'ImageName', 'type': 'str'},
-        'digest': {'key': 'Digest', 'type': 'str'},
-        'tag': {'key': 'Tag', 'type': 'str'},
+        'acr_name': {'key': 'acrName', 'type': 'str'},
+        'image_name': {'key': 'imageName', 'type': 'str'},
+        'digest': {'key': 'digest', 'type': 'str'},
+        'tag': {'key': 'tag', 'type': 'str'},
     }
 
     def __init__(self, **kwargs):
@@ -251,11 +251,11 @@ class BuildProperties(Model):
     """
 
     _attribute_map = {
-        'builder': {'key': 'Builder', 'type': 'str'},
-        'name': {'key': 'Name', 'type': 'str'},
-        'relative_path': {'key': 'RelativePath', 'type': 'str'},
-        'env': {'key': 'Env', 'type': '{str}'},
-        'triggered_build_result': {'key': 'TriggeredBuildResult', 'type': 'TriggeredBuildResult'},
+        'builder': {'key': 'builder', 'type': 'str'},
+        'name': {'key': 'name', 'type': 'str'},
+        'relative_path': {'key': 'relativePath', 'type': 'str'},
+        'env': {'key': 'env', 'type': '{str}'},
+        'triggered_build_result': {'key': 'triggeredBuildResult', 'type': 'TriggeredBuildResult'},
     }
 
     def __init__(self, **kwargs):
@@ -325,9 +325,9 @@ class BuildResultProperties(Model):
     }
 
     _attribute_map = {
-        'name': {'key': 'Name', 'type': 'str'},
-        'status': {'key': 'Status', 'type': 'str'},
-        'container_image_reference': {'key': 'ContainerImageReference', 'type': 'BuildContainerImageReference'},
+        'name': {'key': 'name', 'type': 'str'},
+        'status': {'key': 'status', 'type': 'str'},
+        'container_image_reference': {'key': 'containerImageReference', 'type': 'BuildContainerImageReference'},
     }
 
     def __init__(self, **kwargs):
@@ -934,7 +934,7 @@ class TriggeredBuildResult(Model):
     """
 
     _attribute_map = {
-        'id': {'key': 'Id', 'type': 'str'},
+        'id': {'key': 'id', 'type': 'str'},
     }
 
     def __init__(self, **kwargs):
