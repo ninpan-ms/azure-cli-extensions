@@ -92,13 +92,19 @@ helps['spring-cloud tanzu application-configuration-service'] = """
 """
 
 helps['spring-cloud tanzu application-configuration-service bind'] = """
-    type: group
+    type: command
     short-summary: Bind app to Tanzu Application Configuration Service.
+    examples:
+    - name: Bind an app to Tanzu Application Configuration Service
+      text: az spring-cloud tanzu application-configuration-service bind -g myresourcegroup -s myservice --app myapp
 """
 
 helps['spring-cloud tanzu application-configuration-service unbind'] = """
-    type: group
+    type: command
     short-summary: Unbind app to Tanzu Application Configuration Service.
+    examples:
+    - name: Unbind an app to Tanzu Application Configuration Service
+      text: az spring-cloud tanzu application-configuration-service unbind -g myresourcegroup -s myservice --app myapp
 """
 
 helps['spring-cloud create'] = """
