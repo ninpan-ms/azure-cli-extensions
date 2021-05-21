@@ -413,6 +413,8 @@ def validate_node_resource_group(namespace):
 
 
 def validate_tanzu_configuration_service_patterns(namespace):
+    if not namespace.patterns:
+        return
     pattern_list = namespace.patterns.split(',')
     invalid_list = [p for p in pattern_list if not _is_valid_pattern(p)]
     if invalid_list:

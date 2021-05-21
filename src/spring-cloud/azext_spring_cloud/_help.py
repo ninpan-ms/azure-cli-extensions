@@ -32,8 +32,8 @@ helps['spring-cloud tanzu app create'] = """
     examples:
     - name: Create a default Tanzu app
       text: az spring-cloud tanzu app create -g myresourcegroup -s myservice -n myapp
-    - name: Create a Tanzu app with specific Cpu
-      text: az spring-cloud tanzu app create -g myresourcegroup -s myservice -n myapp --cpu 2
+    - name: Create a Tanzu app with specific Cpu, Memory
+      text: az spring-cloud tanzu app create -g myresourcegroup -s myservice -n myapp --cpu 2 --memory 2Gi
 """
 
 helps['spring-cloud tanzu app update'] = """
@@ -42,8 +42,8 @@ helps['spring-cloud tanzu app update'] = """
     examples:
     - name: Update a default Tanzu app
       text: az spring-cloud tanzu app update -g myresourcegroup -s myservice -n myapp
-    - name: Update a Tanzu app with specific Cpu
-      text: az spring-cloud tanzu app update -g myresourcegroup -s myservice -n myapp --cpu 2
+    - name: Update a Tanzu app with specific Cpu, Memory
+      text: az spring-cloud tanzu app update -g myresourcegroup -s myservice -n myapp --cpu 2 --memory 2Gi
     - name: Expose a Tanzu app to Internet
       text: az spring-cloud tanzu app update -g myresourcegroup -s myservice -n myapp --assign-endpoint True
 """
