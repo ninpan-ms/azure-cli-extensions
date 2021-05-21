@@ -107,8 +107,10 @@ def tanzu_app_update(cmd, client, resource_group, service, name,
         )
     app = _app_get(cmd, client, resource_group, service, name)
     app_properties = app.properties
-    if assign_endpoint is not None:
+    update_app = False
+    if assign_endpoint is not None and app_properties.public != assign_endpoint:
         app_properties.public = assign_endpoint
+        update_app = True
 
     # Create new deployment if not exist
     create_deployment = True
@@ -122,21 +124,28 @@ def tanzu_app_update(cmd, client, resource_group, service, name,
         deployment_properties = app.properties.deployment.properties
         deployment_sku = app.properties.deployment.sku
     # Merge properties from argument
-    if cpu:
+    update_deployment = create_deployment
+    if cpu and deployment_properties.deployment_settings.cpu != cpu:
         deployment_properties.deployment_settings.cpu = cpu
-    if memory:
+        update_deployment = True
+    if memory and deployment_properties.deployment_settings.memory != memory:
         deployment_properties.deployment_settings.memory = memory
-    if env:
+        update_deployment = True
+    if env: # Skip comparation here
+        update_deployment = True
         deployment_properties.deployment_settings.environment_variables = env
     if patterns:
+        update_deployment = True
         deployment_properties.deployment_settings.addon_config = _set_pattern_for_deployment(patterns)
     deployment_name = app.properties.deployment.name if app.properties.deployment else DEFAULT_DEPLOYMENT_NAME
     sku = app_properties.deployment.sku if app_properties.deployment else models.Sku(capacity=1)
-    if instance_count:
+    if instance_count and deployment_sku.capacity != instance_count:
         deployment_sku.capacity = instance_count
+        update_deployment = True
     return _app_create_or_update(cmd, client, resource_group, service, name, deployment_name,
                                  app_properties, deployment_properties, deployment_sku, no_wait,
-                                 create_deployment=create_deployment)
+                                 create_deployment=create_deployment, 
+                                 skip_app_operation=(not update_app), skip_deployment_operation=(not update_deployment))
 
 
 def tanzu_app_start(cmd, client, resource_group, service, name, no_wait=None):
@@ -180,7 +189,7 @@ def tanzu_app_deploy(cmd, client, resource_group, service, name, artifact_path=N
     # get upload url
     upload_url = None
     relative_path = None
-    logger.warning("[1/5] Requesting for upload URL")
+    logger.warning("[1/5] Requesting for upload URL.")
     try:
         response = client.build_service.get_upload_url(resource_group, service)
         upload_url = response.upload_url
@@ -191,7 +200,7 @@ def tanzu_app_deploy(cmd, client, resource_group, service, name, artifact_path=N
     if not upload_url:
         raise CLIError("Failed to get a SAS URL to upload context.")
     account_name, endpoint_suffix, share_name, relative_name, sas_token = get_azure_files_info(upload_url)
-    logger.warning("[2/5] Uploading package to blob")
+    logger.warning("[2/5] Uploading package to blob.")
     path = None
     if artifact_path:
         path = artifact_path
@@ -205,7 +214,7 @@ def tanzu_app_deploy(cmd, client, resource_group, service, name, artifact_path=N
         relative_path=relative_path,
         env={"BP_JVM_VERSION": "8.*", "BP_MAVEN_BUILT_MODULE": target_module} if target_module else None)
     # create or update build
-    logger.warning("[3/5] Creating or Updating build '{}' (this operation can take a while to complete)".format(name))
+    logger.warning("[3/5] Creating or Updating build '{}'.".format(name))
     build_result_id = None
     try:
         response = client.build_service.create_or_update_build(resource_group, service, name, properties)
@@ -214,7 +223,7 @@ def tanzu_app_deploy(cmd, client, resource_group, service, name, artifact_path=N
     except (AttributeError, CloudError) as e:
         raise CLIError("Failed to create or update a build. Error: {}".format(e.message))
     # get build result
-    logger.warning("[4/5] Waiting build finish")
+    logger.warning("[4/5] Waiting build finish. This may take a few minutes.")
     result = client.build_service.get_build_result(resource_group, service, name, build_result_name)
     while result.properties.status == "Building" or result.properties.status == "Queuing":
         sleep(5)
@@ -244,34 +253,59 @@ def tanzu_configuration_service_unbind_app(cmd, client, resource_group, service,
 
 def _app_create_or_update(cmd, client, resource_group, service, app_name, deployment_name,
                           app_properties, deployment_properties, deployment_sku,
-                          no_wait, operation='Updating', create_deployment=True):
+                          no_wait, operation='Updating', create_deployment=True,
+                          skip_app_operation=False, skip_deployment_operation=False):
     '''_app_create_or_update
-    Create or Update an app and deployment under that app
+    Create or Update an app and deployment under that app.
+    :param str operation: What is the caller command, this operation will be used in log.
+    :param bool create_deployment: Whether the deployment need to be created in this method.
+        app.properties.public cannot be true if there is no deployment exist.
+    :param bool skip_app_operation: There is no need to real create or update app.
+    :param bool skip_deployment_operation: There is no need to real create or update deployment.
     '''
+    # if a deployment need to be created, it cannot be skipped
+    skip_deployment_operation = create_deployment or skip_deployment_operation
     total_step = 2
-    # app.properties.public can be set to True only if there is a deployment exist
-    is_public = app_properties.public
-    if is_public and create_deployment:
+    step_count = 0
+    need_additional_step = not skip_app_operation and app_properties.public and create_deployment
+    if skip_deployment_operation:
+        logger.debug("No need to create or update deployment {}".format(deployment_name))
+        total_step -= 1
+    if skip_app_operation:
+        logger.debug("No need to create or update app {}".format(app_name))
+        total_step -= 1
+    if need_additional_step:
+        # app.properties.public can be set to True only if there is a deployment exist
         logger.debug("There is no deployment under app {}, temp set app.public to False".format(app_name))
-        total_step = 3
+        total_step += 1
         app_properties.public = False
-    logger.warning('[1/{}] {} app {}'.format(total_step, operation, app_name))
-    poller = client.apps.create_or_update(
-        resource_group, service, app_name, app_properties)
-    while not poller.done():
-        sleep(APP_CREATE_OR_UPDATE_SLEEP_INTERVAL)
-    logger.warning('[2/{}] {} deployment {} under app {}. This may take a few minutes.'
-                   .format(total_step, operation, deployment_name, app_name))
-    deployment_poller = client.deployments.create_or_update(resource_group, service, app_name, deployment_name,
-                                                 properties=deployment_properties, sku=deployment_sku)
+
+    # Real operation
+    poller = None
+    deployment_poller = None
+    if not skip_app_operation:
+        step_count += 1
+        logger.warning('[{}/{}] {} app {}'.format(step_count, total_step, operation, app_name))
+        poller = client.apps.create_or_update(
+            resource_group, service, app_name, app_properties)
+        while not poller.done():
+            sleep(APP_CREATE_OR_UPDATE_SLEEP_INTERVAL)
+    
+    if not skip_deployment_operation:
+        step_count += 1
+        logger.warning('[{}/{}] {} deployment {} under app {}. This may take a few minutes.'
+                    .format(step_count, total_step, operation, deployment_name, app_name))
+        deployment_poller = client.deployments.create_or_update(resource_group, service, app_name, deployment_name,
+                                                    properties=deployment_properties, sku=deployment_sku)
     # Finally set the app.properties.public as requested
-    if is_public and create_deployment:
-        logger.warning('[3/{}] Assign endpoint for app {}.'.format(total_step, app_name))
+    if need_additional_step:
+        step_count += 1
+        logger.warning('[{}/{}] Assign endpoint for app {}.'.format(step_count, total_step, app_name))
         app_properties.public = True
         poller = client.apps.create_or_update(resource_group, service, app_name, app_properties)
     if no_wait:
-        return deployment_poller
-    while not poller.done() or not deployment_poller.done():
+        return
+    while not _poller_finished(poller) or not _poller_finished(deployment_poller):
         sleep(APP_CREATE_OR_UPDATE_SLEEP_INTERVAL)
     return _app_get(cmd, client, resource_group, service, app_name)
 
@@ -327,3 +361,12 @@ def _tcs_bind_or_unbind_app(cmd, client, resource_group, service, app_name, enab
 
     app.properties.addon_config[TANZU_CONFIGURATION_SERVICE_NAME].enabled = enabled
     return client.apps.create_or_update(resource_group, service, app_name, app.properties)
+
+
+def _poller_finished(poller):
+    '''_poller_finished
+    Whether a poller has been finished.
+    If poller is None, return true
+    else return poller.done()
+    '''
+    return not poller or poller.done()
