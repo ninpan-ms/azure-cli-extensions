@@ -121,6 +121,7 @@ def tanzu_app_update(cmd, client, resource_group, service, name,
     deployment_name = DEFAULT_DEPLOYMENT_NAME
     deployment_properties = _get_default_settings()
     deployment_sku = models.Sku(capacity=1)
+    # logger.warning()
     if app.properties.deployment:
         # Found existing deployment
         create_deployment = False
@@ -311,7 +312,7 @@ def _app_create_or_update(cmd, client, resource_group, service, app_name, deploy
     :param bool skip_deployment_operation: There is no need to real create or update deployment.
     '''
     # if a deployment need to be created, it cannot be skipped
-    skip_deployment_operation = create_deployment or skip_deployment_operation
+    skip_deployment_operation = (not create_deployment) and skip_deployment_operation
     total_step = 2
     step_count = 0
     need_additional_step = not skip_app_operation and app_properties.public and create_deployment
