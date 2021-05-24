@@ -111,6 +111,11 @@ helps['spring-cloud tanzu application-configuration-service unbind'] = """
       text: az spring-cloud tanzu application-configuration-service unbind -g myresourcegroup -s myservice --app myapp
 """
 
+helps['spring-cloud tanzu app logs'] = """
+    type: command
+    short-summary: Show logs of a Tanzu app instance, logs will be streamed when setting '-f/--follow'.
+"""
+
 helps['spring-cloud create'] = """
     type: command
     short-summary: Create an Azure Spring Cloud.

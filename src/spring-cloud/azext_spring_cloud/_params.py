@@ -70,6 +70,13 @@ def load_arguments(self, _):
     with self.argument_context('spring-cloud tanzu application-configuration-service unbind') as c:
         c.argument('app', app_name_type, help='Name of app to be unbinded with Application Configuration Service.', validator=validate_app_name)
 
+    with self.argument_context('spring-cloud tanzu app logs') as c:
+        c.argument('instance', options_list=['--instance', '-i'], help='Name of an existing instance of the deployment.')
+        c.argument('lines', type=int, help='Number of lines to show. Maximum is 10000', validator=validate_log_lines)
+        c.argument('follow', options_list=['--follow ', '-f'], help='Specify if the logs should be streamed.', action='store_true')
+        c.argument('since', help='Only return logs newer than a relative duration like 5s, 2m, or 1h. Maximum is 1h', validator=validate_log_since)
+        c.argument('limit', type=int, help='Maximum kilobytes of logs to return. Ceiling number is 2048.', validator=validate_log_limit)
+
     with self.argument_context('spring-cloud create') as c:
         c.argument('location', arg_type=get_location_type(self.cli_ctx), validator=validate_location)
         c.argument('sku', type=str, validator=validate_sku, help='Name of SKU, the value is "Basic" or "Standard"')

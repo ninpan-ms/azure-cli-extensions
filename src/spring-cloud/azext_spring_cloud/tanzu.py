@@ -12,6 +12,10 @@ from .vendored_sdks.appplatform.v2021_03_01_preview import models
 from ._utils import _get_tanzu_upload_local_file, get_azure_files_info
 from .azure_storage_file import FileService
 from msrestazure.tools import parse_resource_id
+import requests
+import sys
+from six.moves.urllib import parse
+from threading import Thread
 
 logger = get_logger(__name__)
 DEFAULT_DEPLOYMENT_NAME = "default"
@@ -153,7 +157,7 @@ def tanzu_app_start(cmd, client, resource_group, service, name, no_wait=None):
     Start deployment under the existing app.
     Throw exception if app or deployment not found
     '''
-    deployment_name = _assert_deployment_exist_and_retrieve_name(cmd, client, resource_group, service, name)
+    deployment_name = _assert_deployment_exist_and_retrieve(cmd, client, resource_group, service, name).name
     return client.deployments.start(resource_group, service, name, deployment_name)
 
 
@@ -162,7 +166,7 @@ def tanzu_app_restart(cmd, client, resource_group, service, name, no_wait=None):
     Restart deployment under the existing app.
     Throw exception if app or deployment not found
     '''
-    deployment_name = _assert_deployment_exist_and_retrieve_name(cmd, client, resource_group, service, name)
+    deployment_name = _assert_deployment_exist_and_retrieve(cmd, client, resource_group, service, name).name
     return client.deployments.restart(resource_group, service, name, deployment_name)
 
 
@@ -171,7 +175,7 @@ def tanzu_app_stop(cmd, client, resource_group, service, name, no_wait=None):
     Stop deployment under the existing app.
     Throw exception if app or deployment not found
     '''
-    deployment_name = _assert_deployment_exist_and_retrieve_name(cmd, client, resource_group, service, name)
+    deployment_name = _assert_deployment_exist_and_retrieve(cmd, client, resource_group, service, name).name
     return client.deployments.stop(resource_group, service, name, deployment_name)
 
 def tanzu_app_deploy(cmd, client, resource_group, service, name, artifact_path=None, target_module=None, no_wait=None):
@@ -185,7 +189,7 @@ def tanzu_app_deploy(cmd, client, resource_group, service, name, artifact_path=N
     4. Query build result from build service
     5. Send build result id to deployment
     '''
-    deployment_name = _assert_deployment_exist_and_retrieve_name(cmd, client, resource_group, service, name)
+    deployment_name = _assert_deployment_exist_and_retrieve(cmd, client, resource_group, service, name).name
     # get upload url
     upload_url = None
     relative_path = None
@@ -233,6 +237,48 @@ def tanzu_app_deploy(cmd, client, resource_group, service, name, artifact_path=N
 
     logger.warning("[5/5] Deploying build result to deployment {} under app {}".format(deployment_name, name))
     return client.deployments.deploy(resource_group, service, name, deployment_name, build_result_id=build_result_id)
+
+
+def tanzu_app_tail_log(cmd, client, resource_group, service, name, instance=None,
+                       follow=False, lines=50, since=None, limit=2048):
+    '''tanzu_app_tail_log
+    Get real time logs from the app.
+    Throw exception if app or deployment not found.
+    '''
+    if not instance:
+        deployment = _assert_deployment_exist_and_retrieve(cmd, client, resource_group, service, name)
+        if not deployment.properties.instances:
+            raise CLIError("No deployment instances found for app '{0}'".format(name))
+        instances = deployment.properties.instances
+        if len(instances) > 1:
+            logger.warning("Multiple app instances found:")
+            for temp_instance in instances:
+                logger.warning("{}".format(temp_instance.name))
+            raise CLIError("Please use '-i/--instance' parameter to specify the instance name")
+        instance = instances[0].name
+
+    streaming_url = "https://{0}.asc-test.net/api/logstream/apps/{1}/instances/{2}".format(
+        service, name, instance)
+    params = {}
+    params["tailLines"] = lines
+    params["limitBytes"] = limit
+    if since:
+        params["sinceSeconds"] = since
+    if follow:
+        params["follow"] = True
+
+    exceptions = []
+    streaming_url += "?{}".format(parse.urlencode(params)) if params else ""
+    t = Thread(target=_get_app_log, args=(
+        streaming_url, exceptions))
+    t.daemon = True
+    t.start()
+
+    while t.is_alive():
+        sleep(5)  # so that ctrl+c can stop the command
+
+    if exceptions:
+        raise exceptions[0]
 
 
 def tanzu_configuration_service_bind_app(cmd, client, resource_group, service, app_name):
@@ -329,13 +375,13 @@ def _get_default_deployment(cmd, client, resource_group, service, app_name):
     return deployments[0] if deployments else None
 
 
-def _assert_deployment_exist_and_retrieve_name(cmd, client, resource_group, service, name):
+def _assert_deployment_exist_and_retrieve(cmd, client, resource_group, service, name):
     app = _app_get(cmd, client, resource_group, service, name)
     deployment = app.properties.deployment
     if not deployment:
         raise CLIError('Deployment not found, create one by running "az spring-cloud tanzu app '
                        'update -g {} -s {} -n {}"'.format(resource_group, service, name))
-    return deployment.name
+    return deployment
 
 
 def _set_pattern_for_deployment(patterns):
@@ -370,3 +416,19 @@ def _poller_finished(poller):
     else return poller.done()
     '''
     return not poller or poller.done()
+
+
+def _get_app_log(url, exceptions):
+    with requests.get(url, stream=True) as response:
+        try:
+            if response.status_code != 200:
+                raise CLIError("Failed to connect to the server with status code '{}' and reason '{}'".format(
+                    response.status_code, response.reason))
+            std_encoding = sys.stdout.encoding
+            for content in response.iter_content():
+                if content:
+                    sys.stdout.write(content.decode(encoding='utf-8', errors='replace')
+                                     .encode(std_encoding, errors='replace')
+                                     .decode(std_encoding, errors='replace'))
+        except CLIError as e:
+            exceptions.append(e)
