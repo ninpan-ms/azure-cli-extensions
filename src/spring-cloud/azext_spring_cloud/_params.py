@@ -49,7 +49,7 @@ def load_arguments(self, _):
 
     with self.argument_context('spring-cloud tanzu app update') as c:
         c.argument('assign_endpoint', arg_type=get_three_state_flag(),
-                   help='If true, assign endpoint URL for direct access.', default=False)
+                   help='If true, assign endpoint URL for direct access.')
         c.argument('cpu', help='Number of virtual cpu cores per instance.')
         c.argument('memory', help='Number of GB of memory per instance.')
         c.argument('instance_count', type=int, help='Number of instance.', validator=validate_instance_count)
