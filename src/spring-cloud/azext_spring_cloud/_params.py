@@ -35,6 +35,7 @@ def load_arguments(self, _):
 
     with self.argument_context('spring-cloud tanzu app') as c:
         c.argument('service', service_name_type)
+        c.argument('name', name_type, help='Name of app.')
 
     with self.argument_context('spring-cloud tanzu app create') as c:
         c.argument('assign_endpoint', arg_type=get_three_state_flag(),

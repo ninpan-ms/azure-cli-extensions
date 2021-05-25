@@ -218,7 +218,7 @@ def tanzu_app_deploy(cmd, client, resource_group, service, name, artifact_path=N
         builder="default-tanzu-builder",
         name=name,
         relative_path=relative_path,
-        env={"BP_JVM_VERSION": "8.*", "BP_MAVEN_BUILT_MODULE": target_module} if target_module else None)
+        env={"BP_MAVEN_BUILT_MODULE": target_module} if target_module else None)
     # create or update build
     logger.warning("[3/5] Creating or Updating build '{}'.".format(name))
     build_result_id = None
@@ -234,6 +234,10 @@ def tanzu_app_deploy(cmd, client, resource_group, service, name, artifact_path=N
     while result.properties.status == "Building" or result.properties.status == "Queuing":
         sleep(5)
         result = client.build_service.get_build_result(resource_group, service, name, build_result_name)
+    build_logs = client.build_service.get_build_result_log(resource_group, service, name, build_result_name, "all")
+    if build_logs and build_logs.properties and build_logs.properties.blob_url:
+        output = requests.get(build_logs.properties.blob_url).text
+        sys.stdout.write(output)
     if result.properties.status != "Succeeded":
         raise CLIError("Failed to get a successful build result.")
 

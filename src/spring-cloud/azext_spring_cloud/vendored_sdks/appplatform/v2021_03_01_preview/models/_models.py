@@ -302,6 +302,57 @@ class BuildResult(ProxyResource):
         self.properties = kwargs.get('properties', None)
 
 
+class BuildResultLog(ProxyResource):
+    """Build result log resource payload.
+
+    Variables are only populated by the server, and will be ignored when
+    sending a request.
+
+    :ivar id: Fully qualified resource Id for the resource.
+    :vartype id: str
+    :ivar name: The name of the resource.
+    :vartype name: str
+    :ivar type: The type of the resource.
+    :vartype type: str
+    :param properties: Properties of the build result log resource
+    :type properties:
+     ~azure.mgmt.appplatform.v2021_03_01_preview.models.BuildResultLogProperties
+    """
+
+    _validation = {
+        'id': {'readonly': True},
+        'name': {'readonly': True},
+        'type': {'readonly': True},
+    }
+
+    _attribute_map = {
+        'id': {'key': 'id', 'type': 'str'},
+        'name': {'key': 'name', 'type': 'str'},
+        'type': {'key': 'type', 'type': 'str'},
+        'properties': {'key': 'properties', 'type': 'BuildResultLogProperties'},
+    }
+
+    def __init__(self, **kwargs):
+        super(BuildResultLog, self).__init__(**kwargs)
+        self.properties = kwargs.get('properties', None)
+
+
+class BuildResultLogProperties(Model):
+    """Build result log resource properties payload.
+
+    :param blob_url: The public download URL of this build result log
+    :type blob_url: str
+    """
+
+    _attribute_map = {
+        'blob_url': {'key': 'blobUrl', 'type': 'str'},
+    }
+
+    def __init__(self, **kwargs):
+        super(BuildResultLogProperties, self).__init__(**kwargs)
+        self.blob_url = kwargs.get('blob_url', None)
+
+
 class BuildResultProperties(Model):
     """Build result resource properties payload.
 

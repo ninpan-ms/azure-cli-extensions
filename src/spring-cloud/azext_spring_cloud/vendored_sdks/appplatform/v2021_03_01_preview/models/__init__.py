@@ -17,6 +17,8 @@ try:
     from ._models_py3 import BuildContainerImageReference
     from ._models_py3 import BuildProperties
     from ._models_py3 import BuildResult
+    from ._models_py3 import BuildResultLog
+    from ._models_py3 import BuildResultLogProperties
     from ._models_py3 import BuildResultProperties
     from ._models_py3 import ConfigurationServiceGitPropertyValidateResult
     from ._models_py3 import ConfigurationServiceProperties
@@ -47,6 +49,8 @@ except (SyntaxError, ImportError):
     from ._models import BuildContainerImageReference
     from ._models import BuildProperties
     from ._models import BuildResult
+    from ._models import BuildResultLog
+    from ._models import BuildResultLogProperties
     from ._models import BuildResultProperties
     from ._models import ConfigurationServiceGitPropertyValidateResult
     from ._models import ConfigurationServiceProperties
@@ -88,6 +92,8 @@ __all__ = [
     'BuildContainerImageReference',
     'BuildProperties',
     'BuildResult',
+    'BuildResultLog',
+    'BuildResultLogProperties',
     'BuildResultProperties',
     'ConfigurationServiceGitPropertyValidateResult',
     'ConfigurationServiceProperties',
