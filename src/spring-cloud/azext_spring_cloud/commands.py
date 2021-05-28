@@ -33,7 +33,7 @@ def load_command_table(self, _):
         g.command('start', 'tanzu_app_start', supports_no_wait=True)
         g.command('stop', 'tanzu_app_stop', supports_no_wait=True)
         g.command('restart', 'tanzu_app_restart', supports_no_wait=True)
-        g.command('deploy', 'tanzu_app_deploy', supports_no_wait=True)
+        g.command('deploy', 'tanzu_app_deploy', table_transformer=tanzu_app_table_output, supports_no_wait=True)
         g.command('logs', 'tanzu_app_tail_log')
 
     with self.command_group('spring-cloud tanzu application-configuration-service', tanzu_util) as g:

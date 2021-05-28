@@ -8,14 +8,16 @@ from time import sleep
 from knack.util import CLIError
 from knack.log import get_logger
 from msrestazure.azure_exceptions import CloudError
+from msrestazure.tools import parse_resource_id
+from azure.cli.core.commands import LongRunningOperation
 from .vendored_sdks.appplatform.v2021_03_01_preview import models
 from ._utils import _get_tanzu_upload_local_file, get_azure_files_info
 from .azure_storage_file import FileService
-from msrestazure.tools import parse_resource_id
 import requests
 import sys
 from six.moves.urllib import parse
 from threading import Thread
+
 
 logger = get_logger(__name__)
 DEFAULT_DEPLOYMENT_NAME = "default"
@@ -207,13 +209,16 @@ def tanzu_app_deploy(cmd, client, resource_group, service, name, artifact_path=N
         raise CLIError("Failed to get a SAS URL to upload context.")
     account_name, endpoint_suffix, share_name, relative_name, sas_token = get_azure_files_info(upload_url)
     logger.warning("[2/5] Uploading package to blob.")
-    path = None
-    if artifact_path:
-        path = artifact_path
-    else:
-        path = _get_tanzu_upload_local_file()
-    file_service = FileService(account_name, sas_token=sas_token, endpoint_suffix=endpoint_suffix)
-    file_service.create_file_from_path(share_name, None, relative_name, path)
+    progress_bar = cmd.cli_ctx.get_progress_controller()
+    progress_bar.add(message='Uploading')
+    progress_bar.begin()
+    FileService(account_name,
+                sas_token=sas_token,
+                endpoint_suffix=endpoint_suffix).create_file_from_path(share_name,
+                                                                       None,
+                                                                       relative_name,
+                                                                       artifact_path or _get_tanzu_upload_local_file())
+    progress_bar.stop()
     properties = models.BuildProperties(
         builder="default-tanzu-builder",
         name=name,
@@ -223,26 +228,39 @@ def tanzu_app_deploy(cmd, client, resource_group, service, name, artifact_path=N
     logger.warning("[3/5] Creating or Updating build '{}'.".format(name))
     build_result_id = None
     try:
-        response = client.build_service.create_or_update_build(resource_group, service, name, properties)
-        build_result_id = response.properties.triggered_build_result.id
+        build_result_id = client.build_service.create_or_update_build(resource_group,
+                                                                      service,
+                                                                      name,
+                                                                      properties).properties.triggered_build_result.id
         build_result_name = parse_resource_id(build_result_id)["resource_name"]
     except (AttributeError, CloudError) as e:
         raise CLIError("Failed to create or update a build. Error: {}".format(e.message))
     # get build result
     logger.warning("[4/5] Waiting build finish. This may take a few minutes.")
     result = client.build_service.get_build_result(resource_group, service, name, build_result_name)
+    progress_bar.add(message=result.properties.status)
+    progress_bar.begin()
     while result.properties.status == "Building" or result.properties.status == "Queuing":
+        progress_bar.add(message=result.properties.status)
         sleep(5)
         result = client.build_service.get_build_result(resource_group, service, name, build_result_name)
+    progress_bar.stop()
     build_logs = client.build_service.get_build_result_log(resource_group, service, name, build_result_name, "all")
     if build_logs and build_logs.properties and build_logs.properties.blob_url:
-        output = requests.get(build_logs.properties.blob_url).text
-        sys.stdout.write(output)
+        sys.stdout.write(requests.get(build_logs.properties.blob_url).text)
     if result.properties.status != "Succeeded":
         raise CLIError("Failed to get a successful build result.")
 
     logger.warning("[5/5] Deploying build result to deployment {} under app {}".format(deployment_name, name))
-    return client.deployments.deploy(resource_group, service, name, deployment_name, build_result_id=build_result_id)
+    poller = client.deployments.deploy(resource_group,
+                                       service, name,
+                                       deployment_name,
+                                       build_result_id=build_result_id)
+    if no_wait:
+        return poller
+    progress_bar.add(message='Deploying')
+    LongRunningOperation(cmd.cli_ctx)(poller)
+    return _app_get(cmd, client, resource_group, service, name)
 
 
 def tanzu_app_tail_log(cmd, client, resource_group, service, name, instance=None,
@@ -338,10 +356,10 @@ def _app_create_or_update(cmd, client, resource_group, service, app_name, deploy
     if not skip_app_operation:
         step_count += 1
         logger.warning('[{}/{}] {} app {}'.format(step_count, total_step, operation, app_name))
-        poller = client.apps.create_or_update(
-            resource_group, service, app_name, app_properties)
-        while not poller.done():
-            sleep(APP_CREATE_OR_UPDATE_SLEEP_INTERVAL)
+        LongRunningOperation(cmd.cli_ctx)(client.apps.create_or_update(resource_group,
+                                                                       service,
+                                                                       app_name,
+                                                                       app_properties))
 
     if not skip_deployment_operation:
         step_count += 1
@@ -357,8 +375,10 @@ def _app_create_or_update(cmd, client, resource_group, service, app_name, deploy
         poller = client.apps.create_or_update(resource_group, service, app_name, app_properties)
     if no_wait:
         return None
-    while not _poller_finished(poller) or not _poller_finished(deployment_poller):
-        sleep(APP_CREATE_OR_UPDATE_SLEEP_INTERVAL)
+    if deployment_poller:
+        LongRunningOperation(cmd.cli_ctx)(deployment_poller)
+    if poller:
+        LongRunningOperation(cmd.cli_ctx)(poller)
     return _app_get(cmd, client, resource_group, service, app_name)
 
 
@@ -413,15 +433,6 @@ def _tcs_bind_or_unbind_app(cmd, client, resource_group, service, app_name, enab
 
     app.properties.addon_config[TANZU_CONFIGURATION_SERVICE_NAME].enabled = enabled
     return client.apps.create_or_update(resource_group, service, app_name, app.properties)
-
-
-def _poller_finished(poller):
-    '''_poller_finished
-    Whether a poller has been finished.
-    If poller is None, return true
-    else return poller.done()
-    '''
-    return not poller or poller.done()
 
 
 def _get_app_log(url, exceptions):
