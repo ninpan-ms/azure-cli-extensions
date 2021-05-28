@@ -80,7 +80,7 @@ helps['spring-cloud tanzu app restart'] = """
 
 helps['spring-cloud tanzu app deploy'] = """
     type: command
-    short-summary: Deploy source code, Jar or War to Azure Spring Cloud Tanzu app's deployment.
+    short-summary: Deploy source code, Jar or War and set patterns to Azure Spring Cloud Tanzu app's deployment.
     examples:
     - name: Deploy a Tanzu app's deployment with Jar or War file
       text: az spring-cloud tanzu app deploy -g myresourcegroup -s myservice -n myapp --artifact-path <my-JarOrWar>
@@ -88,6 +88,8 @@ helps['spring-cloud tanzu app deploy'] = """
       text: az spring-cloud tanzu app deploy -g myresourcegroup -s myservice -n myapp
     - name: Deploy a Tanzu app's deployment with source code of target module
       text: az spring-cloud tanzu app deploy -g myresourcegroup -s myservice -n myapp --target-module myModule
+      - name: Deploy a Tanzu app's deployment with source code and set configuration patterns
+      text: az spring-cloud tanzu app deploy -g myresourcegroup -s myservice -n myapp --patterns mypattern
 """
 
 helps['spring-cloud tanzu application-configuration-service'] = """

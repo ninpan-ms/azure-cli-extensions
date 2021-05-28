@@ -95,7 +95,7 @@ def tanzu_app_update(cmd, client, resource_group, service, name,
                      memory=None,
                      instance_count=None,
                      env=None,
-                     patterns=None,
+                     config_file_patterns=None,
                      no_wait=False):
     '''tanzu_app_update
     Update an existing app, if the app doesn't exist, this command exit with error.
@@ -141,9 +141,9 @@ def tanzu_app_update(cmd, client, resource_group, service, name,
     if env:  # Skip comparation here
         update_deployment = True
         deployment_properties.deployment_settings.environment_variables = env
-    if patterns:
+    if config_file_patterns:
         update_deployment = True
-        deployment_properties.deployment_settings.addon_config = _set_pattern_for_deployment(patterns)
+        deployment_properties.deployment_settings.addon_config = _set_pattern_for_deployment(config_file_patterns)
     deployment_name = app.properties.deployment.name if app.properties.deployment else DEFAULT_DEPLOYMENT_NAME
     deployment_sku = app_properties.deployment.sku if app_properties.deployment else models.Sku(capacity=1)
     if instance_count and deployment_sku.capacity != instance_count:
@@ -182,9 +182,11 @@ def tanzu_app_stop(cmd, client, resource_group, service, name, no_wait=None):
     return client.deployments.stop(resource_group, service, name, deployment_name)
 
 
-def tanzu_app_deploy(cmd, client, resource_group, service, name, artifact_path=None, target_module=None, no_wait=None):
+def tanzu_app_deploy(cmd, client, resource_group, service, name,
+                    artifact_path=None, target_module=None, config_file_patterns=None, no_wait=None):
     '''tanzu_app_deploy
     Deploy artifact to deployment under the existing app.
+    Update active deployment's pattern if --config-file-patterns are provided.
     Throw exception if app or deployment not found.
     This method does:
     1. Call build service to get upload url
@@ -193,7 +195,8 @@ def tanzu_app_deploy(cmd, client, resource_group, service, name, artifact_path=N
     4. Query build result from build service
     5. Send build result id to deployment
     '''
-    deployment_name = _assert_deployment_exist_and_retrieve(cmd, client, resource_group, service, name).name
+    deployment = _assert_deployment_exist_and_retrieve(cmd, client, resource_group, service, name)
+    deployment_name = deployment.name
     # get upload url
     upload_url = None
     relative_path = None
@@ -250,6 +253,10 @@ def tanzu_app_deploy(cmd, client, resource_group, service, name, artifact_path=N
         sys.stdout.write(requests.get(build_logs.properties.blob_url).text)
     if result.properties.status != "Succeeded":
         raise CLIError("Failed to get a successful build result.")
+
+    # update config-file-patterns for deployment
+    if config_file_patterns:
+        _update_deployment_pattern(client, resource_group, service, name, deployment, config_file_patterns)
 
     logger.warning("[5/5] Deploying build result to deployment {} under app {}".format(deployment_name, name))
     poller = client.deployments.deploy(resource_group,
@@ -420,6 +427,14 @@ def _set_pattern_for_deployment(patterns):
     }
 
 
+def _update_deployment_pattern(cmd, client, resource_group, service, name, deployment, config_file_patterns):
+    deployment_properties = deployment.properties
+    deployment_properties.deployment_settings.addon_config = _set_pattern_for_deployment(config_file_patterns)
+    deployment_poller = client.deployments.create_or_update(resource_group, service, name, deployment.name,
+                                                            properties=deployment_properties, sku=deployment.sku)
+    LongRunningOperation(cmd.cli_ctx)(deployment_poller)
+
+
 def _tcs_bind_or_unbind_app(cmd, client, resource_group, service, app_name, enabled):
     # todo: replace put with patch for app update
     app = _app_get(cmd, client, resource_group, service, app_name)
@@ -432,8 +447,9 @@ def _tcs_bind_or_unbind_app(cmd, client, resource_group, service, app_name, enab
         return None
 
     app.properties.addon_config[TANZU_CONFIGURATION_SERVICE_NAME].enabled = enabled
-    return client.apps.create_or_update(resource_group, service, app_name, app.properties)
-
+    client.apps.create_or_update(resource_group, service, app_name, app.properties)
+    logger.warning('Succeed to {}bind app.{}'.format('' if enabled else 'un',
+                                                     '' if enabled else ' Please restart the app to take effect.'))
 
 def _get_app_log(url, exceptions):
     with requests.get(url, stream=True) as response:
