@@ -257,7 +257,7 @@ def tanzu_app_deploy(cmd, client, resource_group, service, name,
 
     # update config-file-patterns for deployment
     if config_file_patterns:
-        _update_deployment_pattern(client, resource_group, service, name, deployment, config_file_patterns)
+        _update_deployment_pattern(cmd, client, resource_group, service, name, deployment, config_file_patterns)
 
     logger.warning("[5/5] Deploying build result to deployment {} under app {}".format(deployment_name, name))
     poller = client.deployments.deploy(resource_group,
