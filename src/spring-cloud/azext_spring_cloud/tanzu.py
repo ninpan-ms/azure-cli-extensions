@@ -143,7 +143,8 @@ def tanzu_app_update(cmd, client, resource_group, service, name,
         deployment_properties.deployment_settings.environment_variables = env
     if config_file_patterns:
         update_deployment = True
-        deployment_properties.deployment_settings.addon_config = _set_pattern_for_deployment(config_file_patterns)
+        deployment_properties.deployment_settings.addon_config = _set_pattern_for_deployment(
+            deployment_properties.deployment_settings.addon_config, config_file_patterns)
     deployment_name = app.properties.deployment.name if app.properties.deployment else DEFAULT_DEPLOYMENT_NAME
     deployment_sku = app_properties.deployment.sku if app_properties.deployment else models.Sku(capacity=1)
     if instance_count and deployment_sku.capacity != instance_count:
@@ -417,19 +418,22 @@ def _assert_deployment_exist_and_retrieve(cmd, client, resource_group, service, 
     return deployment
 
 
-def _set_pattern_for_deployment(patterns):
-    return {
-        TANZU_CONFIGURATION_SERVICE_NAME: models.AddonProfile(
-            properties={
-                TANZU_CONFIGURATION_SERVICE_PROPERTY_PATTERN: patterns
-            }
-        )
-    }
+def _set_pattern_for_deployment(addon_config, patterns):
+    profile_patterns = models.AddonProfile(
+        properties = {
+            TANZU_CONFIGURATION_SERVICE_PROPERTY_PATTERN: patterns
+        }
+    )
+    if addon_config is None:
+        addon_config = {}
+    addon_config[TANZU_CONFIGURATION_SERVICE_NAME] = profile_patterns
+    return addon_config
 
 
 def _update_deployment_pattern(cmd, client, resource_group, service, name, deployment, config_file_patterns):
     deployment_properties = deployment.properties
-    deployment_properties.deployment_settings.addon_config = _set_pattern_for_deployment(config_file_patterns)
+    deployment_properties.deployment_settings.addon_config = _set_pattern_for_deployment(
+        deployment_properties.deployment_settings.addon_config, config_file_patterns)
     deployment_poller = client.deployments.create_or_update(resource_group, service, name, deployment.name,
                                                             properties=deployment_properties, sku=deployment.sku)
     LongRunningOperation(cmd.cli_ctx)(deployment_poller)
