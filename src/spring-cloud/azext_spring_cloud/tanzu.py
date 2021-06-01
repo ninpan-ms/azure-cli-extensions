@@ -187,7 +187,7 @@ def tanzu_app_deploy(cmd, client, resource_group, service, name,
                     artifact_path=None, target_module=None, config_profile_patterns=None, no_wait=None):
     '''tanzu_app_deploy
     Deploy artifact to deployment under the existing app.
-    Update active deployment's pattern if --config-file-patterns are provided.
+    Update active deployment's pattern if --config-profile-patterns are provided.
     Throw exception if app or deployment not found.
     This method does:
     1. Call build service to get upload url
@@ -418,15 +418,15 @@ def _assert_deployment_exist_and_retrieve(cmd, client, resource_group, service, 
     return deployment
 
 
-def _set_pattern_for_deployment(addon_config, patterns):
-    profile_patterns = models.AddonProfile(
+def _set_pattern_for_deployment(addon_config, config_profile_patterns):
+    profile = models.AddonProfile(
         properties = {
-            TANZU_CONFIGURATION_SERVICE_PROPERTY_PATTERN: patterns
+            TANZU_CONFIGURATION_SERVICE_PROPERTY_PATTERN: config_profile_patterns
         }
     )
     if addon_config is None:
         addon_config = {}
-    addon_config[TANZU_CONFIGURATION_SERVICE_NAME] = profile_patterns
+    addon_config[TANZU_CONFIGURATION_SERVICE_NAME] = profile
     return addon_config
 
 

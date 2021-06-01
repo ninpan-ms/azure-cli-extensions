@@ -412,14 +412,14 @@ def validate_node_resource_group(namespace):
     _validate_resource_group_name(namespace.app_network_resource_group, 'app-network-resource-group')
 
 
-def validate_tanzu_configuration_service_patterns(namespace):
-    if not namespace.patterns:
+def validate_tanzu_config_profile_patterns(namespace):
+    if not namespace.config_profile_patterns:
         return
-    pattern_list = namespace.patterns.split(',')
+    pattern_list = namespace.config_profile_patterns.split(',')
     invalid_list = [p for p in pattern_list if not _is_valid_pattern(p)]
     if invalid_list:
-        logger.warning('patterns "%s" are invalid', ','.join(invalid_list))
-        raise CLIError('--patterns should be the collection of patterns separated by comma, each pattern in the format of \'application\' or \'application/profile\'')
+        logger.warning('Config profile patterns "%s" are invalid.', ','.join(invalid_list))
+        raise CLIError('--config-profile-patterns should be the collection of patterns separated by comma, each pattern in the format of \'application\' or \'application/profile\'')
 
 
 def _validate_resource_group_name(name, message_name):

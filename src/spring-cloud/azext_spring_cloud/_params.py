@@ -12,7 +12,7 @@ from ._validators import (validate_env, validate_cosmos_type, validate_resource_
                           validate_log_limit, validate_log_since, validate_sku, validate_jvm_options,
                           validate_vnet, validate_vnet_required_parameters, validate_node_resource_group,
                           validate_tracing_parameters, validate_app_insights_parameters, validate_java_agent_parameters,
-                          validate_instance_count, validate_tanzu_configuration_service_patterns)
+                          validate_instance_count, validate_tanzu_config_profile_patterns)
 from ._utils import ApiType
 
 from .vendored_sdks.appplatform.v2020_07_01.models import RuntimeVersion, TestKeyType
@@ -56,14 +56,14 @@ def load_arguments(self, _):
         c.argument('instance_count', type=int, help='Number of instance.', validator=validate_instance_count)
         c.argument('env', env_type)
         c.argument('config_profile_patterns', type=str, help='Config profile patterns separated with \',\' to decide which patterns will be used.',
-                    validator=validate_tanzu_configuration_service_patterns)
+                    validator=validate_tanzu_config_profile_patterns)
 
     with self.argument_context('spring-cloud tanzu app deploy') as c:
         c.argument('artifact_path', help='artifact path to deploy to this deployment')
         c.argument(
                 'target_module', help='Child module to be deployed, required for multiple jar packages built from source code.')
         c.argument('config_profile_patterns', type=str, help='Config profile patterns separated with \',\' to decide which patterns will be used.',
-                    validator=validate_tanzu_configuration_service_patterns)
+                    validator=validate_tanzu_config_profile_patterns)
 
     with self.argument_context('spring-cloud tanzu application-configuration-service') as c:
         c.argument('service', service_name_type)
