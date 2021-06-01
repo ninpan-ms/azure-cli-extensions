@@ -55,13 +55,14 @@ def load_arguments(self, _):
         c.argument('memory', help='Number of GB of memory per instance.')
         c.argument('instance_count', type=int, help='Number of instance.', validator=validate_instance_count)
         c.argument('env', env_type)
-        c.argument('config_profile_patterns', type=str, help='Collection of patterns separate with \',\'', validator=validate_tanzu_configuration_service_patterns)
+        c.argument('config_profile_patterns', type=str, help='Config profile patterns separated with \',\' to decide which patterns will be used.',
+                    validator=validate_tanzu_configuration_service_patterns)
 
     with self.argument_context('spring-cloud tanzu app deploy') as c:
         c.argument('artifact_path', help='artifact path to deploy to this deployment')
         c.argument(
                 'target_module', help='Child module to be deployed, required for multiple jar packages built from source code.')
-        c.argument('config_profile_patterns', help='Config profile patterns separated with \',\' to decide which patterns will be used.',
+        c.argument('config_profile_patterns', type=str, help='Config profile patterns separated with \',\' to decide which patterns will be used.',
                     validator=validate_tanzu_configuration_service_patterns)
 
     with self.argument_context('spring-cloud tanzu application-configuration-service') as c:

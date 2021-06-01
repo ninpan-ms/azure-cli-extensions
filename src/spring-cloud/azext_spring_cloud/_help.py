@@ -88,8 +88,8 @@ helps['spring-cloud tanzu app deploy'] = """
       text: az spring-cloud tanzu app deploy -g myresourcegroup -s myservice -n myapp
     - name: Deploy a Tanzu app's deployment with source code of target module
       text: az spring-cloud tanzu app deploy -g myresourcegroup -s myservice -n myapp --target-module myModule
-      - name: Deploy a Tanzu app's deployment with source code and set configuration patterns
-      text: az spring-cloud tanzu app deploy -g myresourcegroup -s myservice -n myapp --patterns mypattern
+    - name: Deploy a Tanzu app's deployment with source code and set configuration patterns
+      text: az spring-cloud tanzu app deploy -g myresourcegroup -s myservice -n myapp --config-profile-patterns mypattern
 """
 
 helps['spring-cloud tanzu application-configuration-service'] = """

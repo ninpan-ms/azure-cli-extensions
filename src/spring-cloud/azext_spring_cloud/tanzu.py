@@ -95,7 +95,7 @@ def tanzu_app_update(cmd, client, resource_group, service, name,
                      memory=None,
                      instance_count=None,
                      env=None,
-                     config_file_patterns=None,
+                     config_profile_patterns=None,
                      no_wait=False):
     '''tanzu_app_update
     Update an existing app, if the app doesn't exist, this command exit with error.
@@ -141,10 +141,10 @@ def tanzu_app_update(cmd, client, resource_group, service, name,
     if env:  # Skip comparation here
         update_deployment = True
         deployment_properties.deployment_settings.environment_variables = env
-    if config_file_patterns:
+    if config_profile_patterns:
         update_deployment = True
         deployment_properties.deployment_settings.addon_config = _set_pattern_for_deployment(
-            deployment_properties.deployment_settings.addon_config, config_file_patterns)
+            deployment_properties.deployment_settings.addon_config, config_profile_patterns)
     deployment_name = app.properties.deployment.name if app.properties.deployment else DEFAULT_DEPLOYMENT_NAME
     deployment_sku = app_properties.deployment.sku if app_properties.deployment else models.Sku(capacity=1)
     if instance_count and deployment_sku.capacity != instance_count:
@@ -184,7 +184,7 @@ def tanzu_app_stop(cmd, client, resource_group, service, name, no_wait=None):
 
 
 def tanzu_app_deploy(cmd, client, resource_group, service, name,
-                    artifact_path=None, target_module=None, config_file_patterns=None, no_wait=None):
+                    artifact_path=None, target_module=None, config_profile_patterns=None, no_wait=None):
     '''tanzu_app_deploy
     Deploy artifact to deployment under the existing app.
     Update active deployment's pattern if --config-file-patterns are provided.
@@ -256,8 +256,8 @@ def tanzu_app_deploy(cmd, client, resource_group, service, name,
         raise CLIError("Failed to get a successful build result.")
 
     # update config-file-patterns for deployment
-    if config_file_patterns:
-        _update_deployment_pattern(cmd, client, resource_group, service, name, deployment, config_file_patterns)
+    if config_profile_patterns:
+        _update_deployment_pattern(cmd, client, resource_group, service, name, deployment, config_profile_patterns)
 
     logger.warning("[5/5] Deploying build result to deployment {} under app {}".format(deployment_name, name))
     poller = client.deployments.deploy(resource_group,
@@ -430,10 +430,10 @@ def _set_pattern_for_deployment(addon_config, patterns):
     return addon_config
 
 
-def _update_deployment_pattern(cmd, client, resource_group, service, name, deployment, config_file_patterns):
+def _update_deployment_pattern(cmd, client, resource_group, service, name, deployment, config_profile_patterns):
     deployment_properties = deployment.properties
     deployment_properties.deployment_settings.addon_config = _set_pattern_for_deployment(
-        deployment_properties.deployment_settings.addon_config, config_file_patterns)
+        deployment_properties.deployment_settings.addon_config, config_profile_patterns)
     deployment_poller = client.deployments.create_or_update(resource_group, service, name, deployment.name,
                                                             properties=deployment_properties, sku=deployment.sku)
     LongRunningOperation(cmd.cli_ctx)(deployment_poller)
