@@ -41,6 +41,7 @@ from threading import Timer
 import sys
 import json
 from collections import defaultdict
+from ._enterprise import _is_enterprise_tier, _app_deploy_enterprise
 
 logger = get_logger(__name__)
 DEFAULT_DEPLOYMENT_NAME = "default"
@@ -484,7 +485,8 @@ def app_deploy(cmd, client, resource_group, service, name,
 
     file_type, file_path = _get_upload_local_file(runtime_version, artifact_path)
 
-    return _app_deploy(client,
+    return _app_deploy(cmd,
+                       client,
                        resource_group,
                        service,
                        name,
@@ -754,7 +756,7 @@ def deployment_create(cmd, client, resource_group, service, app, name,
         instance_count = instance_count or 1
 
     file_type, file_path = _get_upload_local_file(runtime_version, artifact_path)
-    return _app_deploy(client, resource_group, service, app, name, version, file_path,
+    return _app_deploy(cmd, client, resource_group, service, app, name, version, file_path,
                        runtime_version,
                        jvm_options,
                        cpu,
@@ -1267,7 +1269,7 @@ def _get_all_apps(client, resource_group, service):
 
 
 # pylint: disable=too-many-locals, no-member
-def _app_deploy(client, resource_group, service, app, name, version, path, runtime_version, jvm_options, cpu, memory,
+def _app_deploy(cmd, client, resource_group, service, app, name, version, path, runtime_version, jvm_options, cpu, memory,
                 instance_count,
                 env,
                 main_entry=None,
@@ -1275,6 +1277,9 @@ def _app_deploy(client, resource_group, service, app, name, version, path, runti
                 no_wait=False,
                 file_type="Jar",
                 update=False):
+    if _is_enterprise_tier(cmd, resource_group, service):
+        return _app_deploy_enterprise(cmd, resource_group, service, app, name, version, path, runtime_version, jvm_options, cpu, memory, 
+                                      instance_count, env, target_module, no_wait, update)
     upload_url = None
     relative_path = None
     logger.warning("file_type is {}".format(file_type))
