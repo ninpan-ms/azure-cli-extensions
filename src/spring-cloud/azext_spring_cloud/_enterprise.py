@@ -147,5 +147,4 @@ def _get_addon_configs(config_file_patterns):
     )
     addon_configs = {}
     addon_configs[APPLICATION_CONFIGURATION_SERVICE_NAME] = patterns
-    print(patterns.properties[APPLICATION_CONFIGURATION_SERVICE_PROPERTY_PATTERN])
     return addon_configs
