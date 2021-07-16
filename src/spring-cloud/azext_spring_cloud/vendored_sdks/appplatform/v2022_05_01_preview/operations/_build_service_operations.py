@@ -263,7 +263,7 @@ class BuildServiceOperations(object):
         return deserialized
     get_build_result_log.metadata = {'url': '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AppPlatform/Spring/{serviceName}/buildservices/default/builds/{buildName}/results/{buildResultName}/logs/{buildResultLogName}'}  # type: ignore
 
-    def get_upload_url(
+    def get_resource_upload_url(
         self,
         resource_group_name,  # type: str
         service_name,  # type: str
@@ -291,7 +291,7 @@ class BuildServiceOperations(object):
         accept = "application/json"
 
         # Construct URL
-        url = self.get_upload_url.metadata['url']  # type: ignore
+        url = self.get_resource_upload_url.metadata['url']  # type: ignore
         path_format_arguments = {
             'subscriptionId': self._serialize.url("self._config.subscription_id", self._config.subscription_id, 'str'),
             'resourceGroupName': self._serialize.url("resource_group_name", resource_group_name, 'str'),
@@ -321,4 +321,4 @@ class BuildServiceOperations(object):
             return cls(pipeline_response, deserialized, {})
 
         return deserialized
-    get_upload_url.metadata = {'url': '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AppPlatform/Spring/{serviceName}/buildservices/default/getUploadUrl'}  # type: ignore
+    get_resource_upload_url.metadata = {'url': '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AppPlatform/Spring/{serviceName}/buildservices/default/getUploadUrl'}  # type: ignore

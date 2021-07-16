@@ -206,8 +206,8 @@ class AppResourceProperties(msrest.serialization.Model):
     :type public: bool
     :ivar url: URL of the App.
     :vartype url: str
-    :param addon_config: Collection of addons.
-    :type addon_config: dict[str, ~azure.mgmt.appplatform.v2022_05_01_preview.models.AddonProfile]
+    :param addon_configs: Collection of addons.
+    :type addon_configs: dict[str, ~azure.mgmt.appplatform.v2022_05_01_preview.models.AddonProfile]
     :ivar provisioning_state: Provisioning state of the App. Possible values include: "Succeeded",
      "Failed", "Creating", "Updating", "Deleting".
     :vartype provisioning_state: str or
@@ -235,7 +235,7 @@ class AppResourceProperties(msrest.serialization.Model):
     _attribute_map = {
         'public': {'key': 'public', 'type': 'bool'},
         'url': {'key': 'url', 'type': 'str'},
-        'addon_config': {'key': 'addonConfig', 'type': '{AddonProfile}'},
+        'addon_configs': {'key': 'addonConfigs', 'type': '{AddonProfile}'},
         'provisioning_state': {'key': 'provisioningState', 'type': 'str'},
         'active_deployment_name': {'key': 'activeDeploymentName', 'type': 'str'},
         'fqdn': {'key': 'fqdn', 'type': 'str'},
@@ -252,7 +252,7 @@ class AppResourceProperties(msrest.serialization.Model):
         super(AppResourceProperties, self).__init__(**kwargs)
         self.public = kwargs.get('public', None)
         self.url = None
-        self.addon_config = kwargs.get('addon_config', None)
+        self.addon_configs = kwargs.get('addon_configs', None)
         self.provisioning_state = None
         self.active_deployment_name = kwargs.get('active_deployment_name', None)
         self.fqdn = kwargs.get('fqdn', None)
@@ -1698,8 +1698,8 @@ class DeploymentSettings(msrest.serialization.Model):
     :type resource_requests: ~azure.mgmt.appplatform.v2022_05_01_preview.models.ResourceRequests
     :param environment_variables: Collection of environment variables.
     :type environment_variables: dict[str, str]
-    :param addon_config: Collection of addons.
-    :type addon_config: dict[str, ~azure.mgmt.appplatform.v2022_05_01_preview.models.AddonProfile]
+    :param addon_configs: Collection of addons.
+    :type addon_configs: dict[str, ~azure.mgmt.appplatform.v2022_05_01_preview.models.AddonProfile]
     """
 
     _attribute_map = {
@@ -1707,7 +1707,7 @@ class DeploymentSettings(msrest.serialization.Model):
         'memory_in_gb': {'key': 'memoryInGB', 'type': 'int'},
         'resource_requests': {'key': 'resourceRequests', 'type': 'ResourceRequests'},
         'environment_variables': {'key': 'environmentVariables', 'type': '{str}'},
-        'addon_config': {'key': 'addonConfig', 'type': '{AddonProfile}'},
+        'addon_configs': {'key': 'addonConfigs', 'type': '{AddonProfile}'},
     }
 
     def __init__(
@@ -1719,7 +1719,7 @@ class DeploymentSettings(msrest.serialization.Model):
         self.memory_in_gb = kwargs.get('memory_in_gb', 1)
         self.resource_requests = kwargs.get('resource_requests', None)
         self.environment_variables = kwargs.get('environment_variables', None)
-        self.addon_config = kwargs.get('addon_config', None)
+        self.addon_configs = kwargs.get('addon_configs', None)
 
 
 class Error(msrest.serialization.Model):

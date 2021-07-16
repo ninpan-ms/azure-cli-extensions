@@ -472,6 +472,7 @@ def app_deploy(cmd, client, resource_group, service, name,
                jvm_options=None,
                main_entry=None,
                env=None,
+               config_file_patterns=None,
                no_wait=False):
     logger.warning(LOG_RUNNING_PROMPT)
     if not deployment:
@@ -500,6 +501,7 @@ def app_deploy(cmd, client, resource_group, service, name,
                        None,
                        env,
                        main_entry,
+                       config_file_patterns,
                        target_module,
                        no_wait,
                        file_type,
@@ -1273,13 +1275,14 @@ def _app_deploy(cmd, client, resource_group, service, app, name, version, path, 
                 instance_count,
                 env,
                 main_entry=None,
+                config_file_patterns=None,
                 target_module=None,
                 no_wait=False,
                 file_type="Jar",
                 update=False):
     if _is_enterprise_tier(cmd, resource_group, service):
         return _app_deploy_enterprise(cmd, resource_group, service, app, name, version, path, runtime_version, jvm_options, cpu, memory, 
-                                      instance_count, env, target_module, no_wait, update)
+                                      instance_count, env, config_file_patterns, target_module, no_wait, update)
     upload_url = None
     relative_path = None
     logger.warning("file_type is {}".format(file_type))

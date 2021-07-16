@@ -16,6 +16,8 @@ from six.moves.urllib import parse
 from threading import Thread
 
 logger = get_logger(__name__)
+APPLICATION_CONFIGURATION_SERVICE_NAME = "ApplicationConfigurationService"
+APPLICATION_CONFIGURATION_SERVICE_PROPERTY_PATTERN = "ConfigFilePatterns"
 
 def _get_client(cmd):
     return get_mgmt_service_client(cmd.cli_ctx, AppPlatformManagementClient)
@@ -35,6 +37,7 @@ def _get_upload_local_file():
 def _app_deploy_enterprise(cmd, resource_group, service, app, name, version, path, runtime_version, jvm_options, cpu, memory,
                            instance_count,
                            env,
+                           config_file_patterns=None,
                            target_module=None,
                            no_wait=False,
                            update=False):
@@ -55,7 +58,7 @@ def _app_deploy_enterprise(cmd, resource_group, service, app, name, version, pat
     relative_path = None
     logger.warning("[1/5] Requesting for upload URL.")
     try:
-        response = client.build_service.get_upload_url(resource_group, service)
+        response = client.build_service.get_resource_upload_url(resource_group, service)
         upload_url = response.upload_url
         relative_path = response.relative_path
     except CloudError as e:
@@ -118,8 +121,9 @@ def _app_deploy_enterprise(cmd, resource_group, service, app, name, version, pat
     # todo if jvm option, put to env
     settings = models.DeploymentSettings(
         resource_requests=resource_requests,
+        addon_configs=_get_addon_configs(config_file_patterns),
         environment_variables=env
-    ) if resource_requests or env else None
+    ) if resource_requests or env or (config_file_patterns != None) else None
     sku = models.Sku(name='E0', tier='Enterprise', capacity=instance_count) if instance_count else None
     user_source_info = models.BuildResultUserSourceInfo(version=version, build_result_id=build_result_id)
     properties = models.DeploymentResourceProperties(
@@ -133,4 +137,15 @@ def _app_deploy_enterprise(cmd, resource_group, service, app, name, version, pat
 
     return sdk_no_wait(no_wait, client.deployments.begin_create_or_update,
                        resource_group, service, app, name, deployment_resource)
-    
+
+
+def _get_addon_configs(config_file_patterns):
+    patterns = models.AddonProfile(
+        properties = {
+            APPLICATION_CONFIGURATION_SERVICE_PROPERTY_PATTERN: config_file_patterns
+        }
+    )
+    addon_configs = {}
+    addon_configs[APPLICATION_CONFIGURATION_SERVICE_NAME] = patterns
+    print(patterns.properties[APPLICATION_CONFIGURATION_SERVICE_PROPERTY_PATTERN])
+    return addon_configs
