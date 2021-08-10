@@ -37,6 +37,11 @@ def load_command_table(self, _):
         client_factory=cf_spring_cloud_enterprise
     )
 
+    application_configuration_service_cmd_group = CliCommandType(
+        operations_tmpl='azext_spring_cloud.application_configuration_service#{}',
+        client_factory=cf_spring_cloud_enterprise
+    )
+
     with self.command_group('spring-cloud', client_factory=cf_app_services,
                             exception_handler=handle_asc_exception) as g:
         g.custom_command('create', 'spring_cloud_create', supports_no_wait=True, client_factory=cf_spring_cloud)
@@ -149,6 +154,22 @@ def load_command_table(self, _):
         g.custom_command('show', 'service_registry_show')
         g.custom_command('bind', 'service_registry_bind')
         g.custom_command('unbind', 'service_registry_unbind')
+
+    with self.command_group('spring-cloud application-configuration-service',
+                            custom_command_type=application_configuration_service_cmd_group,
+                            exception_handler=handle_asc_exception) as g:
+        g.custom_command('clear', 'application_configuration_service_clear')
+        g.custom_command('show', 'application_configuration_service_show')
+        g.custom_command('bind', 'application_configuration_service_bind')
+        g.custom_command('unbind', 'application_configuration_service_unbind')
+
+    with self.command_group('spring-cloud application-configuration-service git repo',
+                            custom_command_type=application_configuration_service_cmd_group,
+                            exception_handler=handle_asc_exception) as g:
+        g.custom_command('add', 'application_configuration_service_git_add')
+        g.custom_command('update', 'application_configuration_service_git_update')
+        g.custom_command('remove', 'application_configuration_service_git_remove')
+        g.custom_command('list', 'application_configuration_service_git_list')
 
     with self.command_group('spring-cloud', exception_handler=handle_asc_exception):
         pass
