@@ -19,19 +19,17 @@ APPLICATION_CONFIGURATION_SERVICE_NAME = "ApplicationConfigurationService"
 logger = get_logger(__name__)
 
 def application_configuration_service_show(cmd, client, service, resource_group):
-    if is_enterprise_tier(cmd, resource_group, service):
-        return client.configuration_services.get(resource_group, service)
-    else:
-        raise CLIError("Application Configuration Service is only supported in Enterprise tier.")
+    _validate_tier(cmd, resource_group, service)
+
+    return client.configuration_services.get(resource_group, service)
 
 
 def application_configuration_service_clear(cmd, client, service, resource_group):
-    if is_enterprise_tier(cmd, resource_group, service):
-        properties = models.ConfigurationServiceGitProperty()
-        acs_resource = models.ConfigurationServiceResource(properties=properties)
-        return client.configuration_services.begin_create_or_update(resource_group, service, acs_resource)
-    else:
-        raise CLIError("Application Configuration Service is only supported in Enterprise tier.")
+    _validate_tier(cmd, resource_group, service)
+
+    properties = models.ConfigurationServiceGitProperty()
+    acs_resource = models.ConfigurationServiceResource(properties=properties)
+    return client.configuration_services.begin_create_or_update(resource_group, service, acs_resource)
 
 
 def application_configuration_service_git_add(cmd, client, service, resource_group,
@@ -44,6 +42,8 @@ def application_configuration_service_git_add(cmd, client, service, resource_gro
                                               private_key=None,
                                               strict_host_key_checking=None,
                                               no_wait=False):
+    _validate_tier(cmd, resource_group, service)
+
     if patterns:
         patterns = patterns.split(",")
     repo = models.ConfigurationServiceGitRepository(name=name, patterns=patterns, uri=uri, label=label)
@@ -94,6 +94,8 @@ def application_configuration_service_git_update(cmd, client, service, resource_
                                               private_key=None,
                                               strict_host_key_checking=None,
                                               no_wait=False):
+    _validate_tier(cmd, resource_group, service)
+
     acs_resource = client.configuration_services.get(resource_group, service)
     acs_settings = acs_resource.properties.settings
     if not acs_settings or not acs_settings.git_property or not acs_settings.git_property.repositories:
@@ -132,6 +134,8 @@ def application_configuration_service_git_update(cmd, client, service, resource_
 
 
 def application_configuration_service_git_remove(cmd, client, service, resource_group, name, no_wait=False):
+    _validate_tier(cmd, resource_group, service)
+
     acs_resource = client.configuration_services.get(resource_group, service)
     acs_settings = acs_resource.properties.settings
     if not acs_settings or not acs_settings.git_property or not acs_settings.git_property.repositories:
@@ -156,6 +160,8 @@ def application_configuration_service_git_remove(cmd, client, service, resource_
 
 
 def application_configuration_service_git_list(cmd, client, service, resource_group):
+    _validate_tier(cmd, resource_group, service)
+
     acs_resource = client.configuration_services.get(resource_group, service)
     acs_settings = acs_resource.properties.settings
 
@@ -166,17 +172,15 @@ def application_configuration_service_git_list(cmd, client, service, resource_gr
 
 
 def application_configuration_service_bind(cmd, client, service, resource_group, app):
-    if is_enterprise_tier(cmd, resource_group, service):
-        _acs_bind_or_unbind_app(cmd, client, service, resource_group, app, True)
-    else:
-        raise CLIError("Application Configuration Service is only supported in Enterprise tier.")
+    _validate_tier(cmd, resource_group, service)
+
+    _acs_bind_or_unbind_app(cmd, client, service, resource_group, app, True)
 
 
 def application_configuration_service_unbind(cmd, client, service, resource_group, app):
-    if is_enterprise_tier(cmd, resource_group, service):
-        _acs_bind_or_unbind_app(cmd, client, service, resource_group, app, False)
-    else:
-        raise CLIError("Application Configuration Service is only supported in Enterprise tier.")
+    _validate_tier(cmd, resource_group, service)
+
+    _acs_bind_or_unbind_app(cmd, client, service, resource_group, app, False)
 
 
 def _acs_bind_or_unbind_app(cmd, client, service, resource_group, app_name, enabled):
@@ -222,3 +226,8 @@ def _validate_acs_settings(client, resource_group, service, acs_settings):
                         logger.error("Item of the name \"%s\" meets error:", item.name)
                     logger.error("\n".join(item.messages))
             raise CLIError("Application Configuration Service settings contain errors.")
+
+
+def _validate_tier(cmd, resource_group, service):
+    if not is_enterprise_tier(cmd, resource_group, service):
+        raise CLIError("Service Registry is only supported in Enterprise tier.")
