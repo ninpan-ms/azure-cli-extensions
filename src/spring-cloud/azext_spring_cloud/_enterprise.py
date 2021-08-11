@@ -308,7 +308,7 @@ def _get_addon_configs(config_file_patterns):
 
 
 def _get_config_file_patterns(addon_configs):
-    return addon_configs[APPLICATION_CONFIGURATION_SERVICE_NAME] if addon_configs is not None else None
+    return addon_configs.get(APPLICATION_CONFIGURATION_SERVICE_NAME) if addon_configs is not None else None
 
 
 def _get_active_deployment(client, resource_group, service, name):
