@@ -1562,9 +1562,8 @@ class ConfigurationServiceProperties(msrest.serialization.Model):
     :ivar runtime_state: Runtime state of the Application Configuration Service.
     :vartype runtime_state:
      ~azure.mgmt.appplatform.v2022_05_01_preview.models.ConfigurationServiceRuntimeState
-    :param configuration_service_settings: The settings of Application Configuration Service.
-    :type configuration_service_settings:
-     ~azure.mgmt.appplatform.v2022_05_01_preview.models.ConfigurationServiceSettings
+    :param settings: The settings of Application Configuration Service.
+    :type settings: ~azure.mgmt.appplatform.v2022_05_01_preview.models.ConfigurationServiceSettings
     """
 
     _validation = {
@@ -1575,19 +1574,19 @@ class ConfigurationServiceProperties(msrest.serialization.Model):
     _attribute_map = {
         'provisioning_state': {'key': 'provisioningState', 'type': 'str'},
         'runtime_state': {'key': 'runtimeState', 'type': 'ConfigurationServiceRuntimeState'},
-        'configuration_service_settings': {'key': 'configurationServiceSettings', 'type': 'ConfigurationServiceSettings'},
+        'settings': {'key': 'settings', 'type': 'ConfigurationServiceSettings'},
     }
 
     def __init__(
         self,
         *,
-        configuration_service_settings: Optional["ConfigurationServiceSettings"] = None,
+        settings: Optional["ConfigurationServiceSettings"] = None,
         **kwargs
     ):
         super(ConfigurationServiceProperties, self).__init__(**kwargs)
         self.provisioning_state = None
         self.runtime_state = None
-        self.configuration_service_settings = configuration_service_settings
+        self.settings = settings
 
 
 class ConfigurationServiceResource(ProxyResource):
@@ -1673,45 +1672,45 @@ class ConfigurationServiceRuntimeState(msrest.serialization.Model):
 class ConfigurationServiceSettings(msrest.serialization.Model):
     """The settings of Application Configuration Service.
 
-    :param git_properties: Property of git environment.
-    :type git_properties:
+    :param git_property: Property of git environment.
+    :type git_property:
      ~azure.mgmt.appplatform.v2022_05_01_preview.models.ConfigurationServiceGitProperty
     """
 
     _attribute_map = {
-        'git_properties': {'key': 'gitProperties', 'type': 'ConfigurationServiceGitProperty'},
+        'git_property': {'key': 'gitProperty', 'type': 'ConfigurationServiceGitProperty'},
     }
 
     def __init__(
         self,
         *,
-        git_properties: Optional["ConfigurationServiceGitProperty"] = None,
+        git_property: Optional["ConfigurationServiceGitProperty"] = None,
         **kwargs
     ):
         super(ConfigurationServiceSettings, self).__init__(**kwargs)
-        self.git_properties = git_properties
+        self.git_property = git_property
 
 
 class ConfigurationServiceSettingsValidateResult(msrest.serialization.Model):
     """Validation result for configuration service settings.
 
-    :param git_property_validate_result: Validation result for configuration service settings.
-    :type git_property_validate_result:
+    :param git_property_validation_result: Validation result for configuration service settings.
+    :type git_property_validation_result:
      ~azure.mgmt.appplatform.v2022_05_01_preview.models.ConfigurationServiceGitPropertyValidateResult
     """
 
     _attribute_map = {
-        'git_property_validate_result': {'key': 'gitPropertyValidateResult', 'type': 'ConfigurationServiceGitPropertyValidateResult'},
+        'git_property_validation_result': {'key': 'gitPropertyValidationResult', 'type': 'ConfigurationServiceGitPropertyValidateResult'},
     }
 
     def __init__(
         self,
         *,
-        git_property_validate_result: Optional["ConfigurationServiceGitPropertyValidateResult"] = None,
+        git_property_validation_result: Optional["ConfigurationServiceGitPropertyValidateResult"] = None,
         **kwargs
     ):
         super(ConfigurationServiceSettingsValidateResult, self).__init__(**kwargs)
-        self.git_property_validate_result = git_property_validate_result
+        self.git_property_validation_result = git_property_validation_result
 
 
 class CustomContainer(UserSourceInfo):
@@ -2105,14 +2104,6 @@ class DeploymentResourceProperties(msrest.serialization.Model):
 class DeploymentSettings(msrest.serialization.Model):
     """Deployment settings payload.
 
-    :param cpu: Required CPU. This should be 1 for Basic tier, and in range [1, 4] for Standard
-     tier. This is deprecated starting from API version 2022-05-01-preview. Please use the
-     resourceRequests field to set the CPU size.
-    :type cpu: int
-    :param memory_in_gb: Required Memory size in GB. This should be in range [1, 2] for Basic tier,
-     and in range [1, 8] for Standard tier. This is deprecated starting from API version
-     2022-05-01-preview. Please use the resourceRequests field to set the the memory size.
-    :type memory_in_gb: int
     :param resource_requests: The requested resource quantity for required CPU and Memory. It is
      recommended that using this field to represent the required CPU and Memory, the old field cpu
      and memoryInGB will be deprecated later.
@@ -2124,8 +2115,6 @@ class DeploymentSettings(msrest.serialization.Model):
     """
 
     _attribute_map = {
-        'cpu': {'key': 'cpu', 'type': 'int'},
-        'memory_in_gb': {'key': 'memoryInGB', 'type': 'int'},
         'resource_requests': {'key': 'resourceRequests', 'type': 'ResourceRequests'},
         'environment_variables': {'key': 'environmentVariables', 'type': '{str}'},
         'addon_configs': {'key': 'addonConfigs', 'type': '{AddonProfile}'},
@@ -2134,16 +2123,12 @@ class DeploymentSettings(msrest.serialization.Model):
     def __init__(
         self,
         *,
-        cpu: Optional[int] = 1,
-        memory_in_gb: Optional[int] = 1,
         resource_requests: Optional["ResourceRequests"] = None,
         environment_variables: Optional[Dict[str, str]] = None,
         addon_configs: Optional[Dict[str, "AddonProfile"]] = None,
         **kwargs
     ):
         super(DeploymentSettings, self).__init__(**kwargs)
-        self.cpu = cpu
-        self.memory_in_gb = memory_in_gb
         self.resource_requests = resource_requests
         self.environment_variables = environment_variables
         self.addon_configs = addon_configs
@@ -3340,6 +3325,148 @@ class ResourceUploadDefinition(msrest.serialization.Model):
         super(ResourceUploadDefinition, self).__init__(**kwargs)
         self.relative_path = relative_path
         self.upload_url = upload_url
+
+
+class ServiceRegistryInstance(msrest.serialization.Model):
+    """Collection of instances belong to the Service Registry.
+
+    Variables are only populated by the server, and will be ignored when sending a request.
+
+    :ivar name: Name of the Service Registry instance.
+    :vartype name: str
+    :ivar status: Status of the Service Registry instance.
+    :vartype status: str
+    """
+
+    _validation = {
+        'name': {'readonly': True},
+        'status': {'readonly': True},
+    }
+
+    _attribute_map = {
+        'name': {'key': 'name', 'type': 'str'},
+        'status': {'key': 'status', 'type': 'str'},
+    }
+
+    def __init__(
+        self,
+        **kwargs
+    ):
+        super(ServiceRegistryInstance, self).__init__(**kwargs)
+        self.name = None
+        self.status = None
+
+
+class ServiceRegistryProperties(msrest.serialization.Model):
+    """Service Registry properties payload.
+
+    Variables are only populated by the server, and will be ignored when sending a request.
+
+    :ivar provisioning_state: State of the Service Registry. Possible values include: "Creating",
+     "Updating", "Succeeded", "Failed", "Deleting".
+    :vartype provisioning_state: str or
+     ~azure.mgmt.appplatform.v2022_05_01_preview.models.ServiceRegistryProvisioningState
+    :ivar runtime_state: Runtime state of the Service Registry.
+    :vartype runtime_state:
+     ~azure.mgmt.appplatform.v2022_05_01_preview.models.ServiceRegistryRuntimeState
+    """
+
+    _validation = {
+        'provisioning_state': {'readonly': True},
+        'runtime_state': {'readonly': True},
+    }
+
+    _attribute_map = {
+        'provisioning_state': {'key': 'provisioningState', 'type': 'str'},
+        'runtime_state': {'key': 'runtimeState', 'type': 'ServiceRegistryRuntimeState'},
+    }
+
+    def __init__(
+        self,
+        **kwargs
+    ):
+        super(ServiceRegistryProperties, self).__init__(**kwargs)
+        self.provisioning_state = None
+        self.runtime_state = None
+
+
+class ServiceRegistryResource(ProxyResource):
+    """Service Registry resource.
+
+    Variables are only populated by the server, and will be ignored when sending a request.
+
+    :ivar id: Fully qualified resource Id for the resource.
+    :vartype id: str
+    :ivar name: The name of the resource.
+    :vartype name: str
+    :ivar type: The type of the resource.
+    :vartype type: str
+    :param properties: Service Registry properties payload.
+    :type properties: ~azure.mgmt.appplatform.v2022_05_01_preview.models.ServiceRegistryProperties
+    """
+
+    _validation = {
+        'id': {'readonly': True},
+        'name': {'readonly': True},
+        'type': {'readonly': True},
+    }
+
+    _attribute_map = {
+        'id': {'key': 'id', 'type': 'str'},
+        'name': {'key': 'name', 'type': 'str'},
+        'type': {'key': 'type', 'type': 'str'},
+        'properties': {'key': 'properties', 'type': 'ServiceRegistryProperties'},
+    }
+
+    def __init__(
+        self,
+        *,
+        properties: Optional["ServiceRegistryProperties"] = None,
+        **kwargs
+    ):
+        super(ServiceRegistryResource, self).__init__(**kwargs)
+        self.properties = properties
+
+
+class ServiceRegistryRuntimeState(msrest.serialization.Model):
+    """Runtime state of the Service Registry.
+
+    Variables are only populated by the server, and will be ignored when sending a request.
+
+    :ivar cpu: Cpu allocated to each Service Registry instance.
+    :vartype cpu: str
+    :ivar memory: Memory allocated to each Service Registry instance.
+    :vartype memory: str
+    :ivar instance_count: Instance count of the Service Registry.
+    :vartype instance_count: int
+    :ivar instances: Collection of instances belong to the Service Registry.
+    :vartype instances:
+     list[~azure.mgmt.appplatform.v2022_05_01_preview.models.ServiceRegistryInstance]
+    """
+
+    _validation = {
+        'cpu': {'readonly': True},
+        'memory': {'readonly': True},
+        'instance_count': {'readonly': True},
+        'instances': {'readonly': True},
+    }
+
+    _attribute_map = {
+        'cpu': {'key': 'cpu', 'type': 'str'},
+        'memory': {'key': 'memory', 'type': 'str'},
+        'instance_count': {'key': 'instanceCount', 'type': 'int'},
+        'instances': {'key': 'instances', 'type': '[ServiceRegistryInstance]'},
+    }
+
+    def __init__(
+        self,
+        **kwargs
+    ):
+        super(ServiceRegistryRuntimeState, self).__init__(**kwargs)
+        self.cpu = None
+        self.memory = None
+        self.instance_count = None
+        self.instances = None
 
 
 class TrackedResource(Resource):

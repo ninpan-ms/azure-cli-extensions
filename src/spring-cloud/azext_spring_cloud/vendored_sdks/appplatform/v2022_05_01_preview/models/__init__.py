@@ -93,6 +93,10 @@ try:
     from ._models_py3 import ResourceSkuRestrictions
     from ._models_py3 import ResourceSkuZoneDetails
     from ._models_py3 import ResourceUploadDefinition
+    from ._models_py3 import ServiceRegistryInstance
+    from ._models_py3 import ServiceRegistryProperties
+    from ._models_py3 import ServiceRegistryResource
+    from ._models_py3 import ServiceRegistryRuntimeState
     from ._models_py3 import ServiceResource
     from ._models_py3 import ServiceResourceList
     from ._models_py3 import ServiceSpecification
@@ -195,6 +199,10 @@ except (SyntaxError, ImportError):
     from ._models import ResourceSkuRestrictions  # type: ignore
     from ._models import ResourceSkuZoneDetails  # type: ignore
     from ._models import ResourceUploadDefinition  # type: ignore
+    from ._models import ServiceRegistryInstance  # type: ignore
+    from ._models import ServiceRegistryProperties  # type: ignore
+    from ._models import ServiceRegistryResource  # type: ignore
+    from ._models import ServiceRegistryRuntimeState  # type: ignore
     from ._models import ServiceResource  # type: ignore
     from ._models import ServiceResourceList  # type: ignore
     from ._models import ServiceSpecification  # type: ignore
@@ -225,6 +233,7 @@ from ._app_platform_management_client_enums import (
     ProvisioningState,
     ResourceSkuRestrictionsReasonCode,
     ResourceSkuRestrictionsType,
+    ServiceRegistryProvisioningState,
     SkuScaleType,
     SupportedRuntimePlatform,
     SupportedRuntimeValue,
@@ -319,6 +328,10 @@ __all__ = [
     'ResourceSkuRestrictions',
     'ResourceSkuZoneDetails',
     'ResourceUploadDefinition',
+    'ServiceRegistryInstance',
+    'ServiceRegistryProperties',
+    'ServiceRegistryResource',
+    'ServiceRegistryRuntimeState',
     'ServiceResource',
     'ServiceResourceList',
     'ServiceSpecification',
@@ -347,6 +360,7 @@ __all__ = [
     'ProvisioningState',
     'ResourceSkuRestrictionsReasonCode',
     'ResourceSkuRestrictionsType',
+    'ServiceRegistryProvisioningState',
     'SkuScaleType',
     'SupportedRuntimePlatform',
     'SupportedRuntimeValue',

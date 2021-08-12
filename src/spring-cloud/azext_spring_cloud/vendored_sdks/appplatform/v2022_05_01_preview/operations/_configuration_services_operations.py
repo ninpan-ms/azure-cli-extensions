@@ -356,7 +356,7 @@ class ConfigurationServicesOperations(object):
         self,
         resource_group_name,  # type: str
         service_name,  # type: str
-        configuration_service_settings,  # type: "_models.ConfigurationServiceSettings"
+        settings,  # type: "_models.ConfigurationServiceSettings"
         **kwargs  # type: Any
     ):
         # type: (...) -> "_models.ConfigurationServiceSettingsValidateResult"
@@ -388,7 +388,7 @@ class ConfigurationServicesOperations(object):
         header_parameters['Accept'] = self._serialize.header("accept", accept, 'str')
 
         body_content_kwargs = {}  # type: Dict[str, Any]
-        body_content = self._serialize.body(configuration_service_settings, 'ConfigurationServiceSettings')
+        body_content = self._serialize.body(settings, 'ConfigurationServiceSettings')
         body_content_kwargs['content'] = body_content
         request = self._client.post(url, query_parameters, header_parameters, **body_content_kwargs)
         pipeline_response = self._client._pipeline.run(request, stream=False, **kwargs)
@@ -414,7 +414,7 @@ class ConfigurationServicesOperations(object):
         self,
         resource_group_name,  # type: str
         service_name,  # type: str
-        configuration_service_settings,  # type: "_models.ConfigurationServiceSettings"
+        settings,  # type: "_models.ConfigurationServiceSettings"
         **kwargs  # type: Any
     ):
         # type: (...) -> LROPoller["_models.ConfigurationServiceSettingsValidateResult"]
@@ -425,9 +425,8 @@ class ConfigurationServicesOperations(object):
         :type resource_group_name: str
         :param service_name: The name of the Service resource.
         :type service_name: str
-        :param configuration_service_settings: Application Configuration Service settings to be
-         validated.
-        :type configuration_service_settings: ~azure.mgmt.appplatform.v2022_05_01_preview.models.ConfigurationServiceSettings
+        :param settings: Application Configuration Service settings to be validated.
+        :type settings: ~azure.mgmt.appplatform.v2022_05_01_preview.models.ConfigurationServiceSettings
         :keyword callable cls: A custom type or function that will be passed the direct response
         :keyword str continuation_token: A continuation token to restart a poller from a saved state.
         :keyword polling: By default, your polling method will be ARMPolling.
@@ -449,7 +448,7 @@ class ConfigurationServicesOperations(object):
             raw_result = self._validate_initial(
                 resource_group_name=resource_group_name,
                 service_name=service_name,
-                configuration_service_settings=configuration_service_settings,
+                settings=settings,
                 cls=lambda x,y,z: x,
                 **kwargs
             )

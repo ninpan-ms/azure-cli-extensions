@@ -147,6 +147,16 @@ class ResourceSkuRestrictionsType(with_metaclass(_CaseInsensitiveEnumMeta, str, 
     LOCATION = "Location"
     ZONE = "Zone"
 
+class ServiceRegistryProvisioningState(with_metaclass(_CaseInsensitiveEnumMeta, str, Enum)):
+    """State of the Service Registry.
+    """
+
+    CREATING = "Creating"
+    UPDATING = "Updating"
+    SUCCEEDED = "Succeeded"
+    FAILED = "Failed"
+    DELETING = "Deleting"
+
 class SkuScaleType(with_metaclass(_CaseInsensitiveEnumMeta, str, Enum)):
     """Gets or sets the type of the scale.
     """

@@ -40,11 +40,12 @@ def application_configuration_service_git_add(cmd, client, service, resource_gro
                                               strict_host_key_checking=None,
                                               no_wait=False):
     repo = models.ConfigurationServiceGitRepository(name=name, patterns=patterns, uri=uri, label=label)
-    repo = _get_input_repo(repo, patterns, uri, label, search_paths, username, password, host_key, host_key_algorithm, private_key, strict_host_key_checking)
+    repo = _replace_repo_with_input(repo, patterns, uri, label, search_paths, username, password, host_key, host_key_algorithm, private_key, strict_host_key_checking)
 
-    acs_resource = client.configuration_services.get(resource_group, service)
-    acs_resource = _get_acs_resource(acs_resource)
+    acs_resource = _get_or_default_acs_resource(client, resource_group, service)
     repos = acs_resource.properties.settings.git_property.repositories
+    if next((r for r in repos if r.name == name), None) is not None:
+        raise CLIError("Repo '{}' already exists.".format(name))
     repos.append(repo)
     acs_resource.properties.settings.git_property.repositories = repos
 
@@ -66,13 +67,10 @@ def application_configuration_service_git_update(cmd, client, service, resource_
                                                  private_key=None,
                                                  strict_host_key_checking=None,
                                                  no_wait=False):
-    acs_resource = client.configuration_services.get(resource_group, service)
-    acs_resource = _get_acs_resource(acs_resource)
+    acs_resource = _get_or_default_acs_resource(client, resource_group, service)
 
     repo = _get_existing_repo(acs_resource.properties.settings.git_property.repositories, name)
-
-    repo = _get_input_repo(repo, patterns, uri, label, search_paths, username, password, host_key, host_key_algorithm, private_key, strict_host_key_checking)    
-    _replace_in_repos(repo, acs_resource.properties.settings.git_property.repositories)
+    repo = _replace_repo_with_input(repo, patterns, uri, label, search_paths, username, password, host_key, host_key_algorithm, private_key, strict_host_key_checking)
 
     _validate_acs_settings(client, resource_group, service, acs_resource.properties.settings)
 
@@ -81,11 +79,9 @@ def application_configuration_service_git_update(cmd, client, service, resource_
 
 
 def application_configuration_service_git_remove(cmd, client, service, resource_group, name, no_wait=False):
-    acs_resource = client.configuration_services.get(resource_group, service)
-    acs_resource = _get_acs_resource(acs_resource)
+    acs_resource = _get_or_default_acs_resource(acs_resource)
 
     repo = _get_existing_repo(acs_resource.properties.settings.git_property.repositories, name)
-
     acs_resource.properties.settings.git_property.repositories.remove(repo)
 
     _validate_acs_settings(client, resource_group, service, acs_resource.properties.settings)
@@ -132,7 +128,7 @@ def _get_app_addon_configs_with_acs(addon_configs):
     return addon_configs
 
 
-def _get_input_repo(repo, patterns, uri, label, search_paths, username, password, host_key, host_key_algorithm, private_key, strict_host_key_checking):
+def _replace_repo_with_input(repo, patterns, uri, label, search_paths, username, password, host_key, host_key_algorithm, private_key, strict_host_key_checking):
     if patterns:
         patterns = patterns.split(",")
     if search_paths:
@@ -158,11 +154,8 @@ def _get_existing_repo(repos, name):
     return repo
 
 
-def _replace_in_repos(repo, repos):
-    [repo if repo.name == r.name else r for r in repos]
-
-
-def _get_acs_resource(acs_resource):
+def _get_or_default_acs_resource(client, resource_group, service):
+    acs_resource = client.configuration_services.get(resource_group, service)
     if acs_resource is None:
         acs_resource = models.ConfigurationServiceResource()
     acs_resource.properties = _get_acs_properties(acs_resource.properties)

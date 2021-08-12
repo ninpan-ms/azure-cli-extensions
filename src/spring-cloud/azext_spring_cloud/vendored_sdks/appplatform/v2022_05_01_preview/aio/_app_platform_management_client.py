@@ -20,6 +20,8 @@ from ._configuration import AppPlatformManagementClientConfiguration
 from .operations import ServicesOperations
 from .operations import ConfigServersOperations
 from .operations import ConfigurationServicesOperations
+from .operations import ServiceRegistriesOperations
+from .operations import ServiceOperations
 from .operations import BuildServiceOperations
 from .operations import MonitoringSettingsOperations
 from .operations import AppsOperations
@@ -42,6 +44,10 @@ class AppPlatformManagementClient(object):
     :vartype config_servers: azure.mgmt.appplatform.v2022_05_01_preview.aio.operations.ConfigServersOperations
     :ivar configuration_services: ConfigurationServicesOperations operations
     :vartype configuration_services: azure.mgmt.appplatform.v2022_05_01_preview.aio.operations.ConfigurationServicesOperations
+    :ivar service_registries: ServiceRegistriesOperations operations
+    :vartype service_registries: azure.mgmt.appplatform.v2022_05_01_preview.aio.operations.ServiceRegistriesOperations
+    :ivar service: ServiceOperations operations
+    :vartype service: azure.mgmt.appplatform.v2022_05_01_preview.aio.operations.ServiceOperations
     :ivar build_service: BuildServiceOperations operations
     :vartype build_service: azure.mgmt.appplatform.v2022_05_01_preview.aio.operations.BuildServiceOperations
     :ivar monitoring_settings: MonitoringSettingsOperations operations
@@ -92,6 +98,10 @@ class AppPlatformManagementClient(object):
         self.config_servers = ConfigServersOperations(
             self._client, self._config, self._serialize, self._deserialize)
         self.configuration_services = ConfigurationServicesOperations(
+            self._client, self._config, self._serialize, self._deserialize)
+        self.service_registries = ServiceRegistriesOperations(
+            self._client, self._config, self._serialize, self._deserialize)
+        self.service = ServiceOperations(
             self._client, self._config, self._serialize, self._deserialize)
         self.build_service = BuildServiceOperations(
             self._client, self._config, self._serialize, self._deserialize)

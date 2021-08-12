@@ -9,6 +9,8 @@
 from ._services_operations import ServicesOperations
 from ._config_servers_operations import ConfigServersOperations
 from ._configuration_services_operations import ConfigurationServicesOperations
+from ._service_registries_operations import ServiceRegistriesOperations
+from ._service_operations import ServiceOperations
 from ._build_service_operations import BuildServiceOperations
 from ._monitoring_settings_operations import MonitoringSettingsOperations
 from ._apps_operations import AppsOperations
@@ -24,6 +26,8 @@ __all__ = [
     'ServicesOperations',
     'ConfigServersOperations',
     'ConfigurationServicesOperations',
+    'ServiceRegistriesOperations',
+    'ServiceOperations',
     'BuildServiceOperations',
     'MonitoringSettingsOperations',
     'AppsOperations',
