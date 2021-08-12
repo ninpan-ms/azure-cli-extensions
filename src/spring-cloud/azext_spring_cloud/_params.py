@@ -288,3 +288,30 @@ def load_arguments(self, _):
 
     with self.argument_context('spring-cloud service-registry unbind') as c:
         c.argument('app', app_name_type, help='Name of app.', validator=validate_app_name)
+
+    with self.argument_context('spring-cloud application-configuration-service bind') as c:
+        c.argument('app', app_name_type, help='Name of app.', validator=validate_app_name)
+
+    with self.argument_context('spring-cloud application-configuration-service unbind') as c:
+        c.argument('app', app_name_type, help='Name of app.', validator=validate_app_name)
+
+    for scope in ['spring-cloud application-configuration-service git repo add',
+                  'spring-cloud application-configuration-service git repo update']:
+        with self.argument_context(scope) as c:
+            c.argument('patterns',
+                    help="Required patterns used to search in Git repositories. For each pattern, use format like {application} or {application}/{profile} instead of {application}-{profile}.yml, and separate them by comma."),
+            c.argument('uri', help="Required Git URI."),
+            c.argument('label', help="Required branch name to search in the Git repository."),
+            c.argument('search_paths', help='search_paths of the added config, use , as delimiter for multiple paths.')
+            c.argument('username', help='Username of the added config.')
+            c.argument('password', help='Password of the added config.')
+            c.argument('host_key', help='Host key of the added config.')
+            c.argument('host_key_algorithm', help='Host key algorithm of the added config.')
+            c.argument('private_key', help='Private_key of the added config.')
+            c.argument('strict_host_key_checking', help='Strict_host_key_checking of the added config.')
+
+    for scope in ['spring-cloud application-configuration-service git repo add',
+                  'spring-cloud application-configuration-service git repo update',
+                  'spring-cloud application-configuration-service git repo remove']:
+        with self.argument_context(scope) as c:
+            c.argument('name', help="Required unique name to label each item of git configs.")
