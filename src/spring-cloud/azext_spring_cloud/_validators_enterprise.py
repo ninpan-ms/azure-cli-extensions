@@ -36,14 +36,27 @@ def validate_memory(namespace):
     namespace.memory = validate_and_normalize_memory(namespace.memory)
 
 
-def validate_config_file_patterns(namespace):
-    if not namespace.config_file_patterns:
+def validate_git_uri(namespace):
+    uri = namespace.uri
+    if uri and (uri.startswith("https://") or uri.startswith("git@")):
         return
-    pattern_list = namespace.config_file_patterns.split(',')
+    raise CLIError("Git URI should start with \"https://\" or \"git@\"")
+
+
+def validate_config_file_patterns(namespace):
+    _validate_patterns(namespace.config_file_patterns)
+
+
+def validate_acs_patterns(namespace):
+    _validate_patterns(namespace.patterns)
+
+
+def _validate_patterns(patterns):
+    pattern_list = patterns.split(',')
     invalid_list = [p for p in pattern_list if not _is_valid_pattern(p)]
-    if invalid_list:
-        logger.warning('Config file patterns "%s" are invalid.', ','.join(invalid_list))
-        raise CLIError('--config-file-patterns should be the collection of patterns separated by comma, each pattern in the format of \'application\' or \'application/profile\'')
+    if len(invalid_list) > 0:
+        logger.warning("Patterns '%s' are invalid.", ','.join(invalid_list))
+        raise CLIError("Patterns should be the collection of patterns separated by comma, each pattern in the format of 'application' or 'application/profile'")
 
 
 def _is_valid_pattern(pattern):

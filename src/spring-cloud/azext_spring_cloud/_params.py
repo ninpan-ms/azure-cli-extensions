@@ -13,7 +13,8 @@ from ._validators import (validate_env, validate_cosmos_type, validate_resource_
                           validate_vnet, validate_vnet_required_parameters, validate_node_resource_group,
                           validate_tracing_parameters, validate_app_insights_parameters, validate_java_agent_parameters,
                           validate_instance_count)
-from ._validators_enterprise import (validate_config_file_patterns, validate_cpu, validate_memory)
+from ._validators_enterprise import (only_support_enterprise, validate_config_file_patterns, validate_cpu, validate_memory,
+                                     validate_git_uri, validate_acs_patterns)
 from ._utils import ApiType
 
 from .vendored_sdks.appplatform.v2020_07_01.models import RuntimeVersion, TestKeyType
@@ -283,6 +284,10 @@ def load_arguments(self, _):
                    help="Disable Application Insights.",
                    validator=validate_app_insights_parameters)
 
+    for scope in ['spring-cloud application-configuration-service', 'spring-cloud service-registry']:
+        with self.argument_context(scope) as c:
+            c.argument('service', service_name_type, validator=only_support_enterprise)
+
     with self.argument_context('spring-cloud service-registry bind') as c:
         c.argument('app', app_name_type, help='Name of app.', validator=validate_app_name)
 
@@ -299,8 +304,9 @@ def load_arguments(self, _):
                   'spring-cloud application-configuration-service git repo update']:
         with self.argument_context(scope) as c:
             c.argument('patterns',
-                    help="Required patterns used to search in Git repositories. For each pattern, use format like {application} or {application}/{profile} instead of {application}-{profile}.yml, and separate them by comma."),
-            c.argument('uri', help="Required Git URI."),
+                        help="Required patterns used to search in Git repositories. For each pattern, use format like {application} or {application}/{profile} instead of {application}-{profile}.yml, and separate them by comma.",
+                        validator=validate_acs_patterns),
+            c.argument('uri', help="Required Git URI.", validator=validate_git_uri),
             c.argument('label', help="Required branch name to search in the Git repository."),
             c.argument('search_paths', help='search_paths of the added config, use , as delimiter for multiple paths.')
             c.argument('username', help='Username of the added config.')

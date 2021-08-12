@@ -100,11 +100,11 @@ def application_configuration_service_git_list(cmd, client, service, resource_gr
 
 
 def application_configuration_service_bind(cmd, client, service, resource_group, app):
-    _acs_bind_or_unbind_app(cmd, client, service, resource_group, app, True)
+    return _acs_bind_or_unbind_app(cmd, client, service, resource_group, app, True)
 
 
 def application_configuration_service_unbind(cmd, client, service, resource_group, app):
-    _acs_bind_or_unbind_app(cmd, client, service, resource_group, app, False)
+    return _acs_bind_or_unbind_app(cmd, client, service, resource_group, app, False)
 
 
 def _acs_bind_or_unbind_app(cmd, client, service, resource_group, app_name, enabled):

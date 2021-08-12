@@ -37,6 +37,11 @@ def transform_app_table_output(result):
         item['Persistent Storage'] = "{}/{} Gb".format(
             persistentStorage['usedInGb'], persistentStorage['sizeInGb']) if persistentStorage['sizeInGb'] else "-"
 
+        if 'addonConfigs' in item['properties']:
+            addon = item['properties']['addonConfigs']
+            item['Bind Service Registry'] = addon['ServiceRegistry']['enabled'] if addon['ServiceRegistry'] else False
+            item['Bind Application Configuration Service'] = addon['ApplicationConfigurationService']['enabled'] if addon['ApplicationConfigurationService'] else False
+
     return result if is_list else result[0]
 
 
