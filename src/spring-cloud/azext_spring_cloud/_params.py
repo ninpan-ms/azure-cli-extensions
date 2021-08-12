@@ -315,3 +315,9 @@ def load_arguments(self, _):
                   'spring-cloud application-configuration-service git repo remove']:
         with self.argument_context(scope) as c:
             c.argument('name', help="Required unique name to label each item of git configs.")
+
+    with self.argument_context('spring-cloud service-registry bind') as c:
+        c.argument('app', app_name_type, help='Name of app.', validator=validate_app_name)
+
+    with self.argument_context('spring-cloud service-registry unbind') as c:
+        c.argument('app', app_name_type, help='Name of app.', validator=validate_app_name)
