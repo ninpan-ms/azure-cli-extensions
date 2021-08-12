@@ -114,16 +114,22 @@ def application_configuration_service_unbind(cmd, client, service, resource_grou
 
 def _acs_bind_or_unbind_app(cmd, client, service, resource_group, app_name, enabled):
     app = client.apps.get(resource_group, service, app_name)
-    app.properties.addon_configs = {
-        APPLICATION_CONFIGURATION_SERVICE_NAME: models.AddonProfile()
-    } if app.properties.addon_configs is None else app.properties.addon_configs
+    app.properties.addon_configs = _get_app_addon_configs_with_acs(app.properties.addon_configs)
 
-    if app.properties.addon_configs.get(APPLICATION_CONFIGURATION_SERVICE_NAME).enabled == enabled:
+    if app.properties.addon_configs[APPLICATION_CONFIGURATION_SERVICE_NAME].enabled == enabled:
         logger.warning('App "{}" has been {}binded'.format(app_name, '' if enabled else 'un'))
         return
 
     app.properties.addon_configs[APPLICATION_CONFIGURATION_SERVICE_NAME].enabled = enabled
     return client.apps.begin_update(resource_group, service, app_name, app)
+
+
+def _get_app_addon_configs_with_acs(addon_configs):
+    if addon_configs is None:
+        addon_configs = {}
+    if addon_configs.get(APPLICATION_CONFIGURATION_SERVICE_NAME) is None:
+        addon_configs[APPLICATION_CONFIGURATION_SERVICE_NAME] = models.AddonProfile()
+    return addon_configs
 
 
 def _get_input_repo(repo, patterns, uri, label, search_paths, username, password, host_key, host_key_algorithm, private_key, strict_host_key_checking):
@@ -146,10 +152,10 @@ def _get_input_repo(repo, patterns, uri, label, search_paths, username, password
 
 
 def _get_existing_repo(repos, name):
-    repos = [r for r in repos if r.name == name]
-    if not repos or len(repos) != 1:
+    repo = next((r for r in repos if r.name == name), None)
+    if not repo:
         raise CLIError("Repo '{}' not found.".format(name))
-    return repos[0]
+    return repo
 
 
 def _replace_in_repos(repo, repos):
@@ -185,9 +191,7 @@ def _get_acs_git_property(git_property):
 
 
 def _get_acs_repos(repos):
-    if repos is None:
-        repos = []
-    return repos
+    return repos or []
 
 
 def _validate_acs_settings(client, resource_group, service, acs_settings):
