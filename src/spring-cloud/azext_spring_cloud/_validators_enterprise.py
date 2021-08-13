@@ -44,7 +44,8 @@ def validate_git_uri(namespace):
 
 
 def validate_config_file_patterns(namespace):
-    _validate_patterns(namespace.config_file_patterns)
+    if namespace.config_file_patterns:
+        _validate_patterns(namespace.config_file_patterns)
 
 
 def validate_acs_patterns(namespace):

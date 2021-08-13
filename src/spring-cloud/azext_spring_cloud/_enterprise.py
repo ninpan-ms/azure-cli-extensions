@@ -409,7 +409,7 @@ def _create_empty_app(client, resource_group, service, name):
 
 
 def _update_app(assign_endpoint=None):
-    if all(x is None for x in (assign_endpoint)):
+    if assign_endpoint is None:
         return
     properties = models.AppResourceProperties(
        public=assign_endpoint 

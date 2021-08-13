@@ -21,11 +21,11 @@ def service_registry_show(cmd, client, service, resource_group):
 
 
 def service_registry_bind(cmd, client, service, resource_group, app):
-    _service_registry_bind_or_unbind_app(cmd, client, service, resource_group, app, True)
+    return _service_registry_bind_or_unbind_app(cmd, client, service, resource_group, app, True)
 
 
 def service_registry_unbind(cmd, client, service, resource_group, app):
-    _service_registry_bind_or_unbind_app(cmd, client, service, resource_group, app, False)
+    return _service_registry_bind_or_unbind_app(cmd, client, service, resource_group, app, False)
 
 
 def _service_registry_bind_or_unbind_app(cmd, client, service, resource_group, app_name, enabled):
