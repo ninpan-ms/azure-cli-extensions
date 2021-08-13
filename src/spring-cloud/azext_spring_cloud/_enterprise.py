@@ -7,7 +7,11 @@ from .vendored_sdks.appplatform.v2022_05_01_preview import models
 from ._utils import  get_azure_files_info, _pack_source_code
 from azure.cli.core.util import sdk_no_wait
 from .azure_storage_file import FileService
+from requests.auth import HTTPBasicAuth
 import os
+import requests
+import re
+import sys
 import tempfile
 import uuid
 
@@ -229,11 +233,11 @@ def _build_and_get_result(cmd, client, resource_group, service, name, version, a
     logger.warning("[3/{}] Creating or Updating build '{}'.".format(total_steps, name))
     build_result_id = _queue_build(client, resource_group, service, name, relative_path, target_module)
     logger.warning("[4/{}] Waiting for building docker image to finish. This may take a few minutes.".format(total_steps))
-    _wait_build_finished(cmd, client, build_result_id)
+    _wait_build_finished(cmd, client, service, build_result_id)
     return models.BuildResultUserSourceInfo(version=version, build_result_id=build_result_id)
 
 
-def _wait_build_finished(cmd, client, build_result_id):
+def _wait_build_finished(cmd, client, service, build_result_id):
     resource_id = parse_resource_id(build_result_id)
     resource_group = resource_id['resource_group']
     service = resource_id['name']
@@ -241,15 +245,29 @@ def _wait_build_finished(cmd, client, build_result_id):
     build = resource_id['child_name_2']
     build_result_name = resource_id['resource_name']
 
+    # Wait until build pod started
     progress_bar = cmd.cli_ctx.get_progress_controller()
-    result = client.build_service.get_build_result(resource_group, service, build_service, build, build_result_name)
-    progress_bar.add(message=result.properties.status)
     progress_bar.begin()
-    while result.properties.status == "Building" or result.properties.status == "Queuing":
+    result = client.build_service.get_build_result(resource_group, service, build_service, build, build_result_name)
+    while (not result.properties.build_pod_name or not result.properties.build_stages) and (result.properties.status == "Building" or result.properties.status == "Queuing"):
         progress_bar.add(message=result.properties.status)
         sleep(5)
         result = client.build_service.get_build_result(resource_group, service, build_service, build, build_result_name)
     progress_bar.stop()
+
+    # Try to get build logs (failures are not fatal)
+    if result.properties.build_pod_name and result.properties.build_stages:
+        for stage in result.properties.build_stages:
+            _start_build_log_streaming(client, resource_group, service, result.properties.build_pod_name, stage.name)
+    else:
+        logger.warning("Cannot show build logs, but will still wait for the build job.")
+
+    # Wait until build finished
+    result = client.build_service.get_build_result(resource_group, service, build_service, build, build_result_name)
+    while result.properties.status == "Building" or result.properties.status == "Queuing":
+        sleep(5)
+        result = client.build_service.get_build_result(resource_group, service, build_service, build, build_result_name)
+
     if result.properties.status != "Succeeded":
         raise CLIError("Failed to build docker image, please check the build logs and retry.")
 
@@ -449,3 +467,47 @@ def _wait_till_end(cmd, *pollers):
     while any(x and not x.done() for x in pollers):
         progress_bar.add(message='Running')
         sleep(5)
+
+def _start_build_log_streaming(client, resource_group, service, pod_name, stage_name):
+    if not pod_name or not stage_name:
+        return
+
+    logger.info("------------------------- %s -------------------------", stage_name)
+
+    # TODO: try to merge shared log streaming logic with `app_tail_log` function
+    test_keys = client.services.list_test_keys(resource_group, service)
+    primary_key = test_keys.primary_key
+    if not primary_key:
+        logger.warning("To use the log streaming feature, please enable the test endpoint by running 'az spring-cloud test-endpoint enable -n {0} -g {1}'".format(service, resource_group))
+        return
+
+    test_url = test_keys.primary_test_endpoint
+    base_url = test_url.replace('.test.', '.')
+    base_url = re.sub('https://.+?\@', '', base_url)
+    streaming_url = "https://{}/api/logstream/buildpods/{}/stages/{}?follow=true".format(base_url, pod_name, stage_name)
+
+    need_retry = True
+    max_retry_count = 15
+    retry_count = 0
+    while need_retry:
+        retry_count = retry_count + 1
+        if retry_count >= max_retry_count:
+            logger.warning("Failed to get build logs due to time-out")
+            return
+        with requests.get(streaming_url, stream=True, auth=HTTPBasicAuth("primary", primary_key)) as response:
+            if response.status_code == 200:
+                need_retry = False
+                std_encoding = sys.stdout.encoding
+                for content in response.iter_content():
+                    if content:
+                        sys.stdout.write(content.decode(encoding='utf-8', errors='replace')
+                                            .encode(std_encoding, errors='replace')
+                                            .decode(std_encoding, errors='replace'))
+            elif response.status_code == 400:
+                # Container not started yet
+                sleep(2)
+                # TODO: Fail fast if build result already failed
+            else:
+                logger.warning("Failed to get build logs with status code '{}' and reason '{}'".format(
+                    response.status_code, response.content))
+                return
