@@ -108,7 +108,7 @@ def validate_buildpacks_binding_not_exist(cmd, namespace):
         if binding_resource is not None:
             raise CLIError('Buildpacks Binding {} already exists '
                            'in resource group {}, service {}. You can edit it by set command.'
-                           .format(binding_name, resource_group, service))
+                           .format(namespace.name, namespace.resource_group, namespace.service))
     except ResourceNotFoundError:
         # Excepted case
         pass

@@ -1791,23 +1791,23 @@ class ConfigurationServiceSettings(msrest.serialization.Model):
 class ConfigurationServiceSettingsValidateResult(msrest.serialization.Model):
     """Validation result for configuration service settings.
 
-    :param git_property_validate_result: Validation result for configuration service settings.
-    :type git_property_validate_result:
+    :param git_property_validation_result: Validation result for configuration service settings.
+    :type git_property_validation_result:
      ~azure.mgmt.appplatform.v2022_05_01_preview.models.ConfigurationServiceGitPropertyValidateResult
     """
 
     _attribute_map = {
-        'git_property_validate_result': {'key': 'gitPropertyValidateResult', 'type': 'ConfigurationServiceGitPropertyValidateResult'},
+        'git_property_validation_result': {'key': 'gitPropertyValidationResult', 'type': 'ConfigurationServiceGitPropertyValidateResult'},
     }
 
     def __init__(
         self,
         *,
-        git_property_validate_result: Optional["ConfigurationServiceGitPropertyValidateResult"] = None,
+        git_property_validation_result: Optional["ConfigurationServiceGitPropertyValidateResult"] = None,
         **kwargs
     ):
         super(ConfigurationServiceSettingsValidateResult, self).__init__(**kwargs)
-        self.git_property_validate_result = git_property_validate_result
+        self.git_property_validation_result = git_property_validation_result
 
 
 class CustomContainer(UserSourceInfo):
