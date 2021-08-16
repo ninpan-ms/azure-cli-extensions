@@ -23,7 +23,6 @@ from .operations import ServicesOperations
 from .operations import ConfigServersOperations
 from .operations import ConfigurationServicesOperations
 from .operations import ServiceRegistriesOperations
-from .operations import ServiceOperations
 from .operations import BuildServiceOperations
 from .operations import BuildpacksBindingOperations
 from .operations import MonitoringSettingsOperations
@@ -49,8 +48,6 @@ class AppPlatformManagementClient(object):
     :vartype configuration_services: azure.mgmt.appplatform.v2022_05_01_preview.operations.ConfigurationServicesOperations
     :ivar service_registries: ServiceRegistriesOperations operations
     :vartype service_registries: azure.mgmt.appplatform.v2022_05_01_preview.operations.ServiceRegistriesOperations
-    :ivar service: ServiceOperations operations
-    :vartype service: azure.mgmt.appplatform.v2022_05_01_preview.operations.ServiceOperations
     :ivar build_service: BuildServiceOperations operations
     :vartype build_service: azure.mgmt.appplatform.v2022_05_01_preview.operations.BuildServiceOperations
     :ivar buildpacks_binding: BuildpacksBindingOperations operations
@@ -106,8 +103,6 @@ class AppPlatformManagementClient(object):
         self.configuration_services = ConfigurationServicesOperations(
             self._client, self._config, self._serialize, self._deserialize)
         self.service_registries = ServiceRegistriesOperations(
-            self._client, self._config, self._serialize, self._deserialize)
-        self.service = ServiceOperations(
             self._client, self._config, self._serialize, self._deserialize)
         self.build_service = BuildServiceOperations(
             self._client, self._config, self._serialize, self._deserialize)

@@ -10,7 +10,6 @@ from ._services_operations import ServicesOperations
 from ._config_servers_operations import ConfigServersOperations
 from ._configuration_services_operations import ConfigurationServicesOperations
 from ._service_registries_operations import ServiceRegistriesOperations
-from ._service_operations import ServiceOperations
 from ._build_service_operations import BuildServiceOperations
 from ._buildpacks_binding_operations import BuildpacksBindingOperations
 from ._monitoring_settings_operations import MonitoringSettingsOperations
@@ -28,7 +27,6 @@ __all__ = [
     'ConfigServersOperations',
     'ConfigurationServicesOperations',
     'ServiceRegistriesOperations',
-    'ServiceOperations',
     'BuildServiceOperations',
     'BuildpacksBindingOperations',
     'MonitoringSettingsOperations',
