@@ -42,6 +42,11 @@ def load_command_table(self, _):
         client_factory=cf_spring_cloud_enterprise
     )
 
+    buildpacks_binding_cmd_group = CliCommandType(
+        operations_tmpl="azext_spring_cloud.buildpacks_binding#{}",
+        client_factory=cf_spring_cloud_enterprise
+    )
+
     with self.command_group('spring-cloud', client_factory=cf_app_services,
                             exception_handler=handle_asc_exception) as g:
         g.custom_command('create', 'spring_cloud_create', supports_no_wait=True, client_factory=cf_spring_cloud)
@@ -170,6 +175,15 @@ def load_command_table(self, _):
         g.custom_command('update', 'application_configuration_service_git_update')
         g.custom_command('remove', 'application_configuration_service_git_remove')
         g.custom_command('list', 'application_configuration_service_git_list')
+
+    with self.command_group('spring-cloud build-service buildpacks-binding',
+                            custom_command_type=buildpacks_binding_cmd_group,
+                            exception_handler=handle_asc_exception) as g:
+        # create and set commands are differentiate by their parameter validators
+        g.custom_command('create', 'create_or_update_buildpacks_binding')
+        g.custom_command('set', 'create_or_update_buildpacks_binding')
+        g.custom_command('show', 'buildpacks_binding_show')
+        g.custom_command('delete', 'buildpacks_binding_delete')
 
     with self.command_group('spring-cloud', exception_handler=handle_asc_exception):
         pass

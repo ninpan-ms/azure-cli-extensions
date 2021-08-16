@@ -36,6 +36,12 @@ class AppResourceProvisioningState(with_metaclass(_CaseInsensitiveEnumMeta, str,
     UPDATING = "Updating"
     DELETING = "Deleting"
 
+class BindingType(with_metaclass(_CaseInsensitiveEnumMeta, str, Enum)):
+    """Buildpacks Binding Type
+    """
+
+    APPLICATION_INSIGHTS = "ApplicationInsights"
+
 class BuildResultProvisioningState(with_metaclass(_CaseInsensitiveEnumMeta, str, Enum)):
     """Provisioning state of the KPack build result
     """
@@ -146,6 +152,16 @@ class ResourceSkuRestrictionsType(with_metaclass(_CaseInsensitiveEnumMeta, str, 
 
     LOCATION = "Location"
     ZONE = "Zone"
+
+class ServiceRegistryProvisioningState(with_metaclass(_CaseInsensitiveEnumMeta, str, Enum)):
+    """State of the Service Registry.
+    """
+
+    CREATING = "Creating"
+    UPDATING = "Updating"
+    SUCCEEDED = "Succeeded"
+    FAILED = "Failed"
+    DELETING = "Deleting"
 
 class SkuScaleType(with_metaclass(_CaseInsensitiveEnumMeta, str, Enum)):
     """Gets or sets the type of the scale.

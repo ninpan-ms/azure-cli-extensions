@@ -29,6 +29,9 @@ try:
     from ._models_py3 import BuildServiceProperties
     from ._models_py3 import BuildServicePropertiesRuntimeState
     from ._models_py3 import BuildStageProperties
+    from ._models_py3 import BuildpacksBindingLaunchProperties
+    from ._models_py3 import BuildpacksBindingProperties
+    from ._models_py3 import BuildpacksBindingResource
     from ._models_py3 import CertificateProperties
     from ._models_py3 import CertificateResource
     from ._models_py3 import CertificateResourceCollection
@@ -93,6 +96,10 @@ try:
     from ._models_py3 import ResourceSkuRestrictions
     from ._models_py3 import ResourceSkuZoneDetails
     from ._models_py3 import ResourceUploadDefinition
+    from ._models_py3 import ServiceRegistryInstance
+    from ._models_py3 import ServiceRegistryProperties
+    from ._models_py3 import ServiceRegistryResource
+    from ._models_py3 import ServiceRegistryRuntimeState
     from ._models_py3 import ServiceResource
     from ._models_py3 import ServiceResourceList
     from ._models_py3 import ServiceSpecification
@@ -131,6 +138,9 @@ except (SyntaxError, ImportError):
     from ._models import BuildServiceProperties  # type: ignore
     from ._models import BuildServicePropertiesRuntimeState  # type: ignore
     from ._models import BuildStageProperties  # type: ignore
+    from ._models import BuildpacksBindingLaunchProperties  # type: ignore
+    from ._models import BuildpacksBindingProperties  # type: ignore
+    from ._models import BuildpacksBindingResource  # type: ignore
     from ._models import CertificateProperties  # type: ignore
     from ._models import CertificateResource  # type: ignore
     from ._models import CertificateResourceCollection  # type: ignore
@@ -195,6 +205,10 @@ except (SyntaxError, ImportError):
     from ._models import ResourceSkuRestrictions  # type: ignore
     from ._models import ResourceSkuZoneDetails  # type: ignore
     from ._models import ResourceUploadDefinition  # type: ignore
+    from ._models import ServiceRegistryInstance  # type: ignore
+    from ._models import ServiceRegistryProperties  # type: ignore
+    from ._models import ServiceRegistryResource  # type: ignore
+    from ._models import ServiceRegistryRuntimeState  # type: ignore
     from ._models import ServiceResource  # type: ignore
     from ._models import ServiceResourceList  # type: ignore
     from ._models import ServiceSpecification  # type: ignore
@@ -213,6 +227,7 @@ except (SyntaxError, ImportError):
 
 from ._app_platform_management_client_enums import (
     AppResourceProvisioningState,
+    BindingType,
     BuildResultProvisioningState,
     ConfigServerState,
     ConfigurationServiceProvisioningState,
@@ -225,6 +240,7 @@ from ._app_platform_management_client_enums import (
     ProvisioningState,
     ResourceSkuRestrictionsReasonCode,
     ResourceSkuRestrictionsType,
+    ServiceRegistryProvisioningState,
     SkuScaleType,
     SupportedRuntimePlatform,
     SupportedRuntimeValue,
@@ -255,6 +271,9 @@ __all__ = [
     'BuildServiceProperties',
     'BuildServicePropertiesRuntimeState',
     'BuildStageProperties',
+    'BuildpacksBindingLaunchProperties',
+    'BuildpacksBindingProperties',
+    'BuildpacksBindingResource',
     'CertificateProperties',
     'CertificateResource',
     'CertificateResourceCollection',
@@ -319,6 +338,10 @@ __all__ = [
     'ResourceSkuRestrictions',
     'ResourceSkuZoneDetails',
     'ResourceUploadDefinition',
+    'ServiceRegistryInstance',
+    'ServiceRegistryProperties',
+    'ServiceRegistryResource',
+    'ServiceRegistryRuntimeState',
     'ServiceResource',
     'ServiceResourceList',
     'ServiceSpecification',
@@ -335,6 +358,7 @@ __all__ = [
     'UserSourceInfo',
     'ValidationMessages',
     'AppResourceProvisioningState',
+    'BindingType',
     'BuildResultProvisioningState',
     'ConfigServerState',
     'ConfigurationServiceProvisioningState',
@@ -347,6 +371,7 @@ __all__ = [
     'ProvisioningState',
     'ResourceSkuRestrictionsReasonCode',
     'ResourceSkuRestrictionsType',
+    'ServiceRegistryProvisioningState',
     'SkuScaleType',
     'SupportedRuntimePlatform',
     'SupportedRuntimeValue',

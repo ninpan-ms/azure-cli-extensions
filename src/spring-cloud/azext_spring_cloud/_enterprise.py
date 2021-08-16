@@ -26,6 +26,8 @@ NO_PRODUCTION_DEPLOYMENT_SET_ERROR = "This app has no production deployment, use
 DELETE_PRODUCTION_DEPLOYMENT_WARNING = "You are going to delete production deployment, the app will be inaccessible after this operation."
 LOG_RUNNING_PROMPT = "This command usually takes minutes to run. Add '--verbose' parameter if needed."
 
+DEFAULT_BUILD_SERVICE_NAME = "default"
+
 
 def app_get_enterprise(cmd, client, resource_group, service, name):
     app = client.apps.get(resource_group, service, name)

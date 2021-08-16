@@ -177,6 +177,19 @@ class AppPlatformManagementClient(MultiApiClientMixin, _SDKClient):
         return OperationClass(self._client, self._config, Serializer(self._models_dict(api_version)), Deserializer(self._models_dict(api_version)))
 
     @property
+    def buildpacks_binding(self):
+        """Instance depends on the API version:
+
+           * 2022-05-01-preview: :class:`BuildpacksBindingOperations<azure.mgmt.appplatform.v2022_05_01_preview.aio.operations.BuildpacksBindingOperations>`
+        """
+        api_version = self._get_api_version('buildpacks_binding')
+        if api_version == '2022-05-01-preview':
+            from ..v2022_05_01_preview.aio.operations import BuildpacksBindingOperations as OperationClass
+        else:
+            raise ValueError("API version {} does not have operation group 'buildpacks_binding'".format(api_version))
+        return OperationClass(self._client, self._config, Serializer(self._models_dict(api_version)), Deserializer(self._models_dict(api_version)))
+
+    @property
     def certificates(self):
         """Instance depends on the API version:
 
@@ -356,6 +369,32 @@ class AppPlatformManagementClient(MultiApiClientMixin, _SDKClient):
             from ..v2022_05_01_preview.aio.operations import RuntimeVersionsOperations as OperationClass
         else:
             raise ValueError("API version {} does not have operation group 'runtime_versions'".format(api_version))
+        return OperationClass(self._client, self._config, Serializer(self._models_dict(api_version)), Deserializer(self._models_dict(api_version)))
+
+    @property
+    def service(self):
+        """Instance depends on the API version:
+
+           * 2022-05-01-preview: :class:`ServiceOperations<azure.mgmt.appplatform.v2022_05_01_preview.aio.operations.ServiceOperations>`
+        """
+        api_version = self._get_api_version('service')
+        if api_version == '2022-05-01-preview':
+            from ..v2022_05_01_preview.aio.operations import ServiceOperations as OperationClass
+        else:
+            raise ValueError("API version {} does not have operation group 'service'".format(api_version))
+        return OperationClass(self._client, self._config, Serializer(self._models_dict(api_version)), Deserializer(self._models_dict(api_version)))
+
+    @property
+    def service_registries(self):
+        """Instance depends on the API version:
+
+           * 2022-05-01-preview: :class:`ServiceRegistriesOperations<azure.mgmt.appplatform.v2022_05_01_preview.aio.operations.ServiceRegistriesOperations>`
+        """
+        api_version = self._get_api_version('service_registries')
+        if api_version == '2022-05-01-preview':
+            from ..v2022_05_01_preview.aio.operations import ServiceRegistriesOperations as OperationClass
+        else:
+            raise ValueError("API version {} does not have operation group 'service_registries'".format(api_version))
         return OperationClass(self._client, self._config, Serializer(self._models_dict(api_version)), Deserializer(self._models_dict(api_version)))
 
     @property
