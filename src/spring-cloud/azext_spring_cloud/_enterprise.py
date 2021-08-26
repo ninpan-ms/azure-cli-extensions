@@ -247,31 +247,61 @@ def _wait_build_finished(cmd, client, service, build_result_id):
     build = resource_id['child_name_2']
     build_result_name = resource_id['resource_name']
 
-    # Wait until build pod started
+    def _wait_build_pod_to_start_callback():
+        result = client.build_service.get_build_result(resource_group, service, build_service, build, build_result_name)
+        pod_not_started = not result.properties.build_pod_name or not result.properties.build_stages
+        still_building = _is_build_result_still_building(result)
+        return result, pod_not_started and still_building, result.properties.status
+
+    def _wait_build_job_to_finish_callback():
+        result = client.build_service.get_build_result(resource_group, service, build_service, build, build_result_name)
+        return result, _is_build_result_still_building(result), result.properties.status
+
+    def _try_to_stream_build_logs(progress_bar, pod, stages):
+        if not stages:
+            return False
+        for stage in stages:
+            if not _start_build_log_streaming_with_retry(progress_bar, client,
+                                                         resource_group, service,
+                                                         build_service, build, build_result_name,
+                                                         pod, stage.name):
+                return False
+        return True
+
     progress_bar = cmd.cli_ctx.get_progress_controller()
-    progress_bar.begin()
-    result = client.build_service.get_build_result(resource_group, service, build_service, build, build_result_name)
-    while (not result.properties.build_pod_name or not result.properties.build_stages) and (result.properties.status == "Building" or result.properties.status == "Queuing"):
-        progress_bar.add(message=result.properties.status)
-        sleep(5)
-        result = client.build_service.get_build_result(resource_group, service, build_service, build, build_result_name)
-    progress_bar.stop()
-
-    # Try to get build logs (failures are not fatal)
-    if result.properties.build_pod_name and result.properties.build_stages:
-        for stage in result.properties.build_stages:
-            _start_build_log_streaming(client, resource_group, service, result.properties.build_pod_name, stage.name)
-    else:
-        logger.warning("Cannot show build logs, but will still wait for the build job.")
-
-    # Wait until build finished
-    result = client.build_service.get_build_result(resource_group, service, build_service, build, build_result_name)
-    while result.properties.status == "Building" or result.properties.status == "Queuing":
-        sleep(5)
-        result = client.build_service.get_build_result(resource_group, service, build_service, build, build_result_name)
+    result = _do_long_running_build_operation(progress_bar, _wait_build_pod_to_start_callback)
+    build_log_streaming_available = _try_to_stream_build_logs(progress_bar, result.properties.build_pod_name, result.properties.build_stages)
+    if not build_log_streaming_available:
+        logger.warning("Cannot show real time build logs at this moment")
+    result = _do_long_running_build_operation(progress_bar, _wait_build_job_to_finish_callback)
+    if not build_log_streaming_available:
+        _do_long_running_build_operation(progress_bar, lambda: (None, True, "getting offline build logs"), "getting offline build logs", 1, 5)
+        _try_print_build_logs_after_build(client, resource_group, service, build_service, build, build_result_name)
 
     if result.properties.status != "Succeeded":
         raise CLIError("Failed to build docker image, please check the build logs and retry.")
+
+
+def _do_long_running_build_operation(progress_bar, callback, initial_status = None, interval_seconds = 3, max_retries = -1):
+    progress_bar.begin()
+    progress_bar.add(message=initial_status)
+    retry_count = 0
+    obj, should_retry, status = callback()
+    progress_bar.add(message=status)
+    while should_retry and (retry_count < max_retries or max_retries < 0):
+        sleep(interval_seconds)
+        retry_count += 1
+        obj, should_retry, status = callback()
+        progress_bar.add(message=status)
+    progress_bar.end()
+    return obj
+
+
+def _is_build_result_still_building(build_result):
+    if not build_result or not build_result.properties:
+        return None
+    else:
+        return build_result.properties.status == "Building" or build_result.properties.status == "Queuing"
 
 
 def _queue_build(client, resource_group, service, name, relative_path, target_module=None):
@@ -470,46 +500,73 @@ def _wait_till_end(cmd, *pollers):
         progress_bar.add(message='Running')
         sleep(5)
 
-def _start_build_log_streaming(client, resource_group, service, pod_name, stage_name):
+
+# Try to print out build logs after a build succeeded
+def _try_print_build_logs_after_build(client, resource_group, service, build_service, build, build_result):
+    try:
+        logs = client.build_service.get_build_result_log(resource_group, service, build_service, build, build_result, "all")
+        if logs and logs.properties and logs.properties.blob_url:
+            sys.stdout.write(requests.get(logs.properties.blob_url).text)
+        else:
+            logger.warning("No offline build logs available.")
+    except:
+        logger.warning("Unfortunately we are not able to display offline build logs due to unknown errors.")
+
+
+# Try to print build log streaming for a specific pod and build stage
+# Return value: True - no errors please continue; False - unknown error happened
+def _start_build_log_streaming_with_retry(progress_bar, client, resource_group, service, build_service, build, build_result_name, pod_name, stage_name):
     if not pod_name or not stage_name:
-        return
+        return False
 
-    logger.info("------------------------- %s -------------------------", stage_name)
+    streaming_url = primary_key = None
+    def _ensure_streaming_url():
+        nonlocal streaming_url, primary_key
+        if not streaming_url:
+            test_keys = client.services.list_test_keys(resource_group, service)
+            primary_key = test_keys.primary_key
+            if not primary_key:
+                logger.warning("To use the log streaming feature, please enable the test endpoint by running 'az spring-cloud test-endpoint enable -n {0} -g {1}'".format(service, resource_group))
+                raise CLIError("Please enable test endpoint")
+            test_url = test_keys.primary_test_endpoint
+            base_url = test_url.replace('.test.', '.')
+            base_url = re.sub('https://.+?\@', '', base_url)
+            streaming_url = "https://{}/api/logstream/buildpods/{}/stages/{}?follow=true".format(base_url, pod_name, stage_name)
 
-    # TODO: try to merge shared log streaming logic with `app_tail_log` function
-    test_keys = client.services.list_test_keys(resource_group, service)
-    primary_key = test_keys.primary_key
-    if not primary_key:
-        logger.warning("To use the log streaming feature, please enable the test endpoint by running 'az spring-cloud test-endpoint enable -n {0} -g {1}'".format(service, resource_group))
-        return
+    def _wait_build_container_logs_callback():
+        build_result = client.build_service.get_build_result(resource_group, service, build_service, build, build_result_name)
+        _ensure_streaming_url()
+        need_retry, err = _try_stream_build_log(progress_bar, streaming_url, primary_key, build_result)
+        return err, need_retry, "fetching build pod container logs"
 
-    test_url = test_keys.primary_test_endpoint
-    base_url = test_url.replace('.test.', '.')
-    base_url = re.sub('https://.+?\@', '', base_url)
-    streaming_url = "https://{}/api/logstream/buildpods/{}/stages/{}?follow=true".format(base_url, pod_name, stage_name)
+    try:
+        MAX_RETRY_COUNT = 20
+        error = _do_long_running_build_operation(progress_bar, _wait_build_container_logs_callback, "connecting to build pod container", max_retries=MAX_RETRY_COUNT)
+        if error:
+            logger.warning(error)
+            return False
+        return True
+    except:
+        return False
 
-    need_retry = True
-    max_retry_count = 15
-    retry_count = 0
-    while need_retry:
-        retry_count = retry_count + 1
-        if retry_count >= max_retry_count:
-            logger.warning("Failed to get build logs due to time-out")
-            return
-        with requests.get(streaming_url, stream=True, auth=HTTPBasicAuth("primary", primary_key)) as response:
-            if response.status_code == 200:
-                need_retry = False
-                std_encoding = sys.stdout.encoding
-                for content in response.iter_content():
-                    if content:
-                        sys.stdout.write(content.decode(encoding='utf-8', errors='replace')
-                                            .encode(std_encoding, errors='replace')
-                                            .decode(std_encoding, errors='replace'))
-            elif response.status_code == 400:
-                # Container not started yet
-                sleep(2)
-                # TODO: Fail fast if build result already failed
-            else:
-                logger.warning("Failed to get build logs with status code '{}' and reason '{}'".format(
-                    response.status_code, response.content))
-                return
+
+# Call build log streaming API and return whether we need to retry
+# Return value is a tuple of:
+#   boolean: True - not ready yet and need to retry; False - No need to retry
+#   string: error message, None means no errors
+def _try_stream_build_log(progress_bar, streaming_url, primary_key, build_result):
+    with requests.get(streaming_url, stream=True, auth=HTTPBasicAuth("primary", primary_key)) as response:
+        if response.status_code == 200:
+            progress_bar.end()
+            std_encoding = sys.stdout.encoding
+            for content in response.iter_content():
+                if content:
+                    sys.stdout.write(content.decode(encoding='utf-8', errors='replace')
+                                        .encode(std_encoding, errors='replace')
+                                        .decode(std_encoding, errors='replace'))
+            return False, None
+        elif response.status_code == 400:
+            return (True, None) if _is_build_result_still_building(build_result) else (False, None)
+        else:
+            return True, "Failed to get build logs with status code '{}' and reason '{}'".format(
+                    response.status_code, response.content)
