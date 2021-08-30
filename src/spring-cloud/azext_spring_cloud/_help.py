@@ -572,7 +572,7 @@ helps['spring-cloud build-service buildpacks-binding set'] = """
 
 helps['spring-cloud build-service buildpacks-binding show'] = """
     type: command
-    short-summary: Show a buildpacks binding, the secrets will be masked.
+    short-summary: Show a buildpacks binding. The secrets will be masked.
     examples:
         - name: Show a buildpacks binding.
           text: az spring-cloud build-service buildpacks-binding show --name first-binding
