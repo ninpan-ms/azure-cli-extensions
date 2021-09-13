@@ -469,12 +469,12 @@ helps['spring-cloud app-insights update'] = """
 
 helps['spring-cloud service-registry show'] = """
     type: command
-    short-summary: Show provisioning status and runtime status of Service Registry.
+    short-summary: Show the provisioning status and runtime status of Service Registry.
 """
 
 helps['spring-cloud service-registry bind'] = """
     type: command
-    short-summary: Bind app to Service Registry.
+    short-summary: Bind an app to Service Registry.
     examples:
         - name: Bind an app to Service Registry.
           text: az spring-cloud service-registry bind --app MyApp -s MyService -g MyResourceGroup
@@ -482,15 +482,15 @@ helps['spring-cloud service-registry bind'] = """
 
 helps['spring-cloud service-registry unbind'] = """
     type: command
-    short-summary: Unbind app to Service Registry.
+    short-summary: Unbind an app from Service Registry.
     examples:
-        - name: Unbind an app to Service Registry.
+        - name: Unbind an app from Service Registry.
           text: az spring-cloud service-registry unbind --app MyApp -s MyService -g MyResourceGroup
 """
 
 helps['spring-cloud application-configuration-service show'] = """
     type: command
-    short-summary: Show provisioning status, runtime status and settings of Application Configuration Service.
+    short-summary: Show the provisioning status, runtime status, and settings of Application Configuration Service.
 """
 
 helps['spring-cloud application-configuration-service clear'] = """
@@ -500,36 +500,36 @@ helps['spring-cloud application-configuration-service clear'] = """
 
 helps['spring-cloud application-configuration-service git repo add'] = """
     type: command
-    short-summary: Add an item of git property to Application Configuration Service settings.
+    short-summary: Add a Git property to the Application Configuration Service settings.
     examples:
-        - name: Add an item of git property.
+        - name: Add a Git property.
           text: az spring-cloud application-configuration-service git repo add -s MyService -g MyResourceGroup --name MyName --patterns MyPattern --uri https://MyURI --label master
 """
 
 helps['spring-cloud application-configuration-service git repo update'] = """
     type: command
-    short-summary: Update an existing item of git property to Application Configuration Service settings.
+    short-summary: Update an existing Git property in the Application Configuration Service settings.
     examples:
-        - name: Update an item of git property.
+        - name: Update a Git property.
           text: az spring-cloud application-configuration-service git repo update -s MyService -g MyResourceGroup --name MyName --patterns MyPattern
 """
 
 helps['spring-cloud application-configuration-service git repo remove'] = """
     type: command
-    short-summary: Delete an existing item of git property to Application Configuration Service settings.
+    short-summary: Delete an existing Git property from the Application Configuration Service settings.
     examples:
-        - name: Delete an item of git property.
+        - name: Delete a Git property.
           text: az spring-cloud application-configuration-service git repo remove -s MyService -g MyResourceGroup --name MyName
 """
 
 helps['spring-cloud application-configuration-service git repo list'] = """
     type: command
-    short-summary: List all git settings of Application Configuration Service.
+    short-summary: List all Git settings of Application Configuration Service.
 """
 
 helps['spring-cloud application-configuration-service bind'] = """
     type: command
-    short-summary: Bind app to Application Configuration Service.
+    short-summary: Bind an app to Application Configuration Service.
     examples:
         - name: Bind an app to Application Configuration Service.
           text: az spring-cloud application-configuration-service bind --app MyApp -s MyService -g MyResourceGroup
@@ -537,9 +537,9 @@ helps['spring-cloud application-configuration-service bind'] = """
 
 helps['spring-cloud application-configuration-service unbind'] = """
     type: command
-    short-summary: Unbind app to Application Configuration Service.
+    short-summary: Unbind an app from Application Configuration Service.
     examples:
-        - name: Unbind an app to Application Configuration Service.
+        - name: Unbind an app from Application Configuration Service.
           text: az spring-cloud application-configuration-service unbind --app MyApp -s MyService -g MyResourceGroup
 """
 
