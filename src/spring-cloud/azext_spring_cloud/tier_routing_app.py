@@ -12,8 +12,13 @@ from .custom import (app_get as app_get_standard, app_list as app_list_standard,
                      app_create as app_create_standard, app_update as app_update_standard, 
                      app_scale as app_scale_standard, app_deploy as app_deploy_standard,
                      app_delete as app_delete_standard, app_restart as app_restart_standard,
-                     app_start as app_start_standard, app_stop as app_stop_standard)
+                     app_start as app_start_standard, app_stop as app_stop_standard,
+                     app_identity_assign as identity_assign,
+                     app_identity_remove as identity_remove,
+                     app_identity_show as identity_show)
 from knack.log import get_logger
+from .vendored_sdks.appplatform.v2022_05_01_preview import models as models_20220501preview
+from .vendored_sdks.appplatform.v2021_06_01_preview import models as models_20210601preview
 
 logger = get_logger(__name__)
 
@@ -48,7 +53,7 @@ def app_create(cmd, client, resource_group, service, name,
         # runtime_version, enable_persistent_storage assign_ideneity not support
         return app_create_enterprise(cmd, get_client(cmd), resource_group, service, name,
                                      assign_endpoint, cpu, memory, instance_count, jvm_options, 
-                                     env)
+                                     env, assign_identity)
     else:
         return app_create_standard(cmd, client, resource_group, service, name,
                                    assign_endpoint, cpu, memory, instance_count, runtime_version, 
@@ -156,3 +161,24 @@ def app_deploy(cmd, client, resource_group, service, name,
         return app_deploy_standard(cmd, client, resource_group, service, name,
                                    version, deployment, artifact_path, target_module, runtime_version, 
                                    jvm_options, main_entry, env, no_wait)
+
+
+def app_identity_assign(cmd, client, resource_group, service, name, role=None, scope=None):
+    models = models_20210601preview
+    if is_enterprise_tier(cmd, resource_group, service):
+        client = get_client(cmd)
+        models = models_20220501preview
+    return identity_assign(cmd, client, models, resource_group, service, name, role, scope)
+
+
+def app_identity_remove(cmd, client, resource_group, service, name):
+    models = models_20210601preview
+    if is_enterprise_tier(cmd, resource_group, service):
+        client = get_client(cmd)
+        models = models_20220501preview
+    return identity_remove(cmd, client, models, resource_group, service, name)
+
+
+def app_identity_show(cmd, client, resource_group, service, name):
+    client = get_client(cmd) if is_enterprise_tier(cmd, resource_group, service) else client
+    return identity_show(cmd, client, resource_group, service, name)

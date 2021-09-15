@@ -604,11 +604,11 @@ def app_tail_log(cmd, client, resource_group, service, name,
         raise exceptions[0]
 
 
-def app_identity_assign(cmd, client, resource_group, service, name, role=None, scope=None):
+def app_identity_assign(cmd, client, models, resource_group, service, name, role=None, scope=None):
     _check_active_deployment_exist(client, resource_group, service, name)
-    app_resource = models_20210601preview.AppResource()
-    identity = models_20210601preview.ManagedIdentityProperties(type="systemassigned")
-    properties = models_20210601preview.AppResourceProperties()
+    app_resource = models.AppResource()
+    identity = models.ManagedIdentityProperties(type="systemassigned")
+    properties = models.AppResourceProperties()
     resource = client.services.get(resource_group, service)
     location = resource.location
 
@@ -649,10 +649,10 @@ def app_identity_assign(cmd, client, resource_group, service, name, role=None, s
     return app
 
 
-def app_identity_remove(cmd, client, resource_group, service, name):
-    app_resource = models_20210601preview.AppResource()
-    identity = models_20210601preview.ManagedIdentityProperties(type="none")
-    properties = models_20210601preview.AppResourceProperties()
+def app_identity_remove(cmd, client, model, resource_group, service, name):
+    app_resource = models.AppResource()
+    identity = models.ManagedIdentityProperties(type="none")
+    properties = models.AppResourceProperties()
     resource = client.services.get(resource_group, service)
     location = resource.location
 

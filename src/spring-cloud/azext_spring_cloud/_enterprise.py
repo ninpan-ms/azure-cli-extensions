@@ -44,7 +44,7 @@ def app_list_enterprise(cmd, client, resource_group, service):
     return apps
 
 def app_create_enterprise(cmd, client, resource_group, service, name, 
-                          assign_endpoint, cpu, memory, instance_count, jvm_options, env):
+                          assign_endpoint, cpu, memory, instance_count, jvm_options, env, assign_identity):
     '''app_create_enterprise
     Create app with an active deployment, deployment should be deployed with default banner
     1. Create app
@@ -54,9 +54,9 @@ def app_create_enterprise(cmd, client, resource_group, service, name,
     _ensure_app_not_exist(client, resource_group, service, name)
     need_update_app_after_deployment = assign_endpoint
     total_steps = 3 if need_update_app_after_deployment else 2
-    
+
     logger.warning("[1/{}] Creating app {}".format(total_steps, name))
-    app_poller = _create_empty_app(client, resource_group, service, name)
+    app_poller = _create_app(client, resource_group, service, name, assign_identity)
     _wait_till_end(cmd, app_poller)
 
     logger.warning('[2/{}] Create default deployment with name {} {}'.format(total_steps, DEFAULT_DEPLOYMENT_NAME, 
@@ -431,12 +431,14 @@ def _ensure_app_not_exist(client, resource_group, service, name):
         raise CLIError('App {} already exist.'.format(app.id))
 
 
-def _create_empty_app(client, resource_group, service, name):
+def _create_app(client, resource_group, service, name, assign_identity):
     resource = models.AppResource(
                     properties=models.AppResourceProperties(
                         temporary_disk=models.TemporaryDisk(size_in_gb=5, mount_path='/tmp')
                     )
                 )
+    if assign_identity is True:
+        resource.identity = models.ManagedIdentityProperties(type="systemassigned")
     return client.apps.begin_create_or_update(resource_group, service, name, resource)
 
 

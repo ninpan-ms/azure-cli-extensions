@@ -100,7 +100,7 @@ def load_command_table(self, _):
                          supports_no_wait=True)
         g.custom_command('logs', 'app_tail_log')
 
-    with self.command_group('spring-cloud app identity', client_factory=cf_spring_cloud,
+    with self.command_group('spring-cloud app identity', custom_command_type=app_routing_util,
                             exception_handler=handle_asc_exception) as g:
         g.custom_command('assign', 'app_identity_assign')
         g.custom_command('remove', 'app_identity_remove')
