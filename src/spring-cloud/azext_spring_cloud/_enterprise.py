@@ -105,7 +105,7 @@ def app_update_enterprise(cmd, client, resource_group, service, name,
 
 
 def app_deploy_enterprise(cmd, client, resource_group, service, name,
-                          version, deployment, artifact_path, target_module, jvm_options,
+                          version, deployment, artifact_path, builder, target_module, jvm_options,
                           env, config_file_patterns, no_wait):
     '''app_deploy_enterprise
     Deploy artifact to deployment under the existing app.
@@ -122,7 +122,7 @@ def app_deploy_enterprise(cmd, client, resource_group, service, name,
     deployment = _deployment_or_active_deployment_name(client, resource_group, service, name, deployment)
     
     deployment_settings = _format_deployment_settings(jvm_options=jvm_options, env=env, config_file_patterns=config_file_patterns)
-    user_source_info = _build_and_get_result(cmd, client, resource_group, service, name, version, artifact_path, target_module, additional_steps=1)
+    user_source_info = _build_and_get_result(cmd, client, resource_group, service, name, version, artifact_path, builder, target_module, additional_steps=1)
     logger.warning("[5/5] Deploying the built docker image to deployment {} under app {}".format(deployment, name))
     resource = models.DeploymentResource(
         properties=models.DeploymentResourceProperties(
@@ -196,6 +196,7 @@ def deployment_create_enterprise(cmd, client, resource_group, service, app, name
                                  skip_clone_settings=False,
                                  version=None,
                                  artifact_path=None,
+                                 builder=None,
                                  target_module=None,
                                  jvm_options=None,
                                  cpu=None,
@@ -213,7 +214,7 @@ def deployment_create_enterprise(cmd, client, resource_group, service, app, name
                                            jvm_options=jvm_options,
                                            env=env or origin_settings.environment_variables,
                                            config_file_patterns=config_file_patterns or _get_config_file_patterns(origin_settings.addon_configs))
-    user_source_info = _build_and_get_result(cmd, client, resource_group, service, app, version, artifact_path, target_module, additional_steps=1)
+    user_source_info = _build_and_get_result(cmd, client, resource_group, service, app, version, builder, artifact_path, target_module, additional_steps=1)
     resource = models.DeploymentResource(
         properties=models.DeploymentResourceProperties(
             source=user_source_info,
@@ -226,14 +227,14 @@ def deployment_create_enterprise(cmd, client, resource_group, service, app, name
                        resource_group, service, app, name, resource)
 
 
-def _build_and_get_result(cmd, client, resource_group, service, name, version, artifact_path, target_module, additional_steps=0):
+def _build_and_get_result(cmd, client, resource_group, service, name, version, artifact_path, builder, target_module, additional_steps=0):
     total_steps = 4 + additional_steps
     logger.warning("[1/{}] Requesting for upload URL.".format(total_steps))
     upload_url, relative_path = _request_upload_url(client,  resource_group, service, name)
     logger.warning("[2/{}] Uploading package to blob.".format(total_steps))
     _compress_and_upload(cmd, client, upload_url, artifact_path)
     logger.warning("[3/{}] Creating or Updating build '{}'.".format(total_steps, name))
-    build_result_id = _queue_build(client, resource_group, service, name, relative_path, target_module)
+    build_result_id = _queue_build(client, resource_group, service, name, relative_path, builder, target_module)
     logger.warning("[4/{}] Waiting for building docker image to finish. This may take a few minutes.".format(total_steps))
     _wait_build_finished(cmd, client, service, build_result_id)
     return models.BuildResultUserSourceInfo(version=version, build_result_id=build_result_id)
@@ -304,9 +305,9 @@ def _is_build_result_still_building(build_result):
         return build_result.properties.status == "Building" or build_result.properties.status == "Queuing"
 
 
-def _queue_build(client, resource_group, service, name, relative_path, target_module=None):
+def _queue_build(client, resource_group, service, name, relative_path, builder=None, target_module=None):
     properties = models.BuildProperties(
-        builder="default-enterprise-builder",
+        builder= builder,
         relative_path=relative_path,
         env={"BP_MAVEN_BUILT_MODULE": target_module} if target_module else None)
     build = models.Build(properties=properties)

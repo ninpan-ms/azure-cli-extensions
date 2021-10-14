@@ -144,6 +144,7 @@ def app_deploy(cmd, client, resource_group, service, name,
                version=None,
                deployment=None,
                artifact_path=None,
+               builder=None,
                target_module=None,
                runtime_version=None,
                jvm_options=None,
@@ -154,7 +155,7 @@ def app_deploy(cmd, client, resource_group, service, name,
     if is_enterprise_tier(cmd, resource_group, service):
         # runtime_version, assign_ideneity, main_entry not support
         return app_deploy_enterprise(cmd, get_client(cmd), resource_group, service, name,
-                                     version, deployment, artifact_path, target_module, 
+                                     version, deployment, artifact_path, builder, target_module, 
                                      jvm_options, env, config_file_patterns, no_wait)
     else:
         # config_file_patterns not support

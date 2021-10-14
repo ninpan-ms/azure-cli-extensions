@@ -169,6 +169,8 @@ def load_arguments(self, _):
                 'main_entry', options_list=[
                     '--main-entry', '-m'], help="A string containing the path to the .NET executable relative to zip root.")
             c.argument(
+                'builder', help="The name of builder.", default="default")
+            c.argument(
                 'target_module', help='Child module to be deployed, required for multiple jar packages built from source code.')
             c.argument(
                 'version', help='Deployment version, keep unchanged if not set.')
