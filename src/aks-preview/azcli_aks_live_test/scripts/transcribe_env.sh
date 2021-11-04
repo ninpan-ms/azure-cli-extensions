@@ -39,6 +39,11 @@ set -o xtrace
 [[ -z "${CLI_BRANCH}" ]] && (echo "CLI_BRANCH is empty"; exit 1)
 [[ -z "${EXT_REPO}" ]] && (echo "EXT_REPO is empty"; exit 1)
 [[ -z "${EXT_BRANCH}" ]] && (echo "EXT_BRANCH is empty"; exit 1)
+[[ -z "${BACKWARD_COMPATIBILITY_TEST}" ]] && (echo "BACKWARD_COMPATIBILITY_TEST is empty")
+# base directories for acs, aks-preview and live test
+[[ -z "${ACS_BASE_DIR}" ]] && (echo "ACS_BASE_DIR is empty"; exit 1)
+[[ -z "${AKS_PREVIEW_BASE_DIR}" ]] && (echo "AKS_PREVIEW_BASE_DIR is empty"; exit 1)
+[[ -z "${LIVE_TEST_BASE_DIR}" ]] && (echo "LIVE_TEST_BASE_DIR is empty"; exit 1)
 
 # clear
 cat /dev/null > env.list
@@ -59,6 +64,11 @@ echo "SYSTEM_PULLREQUEST_TARGETBRANCH=${SYSTEM_PULLREQUEST_TARGETBRANCH}" >> env
 
 # python version
 echo "PYTHON_VERSION=${PYTHON_VERSION}" >> env.list
+
+# base directories
+echo "ACS_BASE_DIR=${ACS_BASE_DIR}" >> env.list
+echo "AKS_PREVIEW_BASE_DIR=${AKS_PREVIEW_BASE_DIR}" >> env.list
+echo "LIVE_TEST_BASE_DIR=${LIVE_TEST_BASE_DIR}" >> env.list
 
 # azdev env
 echo "AZURE_CLI_TEST_DEV_SP_NAME=${AZCLI_ALT_CLIENT_ID}" >> env.list
@@ -81,3 +91,6 @@ echo "CLI_REPO=${CLI_REPO}" >> env.list
 echo "CLI_BRANCH=${CLI_BRANCH}" >> env.list
 echo "EXT_REPO=${EXT_REPO}" >> env.list
 echo "EXT_BRANCH=${EXT_BRANCH}" >> env.list
+
+# backward compatibility
+echo "BACKWARD_COMPATIBILITY_TEST=${BACKWARD_COMPATIBILITY_TEST}" >> env.list

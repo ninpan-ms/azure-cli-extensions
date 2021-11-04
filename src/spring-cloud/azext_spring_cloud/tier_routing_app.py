@@ -15,10 +15,16 @@ from .custom import (app_get as app_get_standard, app_list as app_list_standard,
                      app_start as app_start_standard, app_stop as app_stop_standard,
                      app_identity_assign as identity_assign,
                      app_identity_remove as identity_remove,
-                     app_identity_show as identity_show)
+                     app_identity_show as identity_show,
+                     app_domain_bind as domain_bind,
+                     app_domain_show as domain_show,
+                     app_domain_list as domain_list,
+                     app_domain_update as domain_update,
+                     app_domain_unbind as domain_unbind,
+                     app_append_loaded_public_certificate as append_loaded_public_certificate)
 from knack.log import get_logger
 from .vendored_sdks.appplatform.v2022_05_01_preview import models as models_20220501preview
-from .vendored_sdks.appplatform.v2021_06_01_preview import models as models_20210601preview
+from .vendored_sdks.appplatform.v2021_09_01_preview import models as models_20210901preview
 
 logger = get_logger(__name__)
 
@@ -143,6 +149,7 @@ def app_scale(cmd, client, resource_group, service, name,
 def app_deploy(cmd, client, resource_group, service, name,
                version=None,
                deployment=None,
+               disable_validation=None,
                artifact_path=None,
                builder=None,
                target_module=None,
@@ -160,12 +167,12 @@ def app_deploy(cmd, client, resource_group, service, name,
     else:
         # config_file_patterns not support
         return app_deploy_standard(cmd, client, resource_group, service, name,
-                                   version, deployment, artifact_path, target_module, runtime_version, 
+                                   version, deployment, disable_validation, artifact_path, target_module, runtime_version, 
                                    jvm_options, main_entry, env, no_wait)
 
 
 def app_identity_assign(cmd, client, resource_group, service, name, role=None, scope=None):
-    models = models_20210601preview
+    models = models_20210901preview
     if is_enterprise_tier(cmd, resource_group, service):
         client = get_client(cmd)
         models = models_20220501preview
@@ -173,7 +180,7 @@ def app_identity_assign(cmd, client, resource_group, service, name, role=None, s
 
 
 def app_identity_remove(cmd, client, resource_group, service, name):
-    models = models_20210601preview
+    models = models_20210901preview
     if is_enterprise_tier(cmd, resource_group, service):
         client = get_client(cmd)
         models = models_20220501preview
@@ -183,3 +190,49 @@ def app_identity_remove(cmd, client, resource_group, service, name):
 def app_identity_show(cmd, client, resource_group, service, name):
     client = get_client(cmd) if is_enterprise_tier(cmd, resource_group, service) else client
     return identity_show(cmd, client, resource_group, service, name)
+
+
+def app_domain_bind(cmd, client, resource_group, service, app, domain_name,
+                certificate=None,
+                enable_end_to_end_tls=None):
+    models = models_20210901preview
+    if is_enterprise_tier(cmd, resource_group, service):
+        client = get_client(cmd)
+        models = models_20220501preview
+    return domain_bind(cmd, client, models, resource_group, service, app, domain_name, certificate, enable_end_to_end_tls)
+
+
+def app_domain_show(cmd, client, resource_group, service, app, domain_name):
+    if is_enterprise_tier(cmd, resource_group, service):
+        client = get_client(cmd)
+    return domain_show(cmd, client, resource_group, service, app, domain_name)
+
+
+def app_domain_list(cmd, client, resource_group, service, app):
+    if is_enterprise_tier(cmd, resource_group, service):
+        client = get_client(cmd)
+    return domain_list(cmd, client, resource_group, service, app)
+
+
+def app_domain_update(cmd, client, resource_group, service, app, domain_name,
+                certificate=None,
+                enable_end_to_end_tls=None):
+    models = models_20210901preview
+    if is_enterprise_tier(cmd, resource_group, service):
+        client = get_client(cmd)
+        models = models_20220501preview
+    return domain_update(cmd, client, models, resource_group, service, app, domain_name, certificate, enable_end_to_end_tls)
+
+
+def app_domain_unbind(cmd, client, resource_group, service, app, domain_name):
+    if is_enterprise_tier(cmd, resource_group, service):
+        client = get_client(cmd)
+    return domain_unbind(cmd, client, resource_group, service, app, domain_name)
+
+
+def app_append_loaded_public_certificate(cmd, client, resource_group, service, name, certificate_name, load_trust_store):
+    models = models_20210901preview
+    if is_enterprise_tier(cmd, resource_group, service):
+        client = get_client(cmd)
+        models = models_20220501preview
+    return append_loaded_public_certificate(cmd, client, resource_group, service, name, certificate_name, load_trust_store, models)

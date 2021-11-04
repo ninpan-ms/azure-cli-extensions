@@ -37,6 +37,7 @@ def deployment_delete(cmd, client, resource_group, service, app, name):
 def deployment_create(cmd, client, resource_group, service, app, name,
                       skip_clone_settings=False,
                       version=None,
+                      disable_validation=None,
                       artifact_path=None,
                       builder=None,
                       target_module=None,
@@ -55,5 +56,5 @@ def deployment_create(cmd, client, resource_group, service, app, name,
                                             jvm_options, cpu, memory, instance_count, env, config_file_patterns, no_wait)
     else:
         return deployment_create_standard(cmd, client, resource_group, service, app, name,
-                                          skip_clone_settings, version, artifact_path, target_module, runtime_version,
+                                          skip_clone_settings, version, disable_validation, artifact_path, target_module, runtime_version,
                                           jvm_options, main_entry, cpu, memory, instance_count, env, no_wait)
