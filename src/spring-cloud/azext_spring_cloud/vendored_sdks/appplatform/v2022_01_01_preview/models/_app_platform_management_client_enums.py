@@ -171,6 +171,15 @@ class KPackBuildStageProvisioningState(with_metaclass(_CaseInsensitiveEnumMeta, 
     SUCCEEDED = "Succeeded"
     FAILED = "Failed"
 
+class LastModifiedByType(with_metaclass(_CaseInsensitiveEnumMeta, str, Enum)):
+    """The type of identity that last modified the resource.
+    """
+
+    USER = "User"
+    APPLICATION = "Application"
+    MANAGED_IDENTITY = "ManagedIdentity"
+    KEY = "Key"
+
 class ManagedIdentityType(with_metaclass(_CaseInsensitiveEnumMeta, str, Enum)):
     """Type of the managed identity
     """
@@ -256,6 +265,7 @@ class SupportedRuntimeValue(with_metaclass(_CaseInsensitiveEnumMeta, str, Enum))
 
     JAVA8 = "Java_8"
     JAVA11 = "Java_11"
+    JAVA17 = "Java_17"
     NET_CORE31 = "NetCore_31"
 
 class TestKeyType(with_metaclass(_CaseInsensitiveEnumMeta, str, Enum)):

@@ -28,29 +28,6 @@ class ActiveDeploymentCollection(msrest.serialization.Model):
         self.active_deployments = kwargs.get('active_deployments', None)
 
 
-class AddonProfile(msrest.serialization.Model):
-    """Deployment addon profile.
-
-    :param enabled: Whether the add-on is enabled or not.
-    :type enabled: bool
-    :param properties: Key-value pairs for configurations of add-on.
-    :type properties: dict[str, str]
-    """
-
-    _attribute_map = {
-        'enabled': {'key': 'enabled', 'type': 'bool'},
-        'properties': {'key': 'properties', 'type': '{str}'},
-    }
-
-    def __init__(
-        self,
-        **kwargs
-    ):
-        super(AddonProfile, self).__init__(**kwargs)
-        self.enabled = kwargs.get('enabled', None)
-        self.properties = kwargs.get('properties', None)
-
-
 class ApiPortalCustomDomainProperties(msrest.serialization.Model):
     """The properties of custom domain for API portal.
 
@@ -81,18 +58,22 @@ class Resource(msrest.serialization.Model):
     :vartype name: str
     :ivar type: The type of the resource.
     :vartype type: str
+    :ivar system_data: Metadata pertaining to creation and last modification of the resource.
+    :vartype system_data: ~azure.mgmt.appplatform.v2022_01_01_preview.models.SystemData
     """
 
     _validation = {
         'id': {'readonly': True},
         'name': {'readonly': True},
         'type': {'readonly': True},
+        'system_data': {'readonly': True},
     }
 
     _attribute_map = {
         'id': {'key': 'id', 'type': 'str'},
         'name': {'key': 'name', 'type': 'str'},
         'type': {'key': 'type', 'type': 'str'},
+        'system_data': {'key': 'systemData', 'type': 'SystemData'},
     }
 
     def __init__(
@@ -103,6 +84,7 @@ class Resource(msrest.serialization.Model):
         self.id = None
         self.name = None
         self.type = None
+        self.system_data = None
 
 
 class ProxyResource(Resource):
@@ -116,18 +98,22 @@ class ProxyResource(Resource):
     :vartype name: str
     :ivar type: The type of the resource.
     :vartype type: str
+    :ivar system_data: Metadata pertaining to creation and last modification of the resource.
+    :vartype system_data: ~azure.mgmt.appplatform.v2022_01_01_preview.models.SystemData
     """
 
     _validation = {
         'id': {'readonly': True},
         'name': {'readonly': True},
         'type': {'readonly': True},
+        'system_data': {'readonly': True},
     }
 
     _attribute_map = {
         'id': {'key': 'id', 'type': 'str'},
         'name': {'key': 'name', 'type': 'str'},
         'type': {'key': 'type', 'type': 'str'},
+        'system_data': {'key': 'systemData', 'type': 'SystemData'},
     }
 
     def __init__(
@@ -148,11 +134,11 @@ class ApiPortalCustomDomainResource(ProxyResource):
     :vartype name: str
     :ivar type: The type of the resource.
     :vartype type: str
+    :ivar system_data: Metadata pertaining to creation and last modification of the resource.
+    :vartype system_data: ~azure.mgmt.appplatform.v2022_01_01_preview.models.SystemData
     :param properties: The properties of custom domain for API portal.
     :type properties:
      ~azure.mgmt.appplatform.v2022_01_01_preview.models.ApiPortalCustomDomainProperties
-    :ivar system_data: Metadata pertaining to creation and last modification of the resource.
-    :vartype system_data: ~azure.mgmt.appplatform.v2022_01_01_preview.models.SystemData
     """
 
     _validation = {
@@ -166,8 +152,8 @@ class ApiPortalCustomDomainResource(ProxyResource):
         'id': {'key': 'id', 'type': 'str'},
         'name': {'key': 'name', 'type': 'str'},
         'type': {'key': 'type', 'type': 'str'},
-        'properties': {'key': 'properties', 'type': 'ApiPortalCustomDomainProperties'},
         'system_data': {'key': 'systemData', 'type': 'SystemData'},
+        'properties': {'key': 'properties', 'type': 'ApiPortalCustomDomainProperties'},
     }
 
     def __init__(
@@ -176,13 +162,12 @@ class ApiPortalCustomDomainResource(ProxyResource):
     ):
         super(ApiPortalCustomDomainResource, self).__init__(**kwargs)
         self.properties = kwargs.get('properties', None)
-        self.system_data = None
 
 
 class ApiPortalCustomDomainResourceCollection(msrest.serialization.Model):
-    """Object that includes an array of API portal Custom Domain resources and a possible link for next set.
+    """Object that includes an array of API portal custom domain resources and a possible link for next set.
 
-    :param value: Collection of API portal Custom Domain resources.
+    :param value: Collection of API portal custom domain resources.
     :type value:
      list[~azure.mgmt.appplatform.v2022_01_01_preview.models.ApiPortalCustomDomainResource]
     :param next_link: URL client should use to fetch the next page (per server side paging).
@@ -249,12 +234,14 @@ class ApiPortalProperties(msrest.serialization.Model):
     :vartype url: str
     :param https_only: Indicate if only https is allowed.
     :type https_only: bool
+    :param gateway_ids: The array of resource Ids of gateway to integrate with API portal.
+    :type gateway_ids: list[str]
     :param source_urls: Collection of OpenAPI source URL locations.
     :type source_urls: list[str]
     :param sso_properties: Single sign-on related configuration.
     :type sso_properties: ~azure.mgmt.appplatform.v2022_01_01_preview.models.SsoProperties
-    :param resource_requests: The requested resource quantity for required CPU and Memory.
-    :type resource_requests:
+    :ivar resource_requests: The requested resource quantity for required CPU and Memory.
+    :vartype resource_requests:
      ~azure.mgmt.appplatform.v2022_01_01_preview.models.ApiPortalResourceRequests
     :ivar instances: Collection of instances belong to API portal.
     :vartype instances: list[~azure.mgmt.appplatform.v2022_01_01_preview.models.ApiPortalInstance]
@@ -263,6 +250,7 @@ class ApiPortalProperties(msrest.serialization.Model):
     _validation = {
         'provisioning_state': {'readonly': True},
         'url': {'readonly': True},
+        'resource_requests': {'readonly': True},
         'instances': {'readonly': True},
     }
 
@@ -271,6 +259,7 @@ class ApiPortalProperties(msrest.serialization.Model):
         'public': {'key': 'public', 'type': 'bool'},
         'url': {'key': 'url', 'type': 'str'},
         'https_only': {'key': 'httpsOnly', 'type': 'bool'},
+        'gateway_ids': {'key': 'gatewayIds', 'type': '[str]'},
         'source_urls': {'key': 'sourceUrls', 'type': '[str]'},
         'sso_properties': {'key': 'ssoProperties', 'type': 'SsoProperties'},
         'resource_requests': {'key': 'resourceRequests', 'type': 'ApiPortalResourceRequests'},
@@ -286,9 +275,10 @@ class ApiPortalProperties(msrest.serialization.Model):
         self.public = kwargs.get('public', None)
         self.url = None
         self.https_only = kwargs.get('https_only', None)
+        self.gateway_ids = kwargs.get('gateway_ids', None)
         self.source_urls = kwargs.get('source_urls', None)
         self.sso_properties = kwargs.get('sso_properties', None)
-        self.resource_requests = kwargs.get('resource_requests', None)
+        self.resource_requests = None
         self.instances = None
 
 
@@ -303,12 +293,12 @@ class ApiPortalResource(ProxyResource):
     :vartype name: str
     :ivar type: The type of the resource.
     :vartype type: str
+    :ivar system_data: Metadata pertaining to creation and last modification of the resource.
+    :vartype system_data: ~azure.mgmt.appplatform.v2022_01_01_preview.models.SystemData
     :param properties: API portal properties payload.
     :type properties: ~azure.mgmt.appplatform.v2022_01_01_preview.models.ApiPortalProperties
     :param sku: Sku of the API portal resource.
     :type sku: ~azure.mgmt.appplatform.v2022_01_01_preview.models.Sku
-    :ivar system_data: Metadata pertaining to creation and last modification of the resource.
-    :vartype system_data: ~azure.mgmt.appplatform.v2022_01_01_preview.models.SystemData
     """
 
     _validation = {
@@ -322,9 +312,9 @@ class ApiPortalResource(ProxyResource):
         'id': {'key': 'id', 'type': 'str'},
         'name': {'key': 'name', 'type': 'str'},
         'type': {'key': 'type', 'type': 'str'},
+        'system_data': {'key': 'systemData', 'type': 'SystemData'},
         'properties': {'key': 'properties', 'type': 'ApiPortalProperties'},
         'sku': {'key': 'sku', 'type': 'Sku'},
-        'system_data': {'key': 'systemData', 'type': 'SystemData'},
     }
 
     def __init__(
@@ -334,7 +324,6 @@ class ApiPortalResource(ProxyResource):
         super(ApiPortalResource, self).__init__(**kwargs)
         self.properties = kwargs.get('properties', None)
         self.sku = kwargs.get('sku', None)
-        self.system_data = None
 
 
 class ApiPortalResourceCollection(msrest.serialization.Model):
@@ -427,10 +416,10 @@ class AppResource(ProxyResource):
     :vartype name: str
     :ivar type: The type of the resource.
     :vartype type: str
-    :param properties: Properties of the App resource.
-    :type properties: ~azure.mgmt.appplatform.v2022_01_01_preview.models.AppResourceProperties
     :ivar system_data: Metadata pertaining to creation and last modification of the resource.
     :vartype system_data: ~azure.mgmt.appplatform.v2022_01_01_preview.models.SystemData
+    :param properties: Properties of the App resource.
+    :type properties: ~azure.mgmt.appplatform.v2022_01_01_preview.models.AppResourceProperties
     :param identity: The Managed Identity type of the app resource.
     :type identity: ~azure.mgmt.appplatform.v2022_01_01_preview.models.ManagedIdentityProperties
     :param location: The GEO location of the application, always the same with its parent resource.
@@ -448,8 +437,8 @@ class AppResource(ProxyResource):
         'id': {'key': 'id', 'type': 'str'},
         'name': {'key': 'name', 'type': 'str'},
         'type': {'key': 'type', 'type': 'str'},
-        'properties': {'key': 'properties', 'type': 'AppResourceProperties'},
         'system_data': {'key': 'systemData', 'type': 'SystemData'},
+        'properties': {'key': 'properties', 'type': 'AppResourceProperties'},
         'identity': {'key': 'identity', 'type': 'ManagedIdentityProperties'},
         'location': {'key': 'location', 'type': 'str'},
     }
@@ -460,7 +449,6 @@ class AppResource(ProxyResource):
     ):
         super(AppResource, self).__init__(**kwargs)
         self.properties = kwargs.get('properties', None)
-        self.system_data = None
         self.identity = kwargs.get('identity', None)
         self.location = kwargs.get('location', None)
 
@@ -499,7 +487,7 @@ class AppResourceProperties(msrest.serialization.Model):
     :ivar url: URL of the App.
     :vartype url: str
     :param addon_configs: Collection of addons.
-    :type addon_configs: dict[str, ~azure.mgmt.appplatform.v2022_01_01_preview.models.AddonProfile]
+    :type addon_configs: dict[str, dict[str, any]]
     :ivar provisioning_state: Provisioning state of the App. Possible values include: "Succeeded",
      "Failed", "Creating", "Updating", "Deleting".
     :vartype provisioning_state: str or
@@ -530,7 +518,7 @@ class AppResourceProperties(msrest.serialization.Model):
     _attribute_map = {
         'public': {'key': 'public', 'type': 'bool'},
         'url': {'key': 'url', 'type': 'str'},
-        'addon_configs': {'key': 'addonConfigs', 'type': '{AddonProfile}'},
+        'addon_configs': {'key': 'addonConfigs', 'type': '{{object}}'},
         'provisioning_state': {'key': 'provisioningState', 'type': 'str'},
         'fqdn': {'key': 'fqdn', 'type': 'str'},
         'https_only': {'key': 'httpsOnly', 'type': 'bool'},
@@ -622,8 +610,8 @@ class CustomPersistentDiskProperties(msrest.serialization.Model):
     :type type: str
     :param mount_path: Required. The mount path of the persistent disk.
     :type mount_path: str
-    :param readonly: Indicates whether the persistent disk is a readonly one.
-    :type readonly: bool
+    :param read_only: Indicates whether the persistent disk is a readOnly one.
+    :type read_only: bool
     :param mount_options: These are the mount options for a persistent disk.
     :type mount_options: list[str]
     """
@@ -636,7 +624,7 @@ class CustomPersistentDiskProperties(msrest.serialization.Model):
     _attribute_map = {
         'type': {'key': 'type', 'type': 'str'},
         'mount_path': {'key': 'mountPath', 'type': 'str'},
-        'readonly': {'key': 'readonly', 'type': 'bool'},
+        'read_only': {'key': 'readOnly', 'type': 'bool'},
         'mount_options': {'key': 'mountOptions', 'type': '[str]'},
     }
 
@@ -651,7 +639,7 @@ class CustomPersistentDiskProperties(msrest.serialization.Model):
         super(CustomPersistentDiskProperties, self).__init__(**kwargs)
         self.type = None  # type: Optional[str]
         self.mount_path = kwargs['mount_path']
-        self.readonly = kwargs.get('readonly', None)
+        self.read_only = kwargs.get('read_only', None)
         self.mount_options = kwargs.get('mount_options', None)
 
 
@@ -665,8 +653,8 @@ class AzureFileVolume(CustomPersistentDiskProperties):
     :type type: str
     :param mount_path: Required. The mount path of the persistent disk.
     :type mount_path: str
-    :param readonly: Indicates whether the persistent disk is a readonly one.
-    :type readonly: bool
+    :param read_only: Indicates whether the persistent disk is a readOnly one.
+    :type read_only: bool
     :param mount_options: These are the mount options for a persistent disk.
     :type mount_options: list[str]
     :param share_name: Required. The share name of the Azure File share.
@@ -682,7 +670,7 @@ class AzureFileVolume(CustomPersistentDiskProperties):
     _attribute_map = {
         'type': {'key': 'type', 'type': 'str'},
         'mount_path': {'key': 'mountPath', 'type': 'str'},
-        'readonly': {'key': 'readonly', 'type': 'bool'},
+        'read_only': {'key': 'readOnly', 'type': 'bool'},
         'mount_options': {'key': 'mountOptions', 'type': '[str]'},
         'share_name': {'key': 'shareName', 'type': 'str'},
     }
@@ -707,6 +695,8 @@ class BindingResource(ProxyResource):
     :vartype name: str
     :ivar type: The type of the resource.
     :vartype type: str
+    :ivar system_data: Metadata pertaining to creation and last modification of the resource.
+    :vartype system_data: ~azure.mgmt.appplatform.v2022_01_01_preview.models.SystemData
     :param properties: Properties of the Binding resource.
     :type properties: ~azure.mgmt.appplatform.v2022_01_01_preview.models.BindingResourceProperties
     """
@@ -715,12 +705,14 @@ class BindingResource(ProxyResource):
         'id': {'readonly': True},
         'name': {'readonly': True},
         'type': {'readonly': True},
+        'system_data': {'readonly': True},
     }
 
     _attribute_map = {
         'id': {'key': 'id', 'type': 'str'},
         'name': {'key': 'name', 'type': 'str'},
         'type': {'key': 'type', 'type': 'str'},
+        'system_data': {'key': 'systemData', 'type': 'SystemData'},
         'properties': {'key': 'properties', 'type': 'BindingResourceProperties'},
     }
 
@@ -825,10 +817,10 @@ class Build(ProxyResource):
     :vartype name: str
     :ivar type: The type of the resource.
     :vartype type: str
-    :param properties: Properties of the build resource.
-    :type properties: ~azure.mgmt.appplatform.v2022_01_01_preview.models.BuildProperties
     :ivar system_data: Metadata pertaining to creation and last modification of the resource.
     :vartype system_data: ~azure.mgmt.appplatform.v2022_01_01_preview.models.SystemData
+    :param properties: Properties of the build resource.
+    :type properties: ~azure.mgmt.appplatform.v2022_01_01_preview.models.BuildProperties
     """
 
     _validation = {
@@ -842,8 +834,8 @@ class Build(ProxyResource):
         'id': {'key': 'id', 'type': 'str'},
         'name': {'key': 'name', 'type': 'str'},
         'type': {'key': 'type', 'type': 'str'},
-        'properties': {'key': 'properties', 'type': 'BuildProperties'},
         'system_data': {'key': 'systemData', 'type': 'SystemData'},
+        'properties': {'key': 'properties', 'type': 'BuildProperties'},
     }
 
     def __init__(
@@ -852,7 +844,6 @@ class Build(ProxyResource):
     ):
         super(Build, self).__init__(**kwargs)
         self.properties = kwargs.get('properties', None)
-        self.system_data = None
 
 
 class BuildCollection(msrest.serialization.Model):
@@ -926,10 +917,10 @@ class BuilderResource(ProxyResource):
     :vartype name: str
     :ivar type: The type of the resource.
     :vartype type: str
-    :param properties: Property of the Builder resource.
-    :type properties: ~azure.mgmt.appplatform.v2022_01_01_preview.models.BuilderProperties
     :ivar system_data: Metadata pertaining to creation and last modification of the resource.
     :vartype system_data: ~azure.mgmt.appplatform.v2022_01_01_preview.models.SystemData
+    :param properties: Property of the Builder resource.
+    :type properties: ~azure.mgmt.appplatform.v2022_01_01_preview.models.BuilderProperties
     """
 
     _validation = {
@@ -943,8 +934,8 @@ class BuilderResource(ProxyResource):
         'id': {'key': 'id', 'type': 'str'},
         'name': {'key': 'name', 'type': 'str'},
         'type': {'key': 'type', 'type': 'str'},
-        'properties': {'key': 'properties', 'type': 'BuilderProperties'},
         'system_data': {'key': 'systemData', 'type': 'SystemData'},
+        'properties': {'key': 'properties', 'type': 'BuilderProperties'},
     }
 
     def __init__(
@@ -953,7 +944,6 @@ class BuilderResource(ProxyResource):
     ):
         super(BuilderResource, self).__init__(**kwargs)
         self.properties = kwargs.get('properties', None)
-        self.system_data = None
 
 
 class BuilderResourceCollection(msrest.serialization.Model):
@@ -1051,10 +1041,10 @@ class BuildpackBindingResource(ProxyResource):
     :vartype name: str
     :ivar type: The type of the resource.
     :vartype type: str
-    :param properties: Properties of a buildpack binding.
-    :type properties: ~azure.mgmt.appplatform.v2022_01_01_preview.models.BuildpackBindingProperties
     :ivar system_data: Metadata pertaining to creation and last modification of the resource.
     :vartype system_data: ~azure.mgmt.appplatform.v2022_01_01_preview.models.SystemData
+    :param properties: Properties of a buildpack binding.
+    :type properties: ~azure.mgmt.appplatform.v2022_01_01_preview.models.BuildpackBindingProperties
     """
 
     _validation = {
@@ -1068,8 +1058,8 @@ class BuildpackBindingResource(ProxyResource):
         'id': {'key': 'id', 'type': 'str'},
         'name': {'key': 'name', 'type': 'str'},
         'type': {'key': 'type', 'type': 'str'},
-        'properties': {'key': 'properties', 'type': 'BuildpackBindingProperties'},
         'system_data': {'key': 'systemData', 'type': 'SystemData'},
+        'properties': {'key': 'properties', 'type': 'BuildpackBindingProperties'},
     }
 
     def __init__(
@@ -1078,7 +1068,6 @@ class BuildpackBindingResource(ProxyResource):
     ):
         super(BuildpackBindingResource, self).__init__(**kwargs)
         self.properties = kwargs.get('properties', None)
-        self.system_data = None
 
 
 class BuildpackBindingResourceCollection(msrest.serialization.Model):
@@ -1168,26 +1157,30 @@ class BuildProperties(msrest.serialization.Model):
 
     :param relative_path: The relative path of source code.
     :type relative_path: str
-    :param builder: The name of builder to build the source code.
+    :param builder: The resource id of builder to build the source code.
     :type builder: str
+    :param agent_pool: The resource id of agent pool.
+    :type agent_pool: str
     :ivar provisioning_state: Provisioning state of the KPack build result. Possible values
      include: "Creating", "Updating", "Succeeded", "Failed", "Deleting".
     :vartype provisioning_state: str or
      ~azure.mgmt.appplatform.v2022_01_01_preview.models.BuildProvisioningState
     :param env: The environment variables for this build.
     :type env: dict[str, str]
-    :param triggered_build_result: The build result triggered by this build.
-    :type triggered_build_result:
+    :ivar triggered_build_result: The build result triggered by this build.
+    :vartype triggered_build_result:
      ~azure.mgmt.appplatform.v2022_01_01_preview.models.TriggeredBuildResult
     """
 
     _validation = {
         'provisioning_state': {'readonly': True},
+        'triggered_build_result': {'readonly': True},
     }
 
     _attribute_map = {
         'relative_path': {'key': 'relativePath', 'type': 'str'},
         'builder': {'key': 'builder', 'type': 'str'},
+        'agent_pool': {'key': 'agentPool', 'type': 'str'},
         'provisioning_state': {'key': 'provisioningState', 'type': 'str'},
         'env': {'key': 'env', 'type': '{str}'},
         'triggered_build_result': {'key': 'triggeredBuildResult', 'type': 'TriggeredBuildResult'},
@@ -1200,9 +1193,10 @@ class BuildProperties(msrest.serialization.Model):
         super(BuildProperties, self).__init__(**kwargs)
         self.relative_path = kwargs.get('relative_path', None)
         self.builder = kwargs.get('builder', None)
+        self.agent_pool = kwargs.get('agent_pool', None)
         self.provisioning_state = None
         self.env = kwargs.get('env', None)
-        self.triggered_build_result = kwargs.get('triggered_build_result', None)
+        self.triggered_build_result = None
 
 
 class BuildResult(ProxyResource):
@@ -1216,10 +1210,10 @@ class BuildResult(ProxyResource):
     :vartype name: str
     :ivar type: The type of the resource.
     :vartype type: str
-    :param properties: Properties of the build result resource.
-    :type properties: ~azure.mgmt.appplatform.v2022_01_01_preview.models.BuildResultProperties
     :ivar system_data: Metadata pertaining to creation and last modification of the resource.
     :vartype system_data: ~azure.mgmt.appplatform.v2022_01_01_preview.models.SystemData
+    :param properties: Properties of the build result resource.
+    :type properties: ~azure.mgmt.appplatform.v2022_01_01_preview.models.BuildResultProperties
     """
 
     _validation = {
@@ -1233,8 +1227,8 @@ class BuildResult(ProxyResource):
         'id': {'key': 'id', 'type': 'str'},
         'name': {'key': 'name', 'type': 'str'},
         'type': {'key': 'type', 'type': 'str'},
-        'properties': {'key': 'properties', 'type': 'BuildResultProperties'},
         'system_data': {'key': 'systemData', 'type': 'SystemData'},
+        'properties': {'key': 'properties', 'type': 'BuildResultProperties'},
     }
 
     def __init__(
@@ -1243,7 +1237,6 @@ class BuildResult(ProxyResource):
     ):
         super(BuildResult, self).__init__(**kwargs)
         self.properties = kwargs.get('properties', None)
-        self.system_data = None
 
 
 class BuildResultCollection(msrest.serialization.Model):
@@ -1335,7 +1328,7 @@ class UserSourceInfo(msrest.serialization.Model):
     """Source information for a deployment.
 
     You probably want to use the sub-classes and not this class directly. Known
-    sub-classes are: BuildResultUserSourceInfo, UploadedUserSourceInfo.
+    sub-classes are: BuildResultUserSourceInfo, CustomContainerUserSourceInfo, UploadedUserSourceInfo.
 
     All required parameters must be populated in order to send to Azure.
 
@@ -1355,7 +1348,7 @@ class UserSourceInfo(msrest.serialization.Model):
     }
 
     _subtype_map = {
-        'type': {'BuildResult': 'BuildResultUserSourceInfo', 'UploadedUserSourceInfo': 'UploadedUserSourceInfo'}
+        'type': {'BuildResult': 'BuildResultUserSourceInfo', 'Container': 'CustomContainerUserSourceInfo', 'UploadedUserSourceInfo': 'UploadedUserSourceInfo'}
     }
 
     def __init__(
@@ -1411,10 +1404,10 @@ class BuildService(ProxyResource):
     :vartype name: str
     :ivar type: The type of the resource.
     :vartype type: str
-    :param properties: Properties of the build resource.
-    :type properties: ~azure.mgmt.appplatform.v2022_01_01_preview.models.BuildServiceProperties
     :ivar system_data: Metadata pertaining to creation and last modification of the resource.
     :vartype system_data: ~azure.mgmt.appplatform.v2022_01_01_preview.models.SystemData
+    :param properties: Properties of the build resource.
+    :type properties: ~azure.mgmt.appplatform.v2022_01_01_preview.models.BuildServiceProperties
     """
 
     _validation = {
@@ -1428,8 +1421,8 @@ class BuildService(ProxyResource):
         'id': {'key': 'id', 'type': 'str'},
         'name': {'key': 'name', 'type': 'str'},
         'type': {'key': 'type', 'type': 'str'},
-        'properties': {'key': 'properties', 'type': 'BuildServiceProperties'},
         'system_data': {'key': 'systemData', 'type': 'SystemData'},
+        'properties': {'key': 'properties', 'type': 'BuildServiceProperties'},
     }
 
     def __init__(
@@ -1438,7 +1431,6 @@ class BuildService(ProxyResource):
     ):
         super(BuildService, self).__init__(**kwargs)
         self.properties = kwargs.get('properties', None)
-        self.system_data = None
 
 
 class BuildServiceAgentPoolProperties(msrest.serialization.Model):
@@ -1482,11 +1474,11 @@ class BuildServiceAgentPoolResource(ProxyResource):
     :vartype name: str
     :ivar type: The type of the resource.
     :vartype type: str
+    :ivar system_data: Metadata pertaining to creation and last modification of the resource.
+    :vartype system_data: ~azure.mgmt.appplatform.v2022_01_01_preview.models.SystemData
     :param properties: build service agent pool properties.
     :type properties:
      ~azure.mgmt.appplatform.v2022_01_01_preview.models.BuildServiceAgentPoolProperties
-    :ivar system_data: Metadata pertaining to creation and last modification of the resource.
-    :vartype system_data: ~azure.mgmt.appplatform.v2022_01_01_preview.models.SystemData
     """
 
     _validation = {
@@ -1500,8 +1492,8 @@ class BuildServiceAgentPoolResource(ProxyResource):
         'id': {'key': 'id', 'type': 'str'},
         'name': {'key': 'name', 'type': 'str'},
         'type': {'key': 'type', 'type': 'str'},
-        'properties': {'key': 'properties', 'type': 'BuildServiceAgentPoolProperties'},
         'system_data': {'key': 'systemData', 'type': 'SystemData'},
+        'properties': {'key': 'properties', 'type': 'BuildServiceAgentPoolProperties'},
     }
 
     def __init__(
@@ -1510,7 +1502,6 @@ class BuildServiceAgentPoolResource(ProxyResource):
     ):
         super(BuildServiceAgentPoolResource, self).__init__(**kwargs)
         self.properties = kwargs.get('properties', None)
-        self.system_data = None
 
 
 class BuildServiceAgentPoolResourceCollection(msrest.serialization.Model):
@@ -1607,9 +1598,9 @@ class BuildServiceProperties(msrest.serialization.Model):
      include: "Creating", "Updating", "Succeeded", "Failed", "Deleting".
     :vartype provisioning_state: str or
      ~azure.mgmt.appplatform.v2022_01_01_preview.models.BuildServiceProvisioningState
-    :param runtime_state: The runtime resource configuration of this build service.
-    :type runtime_state:
-     ~azure.mgmt.appplatform.v2022_01_01_preview.models.BuildServicePropertiesRuntimeState
+    :param resource_requests: The runtime resource configuration of this build service.
+    :type resource_requests:
+     ~azure.mgmt.appplatform.v2022_01_01_preview.models.BuildServicePropertiesResourceRequests
     """
 
     _validation = {
@@ -1619,7 +1610,7 @@ class BuildServiceProperties(msrest.serialization.Model):
     _attribute_map = {
         'k_pack_version': {'key': 'kPackVersion', 'type': 'str'},
         'provisioning_state': {'key': 'provisioningState', 'type': 'str'},
-        'runtime_state': {'key': 'runtimeState', 'type': 'BuildServicePropertiesRuntimeState'},
+        'resource_requests': {'key': 'resourceRequests', 'type': 'BuildServicePropertiesResourceRequests'},
     }
 
     def __init__(
@@ -1629,10 +1620,10 @@ class BuildServiceProperties(msrest.serialization.Model):
         super(BuildServiceProperties, self).__init__(**kwargs)
         self.k_pack_version = kwargs.get('k_pack_version', None)
         self.provisioning_state = None
-        self.runtime_state = kwargs.get('runtime_state', None)
+        self.resource_requests = kwargs.get('resource_requests', None)
 
 
-class BuildServicePropertiesRuntimeState(msrest.serialization.Model):
+class BuildServicePropertiesResourceRequests(msrest.serialization.Model):
     """The runtime resource configuration of this build service.
 
     Variables are only populated by the server, and will be ignored when sending a request.
@@ -1657,7 +1648,7 @@ class BuildServicePropertiesRuntimeState(msrest.serialization.Model):
         self,
         **kwargs
     ):
-        super(BuildServicePropertiesRuntimeState, self).__init__(**kwargs)
+        super(BuildServicePropertiesResourceRequests, self).__init__(**kwargs)
         self.cpu = None
         self.memory = None
 
@@ -1797,6 +1788,8 @@ class CertificateResource(ProxyResource):
     :vartype name: str
     :ivar type: The type of the resource.
     :vartype type: str
+    :ivar system_data: Metadata pertaining to creation and last modification of the resource.
+    :vartype system_data: ~azure.mgmt.appplatform.v2022_01_01_preview.models.SystemData
     :param properties: Properties of the certificate resource payload.
     :type properties: ~azure.mgmt.appplatform.v2022_01_01_preview.models.CertificateProperties
     """
@@ -1805,12 +1798,14 @@ class CertificateResource(ProxyResource):
         'id': {'readonly': True},
         'name': {'readonly': True},
         'type': {'readonly': True},
+        'system_data': {'readonly': True},
     }
 
     _attribute_map = {
         'id': {'key': 'id', 'type': 'str'},
         'name': {'key': 'name', 'type': 'str'},
         'type': {'key': 'type', 'type': 'str'},
+        'system_data': {'key': 'systemData', 'type': 'SystemData'},
         'properties': {'key': 'properties', 'type': 'CertificateProperties'},
     }
 
@@ -1899,6 +1894,8 @@ class ClusterResourceProperties(msrest.serialization.Model):
     :vartype power_state: str or ~azure.mgmt.appplatform.v2022_01_01_preview.models.PowerState
     :param zone_redundant:
     :type zone_redundant: bool
+    :ivar fqdn: Fully qualified dns name of the service instance.
+    :vartype fqdn: str
     """
 
     _validation = {
@@ -1906,6 +1903,7 @@ class ClusterResourceProperties(msrest.serialization.Model):
         'version': {'readonly': True},
         'service_id': {'readonly': True},
         'power_state': {'readonly': True},
+        'fqdn': {'readonly': True},
     }
 
     _attribute_map = {
@@ -1915,6 +1913,7 @@ class ClusterResourceProperties(msrest.serialization.Model):
         'service_id': {'key': 'serviceId', 'type': 'str'},
         'power_state': {'key': 'powerState', 'type': 'str'},
         'zone_redundant': {'key': 'zoneRedundant', 'type': 'bool'},
+        'fqdn': {'key': 'fqdn', 'type': 'str'},
     }
 
     def __init__(
@@ -1928,6 +1927,7 @@ class ClusterResourceProperties(msrest.serialization.Model):
         self.service_id = None
         self.power_state = None
         self.zone_redundant = kwargs.get('zone_redundant', False)
+        self.fqdn = None
 
 
 class ConfigServerGitProperty(msrest.serialization.Model):
@@ -2038,6 +2038,8 @@ class ConfigServerResource(ProxyResource):
     :vartype name: str
     :ivar type: The type of the resource.
     :vartype type: str
+    :ivar system_data: Metadata pertaining to creation and last modification of the resource.
+    :vartype system_data: ~azure.mgmt.appplatform.v2022_01_01_preview.models.SystemData
     :param properties: Properties of the Config Server resource.
     :type properties: ~azure.mgmt.appplatform.v2022_01_01_preview.models.ConfigServerProperties
     """
@@ -2046,12 +2048,14 @@ class ConfigServerResource(ProxyResource):
         'id': {'readonly': True},
         'name': {'readonly': True},
         'type': {'readonly': True},
+        'system_data': {'readonly': True},
     }
 
     _attribute_map = {
         'id': {'key': 'id', 'type': 'str'},
         'name': {'key': 'name', 'type': 'str'},
         'type': {'key': 'type', 'type': 'str'},
+        'system_data': {'key': 'systemData', 'type': 'SystemData'},
         'properties': {'key': 'properties', 'type': 'ConfigServerProperties'},
     }
 
@@ -2329,11 +2333,11 @@ class ConfigurationServiceResource(ProxyResource):
     :vartype name: str
     :ivar type: The type of the resource.
     :vartype type: str
+    :ivar system_data: Metadata pertaining to creation and last modification of the resource.
+    :vartype system_data: ~azure.mgmt.appplatform.v2022_01_01_preview.models.SystemData
     :param properties: Application Configuration Service properties payload.
     :type properties:
      ~azure.mgmt.appplatform.v2022_01_01_preview.models.ConfigurationServiceProperties
-    :ivar system_data: Metadata pertaining to creation and last modification of the resource.
-    :vartype system_data: ~azure.mgmt.appplatform.v2022_01_01_preview.models.SystemData
     """
 
     _validation = {
@@ -2347,8 +2351,8 @@ class ConfigurationServiceResource(ProxyResource):
         'id': {'key': 'id', 'type': 'str'},
         'name': {'key': 'name', 'type': 'str'},
         'type': {'key': 'type', 'type': 'str'},
-        'properties': {'key': 'properties', 'type': 'ConfigurationServiceProperties'},
         'system_data': {'key': 'systemData', 'type': 'SystemData'},
+        'properties': {'key': 'properties', 'type': 'ConfigurationServiceProperties'},
     }
 
     def __init__(
@@ -2357,7 +2361,6 @@ class ConfigurationServiceResource(ProxyResource):
     ):
         super(ConfigurationServiceResource, self).__init__(**kwargs)
         self.properties = kwargs.get('properties', None)
-        self.system_data = None
 
 
 class ConfigurationServiceResourceCollection(msrest.serialization.Model):
@@ -2460,6 +2463,25 @@ class ConfigurationServiceSettingsValidateResult(msrest.serialization.Model):
         self.git_property_validation_result = kwargs.get('git_property_validation_result', None)
 
 
+class ContainerProbeSettings(msrest.serialization.Model):
+    """Container liveness and readiness probe settings.
+
+    :param disable_probe: Indicates whether disable the liveness and readiness probe.
+    :type disable_probe: bool
+    """
+
+    _attribute_map = {
+        'disable_probe': {'key': 'disableProbe', 'type': 'bool'},
+    }
+
+    def __init__(
+        self,
+        **kwargs
+    ):
+        super(ContainerProbeSettings, self).__init__(**kwargs)
+        self.disable_probe = kwargs.get('disable_probe', None)
+
+
 class ContentCertificateProperties(CertificateProperties):
     """Properties of certificate imported from key vault.
 
@@ -2520,6 +2542,77 @@ class ContentCertificateProperties(CertificateProperties):
         self.content = kwargs['content']
 
 
+class CustomContainer(msrest.serialization.Model):
+    """Custom container payload.
+
+    :param server: The name of the registry that contains the container image.
+    :type server: str
+    :param container_image: Container image of the custom container. This should be in the form of
+     :code:`<repository>`::code:`<tag>` without the server name of the registry.
+    :type container_image: str
+    :param command: Entrypoint array. Not executed within a shell. The docker image's ENTRYPOINT is
+     used if this is not provided.
+    :type command: list[str]
+    :param args: Arguments to the entrypoint. The docker image's CMD is used if this is not
+     provided.
+    :type args: list[str]
+    :param image_registry_credential: Credential of the image registry.
+    :type image_registry_credential:
+     ~azure.mgmt.appplatform.v2022_01_01_preview.models.ImageRegistryCredential
+    """
+
+    _attribute_map = {
+        'server': {'key': 'server', 'type': 'str'},
+        'container_image': {'key': 'containerImage', 'type': 'str'},
+        'command': {'key': 'command', 'type': '[str]'},
+        'args': {'key': 'args', 'type': '[str]'},
+        'image_registry_credential': {'key': 'imageRegistryCredential', 'type': 'ImageRegistryCredential'},
+    }
+
+    def __init__(
+        self,
+        **kwargs
+    ):
+        super(CustomContainer, self).__init__(**kwargs)
+        self.server = kwargs.get('server', None)
+        self.container_image = kwargs.get('container_image', None)
+        self.command = kwargs.get('command', None)
+        self.args = kwargs.get('args', None)
+        self.image_registry_credential = kwargs.get('image_registry_credential', None)
+
+
+class CustomContainerUserSourceInfo(UserSourceInfo):
+    """Custom container user source info.
+
+    All required parameters must be populated in order to send to Azure.
+
+    :param type: Required. Type of the source uploaded.Constant filled by server.
+    :type type: str
+    :param version: Version of the source.
+    :type version: str
+    :param custom_container: Custom container payload.
+    :type custom_container: ~azure.mgmt.appplatform.v2022_01_01_preview.models.CustomContainer
+    """
+
+    _validation = {
+        'type': {'required': True},
+    }
+
+    _attribute_map = {
+        'type': {'key': 'type', 'type': 'str'},
+        'version': {'key': 'version', 'type': 'str'},
+        'custom_container': {'key': 'customContainer', 'type': 'CustomContainer'},
+    }
+
+    def __init__(
+        self,
+        **kwargs
+    ):
+        super(CustomContainerUserSourceInfo, self).__init__(**kwargs)
+        self.type = 'Container'  # type: str
+        self.custom_container = kwargs.get('custom_container', None)
+
+
 class CustomDomainProperties(msrest.serialization.Model):
     """Custom domain of app resource payload.
 
@@ -2564,6 +2657,8 @@ class CustomDomainResource(ProxyResource):
     :vartype name: str
     :ivar type: The type of the resource.
     :vartype type: str
+    :ivar system_data: Metadata pertaining to creation and last modification of the resource.
+    :vartype system_data: ~azure.mgmt.appplatform.v2022_01_01_preview.models.SystemData
     :param properties: Properties of the custom domain resource.
     :type properties: ~azure.mgmt.appplatform.v2022_01_01_preview.models.CustomDomainProperties
     """
@@ -2572,12 +2667,14 @@ class CustomDomainResource(ProxyResource):
         'id': {'readonly': True},
         'name': {'readonly': True},
         'type': {'readonly': True},
+        'system_data': {'readonly': True},
     }
 
     _attribute_map = {
         'id': {'key': 'id', 'type': 'str'},
         'name': {'key': 'name', 'type': 'str'},
         'type': {'key': 'type', 'type': 'str'},
+        'system_data': {'key': 'systemData', 'type': 'SystemData'},
         'properties': {'key': 'properties', 'type': 'CustomDomainProperties'},
     }
 
@@ -2752,13 +2849,13 @@ class DeploymentResource(ProxyResource):
     :vartype name: str
     :ivar type: The type of the resource.
     :vartype type: str
+    :ivar system_data: Metadata pertaining to creation and last modification of the resource.
+    :vartype system_data: ~azure.mgmt.appplatform.v2022_01_01_preview.models.SystemData
     :param properties: Properties of the Deployment resource.
     :type properties:
      ~azure.mgmt.appplatform.v2022_01_01_preview.models.DeploymentResourceProperties
     :param sku: Sku of the Deployment resource.
     :type sku: ~azure.mgmt.appplatform.v2022_01_01_preview.models.Sku
-    :ivar system_data: Metadata pertaining to creation and last modification of the resource.
-    :vartype system_data: ~azure.mgmt.appplatform.v2022_01_01_preview.models.SystemData
     """
 
     _validation = {
@@ -2772,9 +2869,9 @@ class DeploymentResource(ProxyResource):
         'id': {'key': 'id', 'type': 'str'},
         'name': {'key': 'name', 'type': 'str'},
         'type': {'key': 'type', 'type': 'str'},
+        'system_data': {'key': 'systemData', 'type': 'SystemData'},
         'properties': {'key': 'properties', 'type': 'DeploymentResourceProperties'},
         'sku': {'key': 'sku', 'type': 'Sku'},
-        'system_data': {'key': 'systemData', 'type': 'SystemData'},
     }
 
     def __init__(
@@ -2784,7 +2881,6 @@ class DeploymentResource(ProxyResource):
         super(DeploymentResource, self).__init__(**kwargs)
         self.properties = kwargs.get('properties', None)
         self.sku = kwargs.get('sku', None)
-        self.system_data = None
 
 
 class DeploymentResourceCollection(msrest.serialization.Model):
@@ -2872,13 +2968,17 @@ class DeploymentSettings(msrest.serialization.Model):
     :param environment_variables: Collection of environment variables.
     :type environment_variables: dict[str, str]
     :param addon_configs: Collection of addons.
-    :type addon_configs: dict[str, ~azure.mgmt.appplatform.v2022_01_01_preview.models.AddonProfile]
+    :type addon_configs: dict[str, dict[str, any]]
+    :param container_probe_settings: Container liveness and readiness probe settings.
+    :type container_probe_settings:
+     ~azure.mgmt.appplatform.v2022_01_01_preview.models.ContainerProbeSettings
     """
 
     _attribute_map = {
         'resource_requests': {'key': 'resourceRequests', 'type': 'ResourceRequests'},
         'environment_variables': {'key': 'environmentVariables', 'type': '{str}'},
-        'addon_configs': {'key': 'addonConfigs', 'type': '{AddonProfile}'},
+        'addon_configs': {'key': 'addonConfigs', 'type': '{{object}}'},
+        'container_probe_settings': {'key': 'containerProbeSettings', 'type': 'ContainerProbeSettings'},
     }
 
     def __init__(
@@ -2889,6 +2989,7 @@ class DeploymentSettings(msrest.serialization.Model):
         self.resource_requests = kwargs.get('resource_requests', None)
         self.environment_variables = kwargs.get('environment_variables', None)
         self.addon_configs = kwargs.get('addon_configs', None)
+        self.container_probe_settings = kwargs.get('container_probe_settings', None)
 
 
 class DiagnosticParameters(msrest.serialization.Model):
@@ -3111,11 +3212,11 @@ class GatewayCustomDomainResource(ProxyResource):
     :vartype name: str
     :ivar type: The type of the resource.
     :vartype type: str
+    :ivar system_data: Metadata pertaining to creation and last modification of the resource.
+    :vartype system_data: ~azure.mgmt.appplatform.v2022_01_01_preview.models.SystemData
     :param properties: The properties of custom domain for Spring Cloud Gateway.
     :type properties:
      ~azure.mgmt.appplatform.v2022_01_01_preview.models.GatewayCustomDomainProperties
-    :ivar system_data: Metadata pertaining to creation and last modification of the resource.
-    :vartype system_data: ~azure.mgmt.appplatform.v2022_01_01_preview.models.SystemData
     """
 
     _validation = {
@@ -3129,8 +3230,8 @@ class GatewayCustomDomainResource(ProxyResource):
         'id': {'key': 'id', 'type': 'str'},
         'name': {'key': 'name', 'type': 'str'},
         'type': {'key': 'type', 'type': 'str'},
-        'properties': {'key': 'properties', 'type': 'GatewayCustomDomainProperties'},
         'system_data': {'key': 'systemData', 'type': 'SystemData'},
+        'properties': {'key': 'properties', 'type': 'GatewayCustomDomainProperties'},
     }
 
     def __init__(
@@ -3139,13 +3240,12 @@ class GatewayCustomDomainResource(ProxyResource):
     ):
         super(GatewayCustomDomainResource, self).__init__(**kwargs)
         self.properties = kwargs.get('properties', None)
-        self.system_data = None
 
 
 class GatewayCustomDomainResourceCollection(msrest.serialization.Model):
-    """Object that includes an array of Spring Cloud Gateway Custom Domain resources and a possible link for next set.
+    """Object that includes an array of Spring Cloud Gateway custom domain resources and a possible link for next set.
 
-    :param value: Collection of Spring Cloud Gateway Custom Domain resources.
+    :param value: Collection of Spring Cloud Gateway custom domain resources.
     :type value:
      list[~azure.mgmt.appplatform.v2022_01_01_preview.models.GatewayCustomDomainResource]
     :param next_link: URL client should use to fetch the next page (per server side paging).
@@ -3197,8 +3297,39 @@ class GatewayInstance(msrest.serialization.Model):
         self.status = None
 
 
-class GatewayOperatorRuntimeState(msrest.serialization.Model):
-    """Runtime state of the Spring Cloud Gateway Operator.
+class GatewayOperatorProperties(msrest.serialization.Model):
+    """Properties of the Spring Cloud Gateway Operator.
+
+    Variables are only populated by the server, and will be ignored when sending a request.
+
+    :ivar resource_requests: The requested resource quantity for required CPU and Memory.
+    :vartype resource_requests:
+     ~azure.mgmt.appplatform.v2022_01_01_preview.models.GatewayOperatorResourceRequests
+    :ivar instances: Collection of instances belong to Spring Cloud Gateway operator.
+    :vartype instances: list[~azure.mgmt.appplatform.v2022_01_01_preview.models.GatewayInstance]
+    """
+
+    _validation = {
+        'resource_requests': {'readonly': True},
+        'instances': {'readonly': True},
+    }
+
+    _attribute_map = {
+        'resource_requests': {'key': 'resourceRequests', 'type': 'GatewayOperatorResourceRequests'},
+        'instances': {'key': 'instances', 'type': '[GatewayInstance]'},
+    }
+
+    def __init__(
+        self,
+        **kwargs
+    ):
+        super(GatewayOperatorProperties, self).__init__(**kwargs)
+        self.resource_requests = None
+        self.instances = None
+
+
+class GatewayOperatorResourceRequests(msrest.serialization.Model):
+    """Properties of the Spring Cloud Gateway Operator.
 
     Variables are only populated by the server, and will be ignored when sending a request.
 
@@ -3208,33 +3339,28 @@ class GatewayOperatorRuntimeState(msrest.serialization.Model):
     :vartype memory: str
     :ivar instance_count: Instance count of the Spring Cloud Gateway Operator.
     :vartype instance_count: int
-    :ivar instances: Collection of instances belong to the Spring Cloud Gateway Operator.
-    :vartype instances: list[~azure.mgmt.appplatform.v2022_01_01_preview.models.GatewayInstance]
     """
 
     _validation = {
         'cpu': {'readonly': True},
         'memory': {'readonly': True},
         'instance_count': {'readonly': True},
-        'instances': {'readonly': True},
     }
 
     _attribute_map = {
         'cpu': {'key': 'cpu', 'type': 'str'},
         'memory': {'key': 'memory', 'type': 'str'},
         'instance_count': {'key': 'instanceCount', 'type': 'int'},
-        'instances': {'key': 'instances', 'type': '[GatewayInstance]'},
     }
 
     def __init__(
         self,
         **kwargs
     ):
-        super(GatewayOperatorRuntimeState, self).__init__(**kwargs)
+        super(GatewayOperatorResourceRequests, self).__init__(**kwargs)
         self.cpu = None
         self.memory = None
         self.instance_count = None
-        self.instances = None
 
 
 class GatewayProperties(msrest.serialization.Model):
@@ -3264,16 +3390,16 @@ class GatewayProperties(msrest.serialization.Model):
      ~azure.mgmt.appplatform.v2022_01_01_preview.models.GatewayResourceRequests
     :ivar instances: Collection of instances belong to Spring Cloud Gateway.
     :vartype instances: list[~azure.mgmt.appplatform.v2022_01_01_preview.models.GatewayInstance]
-    :ivar operator_runtime_state: Runtime state of the Spring Cloud Gateway Operator.
-    :vartype operator_runtime_state:
-     ~azure.mgmt.appplatform.v2022_01_01_preview.models.GatewayOperatorRuntimeState
+    :ivar operator_properties: Properties of the Spring Cloud Gateway Operator.
+    :vartype operator_properties:
+     ~azure.mgmt.appplatform.v2022_01_01_preview.models.GatewayOperatorProperties
     """
 
     _validation = {
         'provisioning_state': {'readonly': True},
         'url': {'readonly': True},
         'instances': {'readonly': True},
-        'operator_runtime_state': {'readonly': True},
+        'operator_properties': {'readonly': True},
     }
 
     _attribute_map = {
@@ -3286,7 +3412,7 @@ class GatewayProperties(msrest.serialization.Model):
         'cors_properties': {'key': 'corsProperties', 'type': 'GatewayCorsProperties'},
         'resource_requests': {'key': 'resourceRequests', 'type': 'GatewayResourceRequests'},
         'instances': {'key': 'instances', 'type': '[GatewayInstance]'},
-        'operator_runtime_state': {'key': 'operatorRuntimeState', 'type': 'GatewayOperatorRuntimeState'},
+        'operator_properties': {'key': 'operatorProperties', 'type': 'GatewayOperatorProperties'},
     }
 
     def __init__(
@@ -3303,7 +3429,7 @@ class GatewayProperties(msrest.serialization.Model):
         self.cors_properties = kwargs.get('cors_properties', None)
         self.resource_requests = kwargs.get('resource_requests', None)
         self.instances = None
-        self.operator_runtime_state = None
+        self.operator_properties = None
 
 
 class GatewayResource(ProxyResource):
@@ -3317,12 +3443,12 @@ class GatewayResource(ProxyResource):
     :vartype name: str
     :ivar type: The type of the resource.
     :vartype type: str
+    :ivar system_data: Metadata pertaining to creation and last modification of the resource.
+    :vartype system_data: ~azure.mgmt.appplatform.v2022_01_01_preview.models.SystemData
     :param properties: Spring Cloud Gateway properties payload.
     :type properties: ~azure.mgmt.appplatform.v2022_01_01_preview.models.GatewayProperties
     :param sku: Sku of the Spring Cloud Gateway resource.
     :type sku: ~azure.mgmt.appplatform.v2022_01_01_preview.models.Sku
-    :ivar system_data: Metadata pertaining to creation and last modification of the resource.
-    :vartype system_data: ~azure.mgmt.appplatform.v2022_01_01_preview.models.SystemData
     """
 
     _validation = {
@@ -3336,9 +3462,9 @@ class GatewayResource(ProxyResource):
         'id': {'key': 'id', 'type': 'str'},
         'name': {'key': 'name', 'type': 'str'},
         'type': {'key': 'type', 'type': 'str'},
+        'system_data': {'key': 'systemData', 'type': 'SystemData'},
         'properties': {'key': 'properties', 'type': 'GatewayProperties'},
         'sku': {'key': 'sku', 'type': 'Sku'},
-        'system_data': {'key': 'systemData', 'type': 'SystemData'},
     }
 
     def __init__(
@@ -3348,7 +3474,6 @@ class GatewayResource(ProxyResource):
         super(GatewayResource, self).__init__(**kwargs)
         self.properties = kwargs.get('properties', None)
         self.sku = kwargs.get('sku', None)
-        self.system_data = None
 
 
 class GatewayResourceCollection(msrest.serialization.Model):
@@ -3403,12 +3528,13 @@ class GatewayRouteConfigProperties(msrest.serialization.Model):
 
     Variables are only populated by the server, and will be ignored when sending a request.
 
-    :ivar provisioning_state: State of the Spring Cloud Gateway Route Config. Possible values
+    :ivar provisioning_state: State of the Spring Cloud Gateway route config. Possible values
      include: "Creating", "Updating", "Succeeded", "Failed", "Deleting".
     :vartype provisioning_state: str or
      ~azure.mgmt.appplatform.v2022_01_01_preview.models.GatewayProvisioningState
-    :param app_name: Name of the Azure Spring Cloud app, required unless route defines ``uri``.
-    :type app_name: str
+    :param app_resource_id: The resource Id of the Azure Spring Cloud app, required unless route
+     defines ``uri``.
+    :type app_resource_id: str
     :param routes: Array of API routes, each route contains properties such as ``title``\ ,
      ``uri``\ , ``ssoEnabled``\ , ``predicates``\ , ``filters``.
     :type routes: list[~azure.mgmt.appplatform.v2022_01_01_preview.models.GatewayApiRoute]
@@ -3420,7 +3546,7 @@ class GatewayRouteConfigProperties(msrest.serialization.Model):
 
     _attribute_map = {
         'provisioning_state': {'key': 'provisioningState', 'type': 'str'},
-        'app_name': {'key': 'appName', 'type': 'str'},
+        'app_resource_id': {'key': 'appResourceId', 'type': 'str'},
         'routes': {'key': 'routes', 'type': '[GatewayApiRoute]'},
     }
 
@@ -3430,7 +3556,7 @@ class GatewayRouteConfigProperties(msrest.serialization.Model):
     ):
         super(GatewayRouteConfigProperties, self).__init__(**kwargs)
         self.provisioning_state = None
-        self.app_name = kwargs.get('app_name', None)
+        self.app_resource_id = kwargs.get('app_resource_id', None)
         self.routes = kwargs.get('routes', None)
 
 
@@ -3445,11 +3571,11 @@ class GatewayRouteConfigResource(ProxyResource):
     :vartype name: str
     :ivar type: The type of the resource.
     :vartype type: str
+    :ivar system_data: Metadata pertaining to creation and last modification of the resource.
+    :vartype system_data: ~azure.mgmt.appplatform.v2022_01_01_preview.models.SystemData
     :param properties: API route config of the Spring Cloud Gateway.
     :type properties:
      ~azure.mgmt.appplatform.v2022_01_01_preview.models.GatewayRouteConfigProperties
-    :ivar system_data: Metadata pertaining to creation and last modification of the resource.
-    :vartype system_data: ~azure.mgmt.appplatform.v2022_01_01_preview.models.SystemData
     """
 
     _validation = {
@@ -3463,8 +3589,8 @@ class GatewayRouteConfigResource(ProxyResource):
         'id': {'key': 'id', 'type': 'str'},
         'name': {'key': 'name', 'type': 'str'},
         'type': {'key': 'type', 'type': 'str'},
-        'properties': {'key': 'properties', 'type': 'GatewayRouteConfigProperties'},
         'system_data': {'key': 'systemData', 'type': 'SystemData'},
+        'properties': {'key': 'properties', 'type': 'GatewayRouteConfigProperties'},
     }
 
     def __init__(
@@ -3473,13 +3599,12 @@ class GatewayRouteConfigResource(ProxyResource):
     ):
         super(GatewayRouteConfigResource, self).__init__(**kwargs)
         self.properties = kwargs.get('properties', None)
-        self.system_data = None
 
 
 class GatewayRouteConfigResourceCollection(msrest.serialization.Model):
-    """Object that includes an array of Spring Cloud Gateway Route Config resources and a possible link for next set.
+    """Object that includes an array of Spring Cloud Gateway route config resources and a possible link for next set.
 
-    :param value: Collection of Spring Cloud Gateway Route Config resources.
+    :param value: Collection of Spring Cloud Gateway route config resources.
     :type value:
      list[~azure.mgmt.appplatform.v2022_01_01_preview.models.GatewayRouteConfigResource]
     :param next_link: URL client should use to fetch the next page (per server side paging).
@@ -3567,11 +3692,34 @@ class GitPatternRepository(msrest.serialization.Model):
         self.strict_host_key_checking = kwargs.get('strict_host_key_checking', None)
 
 
+class ImageRegistryCredential(msrest.serialization.Model):
+    """Credential of the image registry.
+
+    :param username: The username of the image registry credential.
+    :type username: str
+    :param password: The password of the image registry credential.
+    :type password: str
+    """
+
+    _attribute_map = {
+        'username': {'key': 'username', 'type': 'str'},
+        'password': {'key': 'password', 'type': 'str'},
+    }
+
+    def __init__(
+        self,
+        **kwargs
+    ):
+        super(ImageRegistryCredential, self).__init__(**kwargs)
+        self.username = kwargs.get('username', None)
+        self.password = kwargs.get('password', None)
+
+
 class UploadedUserSourceInfo(UserSourceInfo):
     """Source with uploaded location.
 
     You probably want to use the sub-classes and not this class directly. Known
-    sub-classes are: JarUploadedUserSourceInfo, SourceUploadedUserSourceInfo, NetCoreZipUploadedUserSourceInfo.
+    sub-classes are: JarUploadedUserSourceInfo, NetCoreZipUploadedUserSourceInfo, SourceUploadedUserSourceInfo.
 
     All required parameters must be populated in order to send to Azure.
 
@@ -3594,7 +3742,7 @@ class UploadedUserSourceInfo(UserSourceInfo):
     }
 
     _subtype_map = {
-        'type': {'Jar': 'JarUploadedUserSourceInfo', 'Source': 'SourceUploadedUserSourceInfo', 'netCoreZip': 'NetCoreZipUploadedUserSourceInfo'}
+        'type': {'Jar': 'JarUploadedUserSourceInfo', 'NetCoreZip': 'NetCoreZipUploadedUserSourceInfo', 'Source': 'SourceUploadedUserSourceInfo'}
     }
 
     def __init__(
@@ -3979,6 +4127,8 @@ class MonitoringSettingResource(ProxyResource):
     :vartype name: str
     :ivar type: The type of the resource.
     :vartype type: str
+    :ivar system_data: Metadata pertaining to creation and last modification of the resource.
+    :vartype system_data: ~azure.mgmt.appplatform.v2022_01_01_preview.models.SystemData
     :param properties: Properties of the Monitoring Setting resource.
     :type properties:
      ~azure.mgmt.appplatform.v2022_01_01_preview.models.MonitoringSettingProperties
@@ -3988,12 +4138,14 @@ class MonitoringSettingResource(ProxyResource):
         'id': {'readonly': True},
         'name': {'readonly': True},
         'type': {'readonly': True},
+        'system_data': {'readonly': True},
     }
 
     _attribute_map = {
         'id': {'key': 'id', 'type': 'str'},
         'name': {'key': 'name', 'type': 'str'},
         'type': {'key': 'type', 'type': 'str'},
+        'system_data': {'key': 'systemData', 'type': 'SystemData'},
         'properties': {'key': 'properties', 'type': 'MonitoringSettingProperties'},
     }
 
@@ -4096,7 +4248,7 @@ class NetCoreZipUploadedUserSourceInfo(UploadedUserSourceInfo):
         **kwargs
     ):
         super(NetCoreZipUploadedUserSourceInfo, self).__init__(**kwargs)
-        self.type = 'netCoreZip'  # type: str
+        self.type = 'NetCoreZip'  # type: str
         self.net_core_main_entry_path = kwargs.get('net_core_main_entry_path', None)
         self.runtime_version = kwargs.get('runtime_version', None)
 
@@ -4712,10 +4864,10 @@ class ServiceRegistryResource(ProxyResource):
     :vartype name: str
     :ivar type: The type of the resource.
     :vartype type: str
-    :param properties: Service Registry properties payload.
-    :type properties: ~azure.mgmt.appplatform.v2022_01_01_preview.models.ServiceRegistryProperties
     :ivar system_data: Metadata pertaining to creation and last modification of the resource.
     :vartype system_data: ~azure.mgmt.appplatform.v2022_01_01_preview.models.SystemData
+    :param properties: Service Registry properties payload.
+    :type properties: ~azure.mgmt.appplatform.v2022_01_01_preview.models.ServiceRegistryProperties
     """
 
     _validation = {
@@ -4729,8 +4881,8 @@ class ServiceRegistryResource(ProxyResource):
         'id': {'key': 'id', 'type': 'str'},
         'name': {'key': 'name', 'type': 'str'},
         'type': {'key': 'type', 'type': 'str'},
-        'properties': {'key': 'properties', 'type': 'ServiceRegistryProperties'},
         'system_data': {'key': 'systemData', 'type': 'SystemData'},
+        'properties': {'key': 'properties', 'type': 'ServiceRegistryProperties'},
     }
 
     def __init__(
@@ -4739,7 +4891,6 @@ class ServiceRegistryResource(ProxyResource):
     ):
         super(ServiceRegistryResource, self).__init__(**kwargs)
         self.properties = kwargs.get('properties', None)
-        self.system_data = None
 
 
 class ServiceRegistryResourceCollection(msrest.serialization.Model):
@@ -4812,6 +4963,8 @@ class TrackedResource(Resource):
     :vartype name: str
     :ivar type: The type of the resource.
     :vartype type: str
+    :ivar system_data: Metadata pertaining to creation and last modification of the resource.
+    :vartype system_data: ~azure.mgmt.appplatform.v2022_01_01_preview.models.SystemData
     :param location: The GEO location of the resource.
     :type location: str
     :param tags: A set of tags. Tags of the service which is a list of key value pairs that
@@ -4823,12 +4976,14 @@ class TrackedResource(Resource):
         'id': {'readonly': True},
         'name': {'readonly': True},
         'type': {'readonly': True},
+        'system_data': {'readonly': True},
     }
 
     _attribute_map = {
         'id': {'key': 'id', 'type': 'str'},
         'name': {'key': 'name', 'type': 'str'},
         'type': {'key': 'type', 'type': 'str'},
+        'system_data': {'key': 'systemData', 'type': 'SystemData'},
         'location': {'key': 'location', 'type': 'str'},
         'tags': {'key': 'tags', 'type': '{str}'},
     }
@@ -4853,6 +5008,8 @@ class ServiceResource(TrackedResource):
     :vartype name: str
     :ivar type: The type of the resource.
     :vartype type: str
+    :ivar system_data: Metadata pertaining to creation and last modification of the resource.
+    :vartype system_data: ~azure.mgmt.appplatform.v2022_01_01_preview.models.SystemData
     :param location: The GEO location of the resource.
     :type location: str
     :param tags: A set of tags. Tags of the service which is a list of key value pairs that
@@ -4868,12 +5025,14 @@ class ServiceResource(TrackedResource):
         'id': {'readonly': True},
         'name': {'readonly': True},
         'type': {'readonly': True},
+        'system_data': {'readonly': True},
     }
 
     _attribute_map = {
         'id': {'key': 'id', 'type': 'str'},
         'name': {'key': 'name', 'type': 'str'},
         'type': {'key': 'type', 'type': 'str'},
+        'system_data': {'key': 'systemData', 'type': 'SystemData'},
         'location': {'key': 'location', 'type': 'str'},
         'tags': {'key': 'tags', 'type': '{str}'},
         'properties': {'key': 'properties', 'type': 'ClusterResourceProperties'},
@@ -5177,10 +5336,10 @@ class StorageResource(ProxyResource):
     :vartype name: str
     :ivar type: The type of the resource.
     :vartype type: str
-    :param properties: Properties of the storage resource payload.
-    :type properties: ~azure.mgmt.appplatform.v2022_01_01_preview.models.StorageProperties
     :ivar system_data: Metadata pertaining to creation and last modification of the resource.
     :vartype system_data: ~azure.mgmt.appplatform.v2022_01_01_preview.models.SystemData
+    :param properties: Properties of the storage resource payload.
+    :type properties: ~azure.mgmt.appplatform.v2022_01_01_preview.models.StorageProperties
     """
 
     _validation = {
@@ -5194,8 +5353,8 @@ class StorageResource(ProxyResource):
         'id': {'key': 'id', 'type': 'str'},
         'name': {'key': 'name', 'type': 'str'},
         'type': {'key': 'type', 'type': 'str'},
-        'properties': {'key': 'properties', 'type': 'StorageProperties'},
         'system_data': {'key': 'systemData', 'type': 'SystemData'},
+        'properties': {'key': 'properties', 'type': 'StorageProperties'},
     }
 
     def __init__(
@@ -5204,7 +5363,6 @@ class StorageResource(ProxyResource):
     ):
         super(StorageResource, self).__init__(**kwargs)
         self.properties = kwargs.get('properties', None)
-        self.system_data = None
 
 
 class StorageResourceCollection(msrest.serialization.Model):
@@ -5254,7 +5412,7 @@ class SupportedRuntimeVersion(msrest.serialization.Model):
     """Supported deployment runtime version descriptor.
 
     :param value: The raw value which could be passed to deployment CRUD operations. Possible
-     values include: "Java_8", "Java_11", "NetCore_31".
+     values include: "Java_8", "Java_11", "Java_17", "NetCore_31".
     :type value: str or ~azure.mgmt.appplatform.v2022_01_01_preview.models.SupportedRuntimeValue
     :param platform: The platform of this runtime version (possible values: "Java" or ".NET").
      Possible values include: "Java", ".NET Core".
@@ -5315,8 +5473,8 @@ class SystemData(msrest.serialization.Model):
     :param last_modified_by_type: The type of identity that last modified the resource. Possible
      values include: "User", "Application", "ManagedIdentity", "Key".
     :type last_modified_by_type: str or
-     ~azure.mgmt.appplatform.v2022_01_01_preview.models.CreatedByType
-    :param last_modified_at: The timestamp of resource last modification (UTC).
+     ~azure.mgmt.appplatform.v2022_01_01_preview.models.LastModifiedByType
+    :param last_modified_at: The timestamp of resource modification (UTC).
     :type last_modified_at: ~datetime.datetime
     """
 

@@ -26,9 +26,9 @@ from .operations import ServiceRegistriesOperations
 from .operations import BuildServiceOperations
 from .operations import BuildpackBindingOperations
 from .operations import BuildServiceBuilderOperations
+from .operations import BuildServiceAgentPoolOperations
 from .operations import MonitoringSettingsOperations
 from .operations import AppsOperations
-from .operations import BuildServiceAgentPoolOperations
 from .operations import BindingsOperations
 from .operations import StoragesOperations
 from .operations import CertificatesOperations
@@ -62,12 +62,12 @@ class AppPlatformManagementClient(object):
     :vartype buildpack_binding: azure.mgmt.appplatform.v2022_01_01_preview.operations.BuildpackBindingOperations
     :ivar build_service_builder: BuildServiceBuilderOperations operations
     :vartype build_service_builder: azure.mgmt.appplatform.v2022_01_01_preview.operations.BuildServiceBuilderOperations
+    :ivar build_service_agent_pool: BuildServiceAgentPoolOperations operations
+    :vartype build_service_agent_pool: azure.mgmt.appplatform.v2022_01_01_preview.operations.BuildServiceAgentPoolOperations
     :ivar monitoring_settings: MonitoringSettingsOperations operations
     :vartype monitoring_settings: azure.mgmt.appplatform.v2022_01_01_preview.operations.MonitoringSettingsOperations
     :ivar apps: AppsOperations operations
     :vartype apps: azure.mgmt.appplatform.v2022_01_01_preview.operations.AppsOperations
-    :ivar build_service_agent_pool: BuildServiceAgentPoolOperations operations
-    :vartype build_service_agent_pool: azure.mgmt.appplatform.v2022_01_01_preview.operations.BuildServiceAgentPoolOperations
     :ivar bindings: BindingsOperations operations
     :vartype bindings: azure.mgmt.appplatform.v2022_01_01_preview.operations.BindingsOperations
     :ivar storages: StoragesOperations operations
@@ -134,11 +134,11 @@ class AppPlatformManagementClient(object):
             self._client, self._config, self._serialize, self._deserialize)
         self.build_service_builder = BuildServiceBuilderOperations(
             self._client, self._config, self._serialize, self._deserialize)
+        self.build_service_agent_pool = BuildServiceAgentPoolOperations(
+            self._client, self._config, self._serialize, self._deserialize)
         self.monitoring_settings = MonitoringSettingsOperations(
             self._client, self._config, self._serialize, self._deserialize)
         self.apps = AppsOperations(
-            self._client, self._config, self._serialize, self._deserialize)
-        self.build_service_agent_pool = BuildServiceAgentPoolOperations(
             self._client, self._config, self._serialize, self._deserialize)
         self.bindings = BindingsOperations(
             self._client, self._config, self._serialize, self._deserialize)

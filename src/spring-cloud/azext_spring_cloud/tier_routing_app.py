@@ -16,11 +16,11 @@ from .custom import (app_get as app_get_standard, app_list as app_list_standard,
                      app_identity_assign as identity_assign,
                      app_identity_remove as identity_remove,
                      app_identity_show as identity_show,
-                     app_domain_bind as domain_bind,
-                     app_domain_show as domain_show,
-                     app_domain_list as domain_list,
-                     app_domain_update as domain_update,
-                     app_domain_unbind as domain_unbind,
+                     domain_bind as domain_bind,
+                     domain_show as domain_show,
+                     domain_list as domain_list,
+                     domain_update as domain_update,
+                     domain_unbind as domain_unbind,
                      app_append_loaded_public_certificate as append_loaded_public_certificate)
 from knack.log import get_logger
 from .vendored_sdks.appplatform.v2022_01_01_preview import models as models_20220101preview

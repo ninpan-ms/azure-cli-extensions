@@ -574,7 +574,7 @@ class BuildServiceOperations(object):
             return cls(pipeline_response, deserialized, {})
 
         return deserialized
-    get_build_result_log.metadata = {'url': '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AppPlatform/Spring/{serviceName}/buildServices/{buildServiceName}/builds/{buildName}/results/{buildResultName}/getLog'}  # type: ignore
+    get_build_result_log.metadata = {'url': '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AppPlatform/Spring/{serviceName}/buildServices/{buildServiceName}/builds/{buildName}/results/{buildResultName}/getLogFileUrl'}  # type: ignore
 
     def get_resource_upload_url(
         self,
@@ -638,7 +638,7 @@ class BuildServiceOperations(object):
             return cls(pipeline_response, deserialized, {})
 
         return deserialized
-    get_resource_upload_url.metadata = {'url': '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AppPlatform/Spring/{serviceName}/buildServices/{buildServiceName}/getUploadUrl'}  # type: ignore
+    get_resource_upload_url.metadata = {'url': '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AppPlatform/Spring/{serviceName}/buildServices/{buildServiceName}/getResourceUploadUrl'}  # type: ignore
 
     def supported_buildpacks(
         self,

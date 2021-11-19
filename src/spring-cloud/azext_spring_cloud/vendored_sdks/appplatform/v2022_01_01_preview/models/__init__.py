@@ -8,7 +8,6 @@
 
 try:
     from ._models_py3 import ActiveDeploymentCollection
-    from ._models_py3 import AddonProfile
     from ._models_py3 import ApiPortalCustomDomainProperties
     from ._models_py3 import ApiPortalCustomDomainResource
     from ._models_py3 import ApiPortalCustomDomainResourceCollection
@@ -42,7 +41,7 @@ try:
     from ._models_py3 import BuildServiceAgentPoolTierProperties
     from ._models_py3 import BuildServiceCollection
     from ._models_py3 import BuildServiceProperties
-    from ._models_py3 import BuildServicePropertiesRuntimeState
+    from ._models_py3 import BuildServicePropertiesResourceRequests
     from ._models_py3 import BuildServiceSupportedItem
     from ._models_py3 import BuildStageProperties
     from ._models_py3 import BuilderProperties
@@ -75,7 +74,10 @@ try:
     from ._models_py3 import ConfigurationServiceResourceRequests
     from ._models_py3 import ConfigurationServiceSettings
     from ._models_py3 import ConfigurationServiceSettingsValidateResult
+    from ._models_py3 import ContainerProbeSettings
     from ._models_py3 import ContentCertificateProperties
+    from ._models_py3 import CustomContainer
+    from ._models_py3 import CustomContainerUserSourceInfo
     from ._models_py3 import CustomDomainProperties
     from ._models_py3 import CustomDomainResource
     from ._models_py3 import CustomDomainResourceCollection
@@ -97,7 +99,8 @@ try:
     from ._models_py3 import GatewayCustomDomainResource
     from ._models_py3 import GatewayCustomDomainResourceCollection
     from ._models_py3 import GatewayInstance
-    from ._models_py3 import GatewayOperatorRuntimeState
+    from ._models_py3 import GatewayOperatorProperties
+    from ._models_py3 import GatewayOperatorResourceRequests
     from ._models_py3 import GatewayProperties
     from ._models_py3 import GatewayResource
     from ._models_py3 import GatewayResourceCollection
@@ -106,6 +109,7 @@ try:
     from ._models_py3 import GatewayRouteConfigResource
     from ._models_py3 import GatewayRouteConfigResourceCollection
     from ._models_py3 import GitPatternRepository
+    from ._models_py3 import ImageRegistryCredential
     from ._models_py3 import JarUploadedUserSourceInfo
     from ._models_py3 import KeyVaultCertificateProperties
     from ._models_py3 import LoadedCertificate
@@ -168,7 +172,6 @@ try:
     from ._models_py3 import ValidationMessages
 except (SyntaxError, ImportError):
     from ._models import ActiveDeploymentCollection  # type: ignore
-    from ._models import AddonProfile  # type: ignore
     from ._models import ApiPortalCustomDomainProperties  # type: ignore
     from ._models import ApiPortalCustomDomainResource  # type: ignore
     from ._models import ApiPortalCustomDomainResourceCollection  # type: ignore
@@ -202,7 +205,7 @@ except (SyntaxError, ImportError):
     from ._models import BuildServiceAgentPoolTierProperties  # type: ignore
     from ._models import BuildServiceCollection  # type: ignore
     from ._models import BuildServiceProperties  # type: ignore
-    from ._models import BuildServicePropertiesRuntimeState  # type: ignore
+    from ._models import BuildServicePropertiesResourceRequests  # type: ignore
     from ._models import BuildServiceSupportedItem  # type: ignore
     from ._models import BuildStageProperties  # type: ignore
     from ._models import BuilderProperties  # type: ignore
@@ -235,7 +238,10 @@ except (SyntaxError, ImportError):
     from ._models import ConfigurationServiceResourceRequests  # type: ignore
     from ._models import ConfigurationServiceSettings  # type: ignore
     from ._models import ConfigurationServiceSettingsValidateResult  # type: ignore
+    from ._models import ContainerProbeSettings  # type: ignore
     from ._models import ContentCertificateProperties  # type: ignore
+    from ._models import CustomContainer  # type: ignore
+    from ._models import CustomContainerUserSourceInfo  # type: ignore
     from ._models import CustomDomainProperties  # type: ignore
     from ._models import CustomDomainResource  # type: ignore
     from ._models import CustomDomainResourceCollection  # type: ignore
@@ -257,7 +263,8 @@ except (SyntaxError, ImportError):
     from ._models import GatewayCustomDomainResource  # type: ignore
     from ._models import GatewayCustomDomainResourceCollection  # type: ignore
     from ._models import GatewayInstance  # type: ignore
-    from ._models import GatewayOperatorRuntimeState  # type: ignore
+    from ._models import GatewayOperatorProperties  # type: ignore
+    from ._models import GatewayOperatorResourceRequests  # type: ignore
     from ._models import GatewayProperties  # type: ignore
     from ._models import GatewayResource  # type: ignore
     from ._models import GatewayResourceCollection  # type: ignore
@@ -266,6 +273,7 @@ except (SyntaxError, ImportError):
     from ._models import GatewayRouteConfigResource  # type: ignore
     from ._models import GatewayRouteConfigResourceCollection  # type: ignore
     from ._models import GitPatternRepository  # type: ignore
+    from ._models import ImageRegistryCredential  # type: ignore
     from ._models import JarUploadedUserSourceInfo  # type: ignore
     from ._models import KeyVaultCertificateProperties  # type: ignore
     from ._models import LoadedCertificate  # type: ignore
@@ -343,6 +351,7 @@ from ._app_platform_management_client_enums import (
     DeploymentResourceStatus,
     GatewayProvisioningState,
     KPackBuildStageProvisioningState,
+    LastModifiedByType,
     ManagedIdentityType,
     MonitoringSettingState,
     PowerState,
@@ -359,7 +368,6 @@ from ._app_platform_management_client_enums import (
 
 __all__ = [
     'ActiveDeploymentCollection',
-    'AddonProfile',
     'ApiPortalCustomDomainProperties',
     'ApiPortalCustomDomainResource',
     'ApiPortalCustomDomainResourceCollection',
@@ -393,7 +401,7 @@ __all__ = [
     'BuildServiceAgentPoolTierProperties',
     'BuildServiceCollection',
     'BuildServiceProperties',
-    'BuildServicePropertiesRuntimeState',
+    'BuildServicePropertiesResourceRequests',
     'BuildServiceSupportedItem',
     'BuildStageProperties',
     'BuilderProperties',
@@ -426,7 +434,10 @@ __all__ = [
     'ConfigurationServiceResourceRequests',
     'ConfigurationServiceSettings',
     'ConfigurationServiceSettingsValidateResult',
+    'ContainerProbeSettings',
     'ContentCertificateProperties',
+    'CustomContainer',
+    'CustomContainerUserSourceInfo',
     'CustomDomainProperties',
     'CustomDomainResource',
     'CustomDomainResourceCollection',
@@ -448,7 +459,8 @@ __all__ = [
     'GatewayCustomDomainResource',
     'GatewayCustomDomainResourceCollection',
     'GatewayInstance',
-    'GatewayOperatorRuntimeState',
+    'GatewayOperatorProperties',
+    'GatewayOperatorResourceRequests',
     'GatewayProperties',
     'GatewayResource',
     'GatewayResourceCollection',
@@ -457,6 +469,7 @@ __all__ = [
     'GatewayRouteConfigResource',
     'GatewayRouteConfigResourceCollection',
     'GitPatternRepository',
+    'ImageRegistryCredential',
     'JarUploadedUserSourceInfo',
     'KeyVaultCertificateProperties',
     'LoadedCertificate',
@@ -532,6 +545,7 @@ __all__ = [
     'DeploymentResourceStatus',
     'GatewayProvisioningState',
     'KPackBuildStageProvisioningState',
+    'LastModifiedByType',
     'ManagedIdentityType',
     'MonitoringSettingState',
     'PowerState',

@@ -13,9 +13,9 @@ from ._service_registries_operations import ServiceRegistriesOperations
 from ._build_service_operations import BuildServiceOperations
 from ._buildpack_binding_operations import BuildpackBindingOperations
 from ._build_service_builder_operations import BuildServiceBuilderOperations
+from ._build_service_agent_pool_operations import BuildServiceAgentPoolOperations
 from ._monitoring_settings_operations import MonitoringSettingsOperations
 from ._apps_operations import AppsOperations
-from ._build_service_agent_pool_operations import BuildServiceAgentPoolOperations
 from ._bindings_operations import BindingsOperations
 from ._storages_operations import StoragesOperations
 from ._certificates_operations import CertificatesOperations
@@ -38,9 +38,9 @@ __all__ = [
     'BuildServiceOperations',
     'BuildpackBindingOperations',
     'BuildServiceBuilderOperations',
+    'BuildServiceAgentPoolOperations',
     'MonitoringSettingsOperations',
     'AppsOperations',
-    'BuildServiceAgentPoolOperations',
     'BindingsOperations',
     'StoragesOperations',
     'CertificatesOperations',

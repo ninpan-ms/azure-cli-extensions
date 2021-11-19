@@ -98,6 +98,9 @@ def load_command_table(self, _):
         g.custom_command('start', 'app_start', supports_no_wait=True)
         g.custom_command('stop', 'app_stop', supports_no_wait=True)
         g.custom_command('restart', 'app_restart', supports_no_wait=True)
+
+    with self.command_group('spring-cloud app', client_factory=cf_spring_cloud_20210901preview,
+                            exception_handler=handle_asc_exception) as g:
         g.custom_command('append-loaded-public-certificate', 'app_append_loaded_public_certificate')
 
     with self.command_group('spring-cloud app', client_factory=cf_spring_cloud_20210601preview,
@@ -109,6 +112,7 @@ def load_command_table(self, _):
                          supports_no_wait=True)
         g.custom_command('logs', 'app_tail_log')
         g.custom_command('append-persistent-storage', 'app_append_persistent_storage')
+        g.custom_command('append-loaded-public-certificate', 'app_append_loaded_public_certificate')        
 
     with self.command_group('spring-cloud app identity', custom_command_type=app_routing_util,
                             exception_handler=handle_asc_exception) as g:
@@ -129,6 +133,9 @@ def load_command_table(self, _):
         g.custom_show_command(
             'show', 'deployment_get', table_transformer=transform_spring_cloud_deployment_output)
         g.custom_command('delete', 'deployment_delete', supports_no_wait=True)
+
+    with self.command_group('spring-cloud app deployment', client_factory=cf_spring_cloud_20210901preview,
+                            exception_handler=handle_asc_exception) as g:
         g.custom_command('generate-heap-dump', 'deployment_generate_heap_dump')
         g.custom_command('generate-thread-dump', 'deployment_generate_thread_dump')
         g.custom_command('start-jfr', 'deployment_start_jfr')

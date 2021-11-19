@@ -116,6 +116,7 @@ class GatewaysOperations(object):
         resource_group_name,  # type: str
         service_name,  # type: str
         gateway_name,  # type: str
+        gateway_resource,  # type: "_models.GatewayResource"
         **kwargs  # type: Any
     ):
         # type: (...) -> "_models.GatewayResource"
@@ -125,6 +126,7 @@ class GatewaysOperations(object):
         }
         error_map.update(kwargs.pop('error_map', {}))
         api_version = "2022-01-01-preview"
+        content_type = kwargs.pop("content_type", "application/json")
         accept = "application/json"
 
         # Construct URL
@@ -143,9 +145,13 @@ class GatewaysOperations(object):
 
         # Construct headers
         header_parameters = {}  # type: Dict[str, Any]
+        header_parameters['Content-Type'] = self._serialize.header("content_type", content_type, 'str')
         header_parameters['Accept'] = self._serialize.header("accept", accept, 'str')
 
-        request = self._client.put(url, query_parameters, header_parameters)
+        body_content_kwargs = {}  # type: Dict[str, Any]
+        body_content = self._serialize.body(gateway_resource, 'GatewayResource')
+        body_content_kwargs['content'] = body_content
+        request = self._client.put(url, query_parameters, header_parameters, **body_content_kwargs)
         pipeline_response = self._client._pipeline.run(request, stream=False, **kwargs)
         response = pipeline_response.http_response
 
@@ -173,6 +179,7 @@ class GatewaysOperations(object):
         resource_group_name,  # type: str
         service_name,  # type: str
         gateway_name,  # type: str
+        gateway_resource,  # type: "_models.GatewayResource"
         **kwargs  # type: Any
     ):
         # type: (...) -> LROPoller["_models.GatewayResource"]
@@ -185,6 +192,8 @@ class GatewaysOperations(object):
         :type service_name: str
         :param gateway_name: The name of Spring Cloud Gateway.
         :type gateway_name: str
+        :param gateway_resource: The gateway for the create or update operation.
+        :type gateway_resource: ~azure.mgmt.appplatform.v2022_01_01_preview.models.GatewayResource
         :keyword callable cls: A custom type or function that will be passed the direct response
         :keyword str continuation_token: A continuation token to restart a poller from a saved state.
         :keyword polling: By default, your polling method will be ARMPolling.
@@ -207,6 +216,7 @@ class GatewaysOperations(object):
                 resource_group_name=resource_group_name,
                 service_name=service_name,
                 gateway_name=gateway_name,
+                gateway_resource=gateway_resource,
                 cls=lambda x,y,z: x,
                 **kwargs
             )

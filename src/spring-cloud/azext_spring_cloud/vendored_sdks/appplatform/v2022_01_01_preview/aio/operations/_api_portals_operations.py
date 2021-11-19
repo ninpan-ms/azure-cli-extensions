@@ -111,6 +111,7 @@ class ApiPortalsOperations:
         resource_group_name: str,
         service_name: str,
         api_portal_name: str,
+        api_portal_resource: "_models.ApiPortalResource",
         **kwargs: Any
     ) -> "_models.ApiPortalResource":
         cls = kwargs.pop('cls', None)  # type: ClsType["_models.ApiPortalResource"]
@@ -119,6 +120,7 @@ class ApiPortalsOperations:
         }
         error_map.update(kwargs.pop('error_map', {}))
         api_version = "2022-01-01-preview"
+        content_type = kwargs.pop("content_type", "application/json")
         accept = "application/json"
 
         # Construct URL
@@ -137,9 +139,13 @@ class ApiPortalsOperations:
 
         # Construct headers
         header_parameters = {}  # type: Dict[str, Any]
+        header_parameters['Content-Type'] = self._serialize.header("content_type", content_type, 'str')
         header_parameters['Accept'] = self._serialize.header("accept", accept, 'str')
 
-        request = self._client.put(url, query_parameters, header_parameters)
+        body_content_kwargs = {}  # type: Dict[str, Any]
+        body_content = self._serialize.body(api_portal_resource, 'ApiPortalResource')
+        body_content_kwargs['content'] = body_content
+        request = self._client.put(url, query_parameters, header_parameters, **body_content_kwargs)
         pipeline_response = await self._client._pipeline.run(request, stream=False, **kwargs)
         response = pipeline_response.http_response
 
@@ -167,6 +173,7 @@ class ApiPortalsOperations:
         resource_group_name: str,
         service_name: str,
         api_portal_name: str,
+        api_portal_resource: "_models.ApiPortalResource",
         **kwargs: Any
     ) -> AsyncLROPoller["_models.ApiPortalResource"]:
         """Create the default API portal or update the existing API portal.
@@ -178,6 +185,8 @@ class ApiPortalsOperations:
         :type service_name: str
         :param api_portal_name: The name of API portal.
         :type api_portal_name: str
+        :param api_portal_resource: The API portal for the create or update operation.
+        :type api_portal_resource: ~azure.mgmt.appplatform.v2022_01_01_preview.models.ApiPortalResource
         :keyword callable cls: A custom type or function that will be passed the direct response
         :keyword str continuation_token: A continuation token to restart a poller from a saved state.
         :keyword polling: By default, your polling method will be AsyncARMPolling.
@@ -200,6 +209,7 @@ class ApiPortalsOperations:
                 resource_group_name=resource_group_name,
                 service_name=service_name,
                 api_portal_name=api_portal_name,
+                api_portal_resource=api_portal_resource,
                 cls=lambda x,y,z: x,
                 **kwargs
             )

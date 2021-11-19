@@ -121,6 +121,7 @@ class ApiPortalCustomDomainsOperations(object):
         service_name,  # type: str
         api_portal_name,  # type: str
         domain_name,  # type: str
+        api_portal_custom_domain_resource,  # type: "_models.ApiPortalCustomDomainResource"
         **kwargs  # type: Any
     ):
         # type: (...) -> "_models.ApiPortalCustomDomainResource"
@@ -130,6 +131,7 @@ class ApiPortalCustomDomainsOperations(object):
         }
         error_map.update(kwargs.pop('error_map', {}))
         api_version = "2022-01-01-preview"
+        content_type = kwargs.pop("content_type", "application/json")
         accept = "application/json"
 
         # Construct URL
@@ -149,9 +151,13 @@ class ApiPortalCustomDomainsOperations(object):
 
         # Construct headers
         header_parameters = {}  # type: Dict[str, Any]
+        header_parameters['Content-Type'] = self._serialize.header("content_type", content_type, 'str')
         header_parameters['Accept'] = self._serialize.header("accept", accept, 'str')
 
-        request = self._client.put(url, query_parameters, header_parameters)
+        body_content_kwargs = {}  # type: Dict[str, Any]
+        body_content = self._serialize.body(api_portal_custom_domain_resource, 'ApiPortalCustomDomainResource')
+        body_content_kwargs['content'] = body_content
+        request = self._client.put(url, query_parameters, header_parameters, **body_content_kwargs)
         pipeline_response = self._client._pipeline.run(request, stream=False, **kwargs)
         response = pipeline_response.http_response
 
@@ -180,6 +186,7 @@ class ApiPortalCustomDomainsOperations(object):
         service_name,  # type: str
         api_portal_name,  # type: str
         domain_name,  # type: str
+        api_portal_custom_domain_resource,  # type: "_models.ApiPortalCustomDomainResource"
         **kwargs  # type: Any
     ):
         # type: (...) -> LROPoller["_models.ApiPortalCustomDomainResource"]
@@ -194,6 +201,9 @@ class ApiPortalCustomDomainsOperations(object):
         :type api_portal_name: str
         :param domain_name: The name of the API portal custom domain.
         :type domain_name: str
+        :param api_portal_custom_domain_resource: The API portal custom domain for the create or update
+         operation.
+        :type api_portal_custom_domain_resource: ~azure.mgmt.appplatform.v2022_01_01_preview.models.ApiPortalCustomDomainResource
         :keyword callable cls: A custom type or function that will be passed the direct response
         :keyword str continuation_token: A continuation token to restart a poller from a saved state.
         :keyword polling: By default, your polling method will be ARMPolling.
@@ -217,6 +227,7 @@ class ApiPortalCustomDomainsOperations(object):
                 service_name=service_name,
                 api_portal_name=api_portal_name,
                 domain_name=domain_name,
+                api_portal_custom_domain_resource=api_portal_custom_domain_resource,
                 cls=lambda x,y,z: x,
                 **kwargs
             )
@@ -386,7 +397,7 @@ class ApiPortalCustomDomainsOperations(object):
         **kwargs  # type: Any
     ):
         # type: (...) -> Iterable["_models.ApiPortalCustomDomainResourceCollection"]
-        """Handle requests to list all API portal Custom Domains.
+        """Handle requests to list all API portal custom domains.
 
         :param resource_group_name: The name of the resource group that contains the resource. You can
          obtain this value from the Azure Resource Manager API or the portal.

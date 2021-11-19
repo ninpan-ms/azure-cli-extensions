@@ -121,6 +121,7 @@ class GatewayCustomDomainsOperations(object):
         service_name,  # type: str
         gateway_name,  # type: str
         domain_name,  # type: str
+        gateway_custom_domain_resource,  # type: "_models.GatewayCustomDomainResource"
         **kwargs  # type: Any
     ):
         # type: (...) -> "_models.GatewayCustomDomainResource"
@@ -130,6 +131,7 @@ class GatewayCustomDomainsOperations(object):
         }
         error_map.update(kwargs.pop('error_map', {}))
         api_version = "2022-01-01-preview"
+        content_type = kwargs.pop("content_type", "application/json")
         accept = "application/json"
 
         # Construct URL
@@ -149,9 +151,13 @@ class GatewayCustomDomainsOperations(object):
 
         # Construct headers
         header_parameters = {}  # type: Dict[str, Any]
+        header_parameters['Content-Type'] = self._serialize.header("content_type", content_type, 'str')
         header_parameters['Accept'] = self._serialize.header("accept", accept, 'str')
 
-        request = self._client.put(url, query_parameters, header_parameters)
+        body_content_kwargs = {}  # type: Dict[str, Any]
+        body_content = self._serialize.body(gateway_custom_domain_resource, 'GatewayCustomDomainResource')
+        body_content_kwargs['content'] = body_content
+        request = self._client.put(url, query_parameters, header_parameters, **body_content_kwargs)
         pipeline_response = self._client._pipeline.run(request, stream=False, **kwargs)
         response = pipeline_response.http_response
 
@@ -180,6 +186,7 @@ class GatewayCustomDomainsOperations(object):
         service_name,  # type: str
         gateway_name,  # type: str
         domain_name,  # type: str
+        gateway_custom_domain_resource,  # type: "_models.GatewayCustomDomainResource"
         **kwargs  # type: Any
     ):
         # type: (...) -> LROPoller["_models.GatewayCustomDomainResource"]
@@ -194,6 +201,9 @@ class GatewayCustomDomainsOperations(object):
         :type gateway_name: str
         :param domain_name: The name of the Spring Cloud Gateway custom domain.
         :type domain_name: str
+        :param gateway_custom_domain_resource: The gateway custom domain resource for the create or
+         update operation.
+        :type gateway_custom_domain_resource: ~azure.mgmt.appplatform.v2022_01_01_preview.models.GatewayCustomDomainResource
         :keyword callable cls: A custom type or function that will be passed the direct response
         :keyword str continuation_token: A continuation token to restart a poller from a saved state.
         :keyword polling: By default, your polling method will be ARMPolling.
@@ -217,6 +227,7 @@ class GatewayCustomDomainsOperations(object):
                 service_name=service_name,
                 gateway_name=gateway_name,
                 domain_name=domain_name,
+                gateway_custom_domain_resource=gateway_custom_domain_resource,
                 cls=lambda x,y,z: x,
                 **kwargs
             )
@@ -386,7 +397,7 @@ class GatewayCustomDomainsOperations(object):
         **kwargs  # type: Any
     ):
         # type: (...) -> Iterable["_models.GatewayCustomDomainResourceCollection"]
-        """Handle requests to list all Spring Cloud Gateway Custom Domains.
+        """Handle requests to list all Spring Cloud Gateway custom domains.
 
         :param resource_group_name: The name of the resource group that contains the resource. You can
          obtain this value from the Azure Resource Manager API or the portal.
