@@ -332,8 +332,8 @@ class CustomPersistentDiskProperties(msrest.serialization.Model):
     :type type: str
     :param mount_path: Required. The mount path of the persistent disk.
     :type mount_path: str
-    :param readonly: Indicates whether the persistent disk is a readonly one.
-    :type readonly: bool
+    :param read_only: Indicates whether the persistent disk is a readOnly one.
+    :type read_only: bool
     :param mount_options: These are the mount options for a persistent disk.
     :type mount_options: list[str]
     """
@@ -346,7 +346,7 @@ class CustomPersistentDiskProperties(msrest.serialization.Model):
     _attribute_map = {
         'type': {'key': 'type', 'type': 'str'},
         'mount_path': {'key': 'mountPath', 'type': 'str'},
-        'readonly': {'key': 'readonly', 'type': 'bool'},
+        'read_only': {'key': 'readOnly', 'type': 'bool'},
         'mount_options': {'key': 'mountOptions', 'type': '[str]'},
     }
 
@@ -358,14 +358,14 @@ class CustomPersistentDiskProperties(msrest.serialization.Model):
         self,
         *,
         mount_path: str,
-        readonly: Optional[bool] = None,
+        read_only: Optional[bool] = None,
         mount_options: Optional[List[str]] = None,
         **kwargs
     ):
         super(CustomPersistentDiskProperties, self).__init__(**kwargs)
         self.type = None  # type: Optional[str]
         self.mount_path = mount_path
-        self.readonly = readonly
+        self.read_only = read_only
         self.mount_options = mount_options
 
 
@@ -379,8 +379,8 @@ class AzureFileVolume(CustomPersistentDiskProperties):
     :type type: str
     :param mount_path: Required. The mount path of the persistent disk.
     :type mount_path: str
-    :param readonly: Indicates whether the persistent disk is a readonly one.
-    :type readonly: bool
+    :param read_only: Indicates whether the persistent disk is a readOnly one.
+    :type read_only: bool
     :param mount_options: These are the mount options for a persistent disk.
     :type mount_options: list[str]
     :param share_name: Required. The share name of the Azure File share.
@@ -396,7 +396,7 @@ class AzureFileVolume(CustomPersistentDiskProperties):
     _attribute_map = {
         'type': {'key': 'type', 'type': 'str'},
         'mount_path': {'key': 'mountPath', 'type': 'str'},
-        'readonly': {'key': 'readonly', 'type': 'bool'},
+        'read_only': {'key': 'readOnly', 'type': 'bool'},
         'mount_options': {'key': 'mountOptions', 'type': '[str]'},
         'share_name': {'key': 'shareName', 'type': 'str'},
     }
@@ -406,11 +406,11 @@ class AzureFileVolume(CustomPersistentDiskProperties):
         *,
         mount_path: str,
         share_name: str,
-        readonly: Optional[bool] = None,
+        read_only: Optional[bool] = None,
         mount_options: Optional[List[str]] = None,
         **kwargs
     ):
-        super(AzureFileVolume, self).__init__(mount_path=mount_path, readonly=readonly, mount_options=mount_options, **kwargs)
+        super(AzureFileVolume, self).__init__(mount_path=mount_path, read_only=read_only, mount_options=mount_options, **kwargs)
         self.type = 'AzureFileVolume'  # type: str
         self.share_name = share_name
 
@@ -1491,6 +1491,9 @@ class DeploymentSettings(msrest.serialization.Model):
     :param runtime_version: Runtime version. Possible values include: "Java_8", "Java_11",
      "NetCore_31". Default value: "Java_8".
     :type runtime_version: str or ~azure.mgmt.appplatform.v2021_09_01_preview.models.RuntimeVersion
+    :param container_probe_settings: Container liveness and readiness probe settings.
+    :type container_probe_settings:
+     ~azure.mgmt.appplatform.v2021_09_01_preview.models.DeploymentSettingsContainerProbeSettings
     """
 
     _attribute_map = {
@@ -1501,6 +1504,7 @@ class DeploymentSettings(msrest.serialization.Model):
         'net_core_main_entry_path': {'key': 'netCoreMainEntryPath', 'type': 'str'},
         'environment_variables': {'key': 'environmentVariables', 'type': '{str}'},
         'runtime_version': {'key': 'runtimeVersion', 'type': 'str'},
+        'container_probe_settings': {'key': 'containerProbeSettings', 'type': 'DeploymentSettingsContainerProbeSettings'},
     }
 
     def __init__(
@@ -1513,6 +1517,7 @@ class DeploymentSettings(msrest.serialization.Model):
         net_core_main_entry_path: Optional[str] = None,
         environment_variables: Optional[Dict[str, str]] = None,
         runtime_version: Optional[Union[str, "RuntimeVersion"]] = "Java_8",
+        container_probe_settings: Optional["DeploymentSettingsContainerProbeSettings"] = None,
         **kwargs
     ):
         super(DeploymentSettings, self).__init__(**kwargs)
@@ -1523,6 +1528,28 @@ class DeploymentSettings(msrest.serialization.Model):
         self.net_core_main_entry_path = net_core_main_entry_path
         self.environment_variables = environment_variables
         self.runtime_version = runtime_version
+        self.container_probe_settings = container_probe_settings
+
+
+class DeploymentSettingsContainerProbeSettings(msrest.serialization.Model):
+    """Container liveness and readiness probe settings.
+
+    :param disable_probe: Indicates whether disable the liveness and readiness probe.
+    :type disable_probe: bool
+    """
+
+    _attribute_map = {
+        'disable_probe': {'key': 'disableProbe', 'type': 'bool'},
+    }
+
+    def __init__(
+        self,
+        *,
+        disable_probe: Optional[bool] = None,
+        **kwargs
+    ):
+        super(DeploymentSettingsContainerProbeSettings, self).__init__(**kwargs)
+        self.disable_probe = disable_probe
 
 
 class DiagnosticParameters(msrest.serialization.Model):
