@@ -214,7 +214,7 @@ def deployment_create_enterprise(cmd, client, resource_group, service, app, name
                                            jvm_options=jvm_options,
                                            env=env or origin_settings.environment_variables,
                                            config_file_patterns=config_file_patterns or _get_config_file_patterns(origin_settings.addon_configs))
-    user_source_info = _build_and_get_result(cmd, client, resource_group, service, app, version, builder, artifact_path, target_module, additional_steps=1)
+    user_source_info = _build_and_get_result(cmd, client, resource_group, service, app, version, artifact_path, builder, target_module, additional_steps=1)
     resource = models.DeploymentResource(
         properties=models.DeploymentResourceProperties(
             source=user_source_info,
