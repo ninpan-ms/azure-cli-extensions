@@ -6,7 +6,7 @@ import unittest
 import copy
 from argparse import Namespace
 from azure.cli.core.util import CLIError
-from ...vendored_sdks.appplatform.v2022_05_01_preview import models
+from ...vendored_sdks.appplatform.v2022_01_01_preview import models
 from ..._enterprise import (app_get_enterprise)
 
 try:

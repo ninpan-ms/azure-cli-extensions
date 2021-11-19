@@ -11,7 +11,7 @@ from .custom import (certificate_add as custom_certificate_add,
                      certificate_remove as custom_certificate_remove,
                      certificate_list_reference_app as custom_certificate_list_reference_app)
 from knack.log import get_logger
-from .vendored_sdks.appplatform.v2022_05_01_preview import models as models_20220501preview
+from .vendored_sdks.appplatform.v2022_01_01_preview import models as models_20220101preview
 from .vendored_sdks.appplatform.v2021_09_01_preview import models as models_20210901preview
 
 logger = get_logger(__name__)
@@ -22,7 +22,7 @@ def certificate_add(cmd, client, resource_group, service, name, only_public_cert
     models = models_20210901preview
     if is_enterprise_tier(cmd, resource_group, service):
         client = get_client(cmd)
-        models = models_20220501preview
+        models = models_20220101preview
     return custom_certificate_add(cmd, client, resource_group, service, name, models, only_public_cert,
                     vault_uri, vault_certificate_name, public_certificate_file)
 

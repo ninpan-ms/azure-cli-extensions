@@ -22,8 +22,8 @@ from ._validators_enterprise import (validate_config_file_patterns, validate_cpu
 from ._utils import ApiType
 
 from .vendored_sdks.appplatform.v2020_07_01.models import RuntimeVersion, TestKeyType
-from .vendored_sdks.appplatform.v2022_05_01_preview.models \
-    import _app_platform_management_client_enums as v20220501_preview_AppPlatformEnums
+from .vendored_sdks.appplatform.v2022_01_01_preview.models \
+    import _app_platform_management_client_enums as v20220101_preview_AppPlatformEnums
 
 
 name_type = CLIArgumentType(options_list=[
@@ -440,7 +440,7 @@ def load_arguments(self, _):
                   'spring-cloud build-service buildpacks-binding set']:
         with self.argument_context(scope) as c:
             c.argument('type',
-                       arg_type=get_enum_type(v20220501_preview_AppPlatformEnums.BindingType),
+                       arg_type=get_enum_type(v20220101_preview_AppPlatformEnums.BindingType),
                        help='Required type for buildpacks binding.')
             c.argument('properties',
                        help='Non-sensitive properties for launchProperties. Format "key[=value]".',

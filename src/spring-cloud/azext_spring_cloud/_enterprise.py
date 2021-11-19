@@ -3,7 +3,7 @@ from knack.util import CLIError
 from knack.log import get_logger
 from msrestazure.azure_exceptions import CloudError
 from msrestazure.tools import parse_resource_id
-from .vendored_sdks.appplatform.v2022_05_01_preview import models
+from .vendored_sdks.appplatform.v2022_01_01_preview import models
 from ._utils import  get_azure_files_info, _pack_source_code
 from azure.cli.core.util import sdk_no_wait
 from .azure_storage_file import FileService

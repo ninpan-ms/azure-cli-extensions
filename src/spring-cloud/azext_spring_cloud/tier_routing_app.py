@@ -23,7 +23,7 @@ from .custom import (app_get as app_get_standard, app_list as app_list_standard,
                      app_domain_unbind as domain_unbind,
                      app_append_loaded_public_certificate as append_loaded_public_certificate)
 from knack.log import get_logger
-from .vendored_sdks.appplatform.v2022_05_01_preview import models as models_20220501preview
+from .vendored_sdks.appplatform.v2022_01_01_preview import models as models_20220101preview
 from .vendored_sdks.appplatform.v2021_09_01_preview import models as models_20210901preview
 
 logger = get_logger(__name__)
@@ -175,7 +175,7 @@ def app_identity_assign(cmd, client, resource_group, service, name, role=None, s
     models = models_20210901preview
     if is_enterprise_tier(cmd, resource_group, service):
         client = get_client(cmd)
-        models = models_20220501preview
+        models = models_20220101preview
     return identity_assign(cmd, client, models, resource_group, service, name, role, scope)
 
 
@@ -183,7 +183,7 @@ def app_identity_remove(cmd, client, resource_group, service, name):
     models = models_20210901preview
     if is_enterprise_tier(cmd, resource_group, service):
         client = get_client(cmd)
-        models = models_20220501preview
+        models = models_20220101preview
     return identity_remove(cmd, client, models, resource_group, service, name)
 
 
@@ -198,7 +198,7 @@ def app_domain_bind(cmd, client, resource_group, service, app, domain_name,
     models = models_20210901preview
     if is_enterprise_tier(cmd, resource_group, service):
         client = get_client(cmd)
-        models = models_20220501preview
+        models = models_20220101preview
     return domain_bind(cmd, client, models, resource_group, service, app, domain_name, certificate, enable_end_to_end_tls)
 
 
@@ -220,7 +220,7 @@ def app_domain_update(cmd, client, resource_group, service, app, domain_name,
     models = models_20210901preview
     if is_enterprise_tier(cmd, resource_group, service):
         client = get_client(cmd)
-        models = models_20220501preview
+        models = models_20220101preview
     return domain_update(cmd, client, models, resource_group, service, app, domain_name, certificate, enable_end_to_end_tls)
 
 
@@ -234,5 +234,5 @@ def app_append_loaded_public_certificate(cmd, client, resource_group, service, n
     models = models_20210901preview
     if is_enterprise_tier(cmd, resource_group, service):
         client = get_client(cmd)
-        models = models_20220501preview
+        models = models_20220101preview
     return append_loaded_public_certificate(cmd, client, resource_group, service, name, certificate_name, load_trust_store, models)

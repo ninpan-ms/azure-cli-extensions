@@ -6,7 +6,7 @@
 # pylint: disable=unused-argument, logging-format-interpolation, protected-access, wrong-import-order, too-many-lines
 from ._enterprise import app_get_enterprise
 from ._util_enterprise import (is_enterprise_tier, get_client)
-from .vendored_sdks.appplatform.v2022_05_01_preview import models as models
+from .vendored_sdks.appplatform.v2022_01_01_preview import models as models
 from azure.cli.core.commands import cached_put
 from azure.cli.core.util import sdk_no_wait
 from knack.log import get_logger

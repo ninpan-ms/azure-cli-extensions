@@ -5,7 +5,7 @@
 
 # pylint: disable=wrong-import-order
 from ._enterprise import DEFAULT_BUILD_SERVICE_NAME
-from .vendored_sdks.appplatform.v2022_05_01_preview import models
+from .vendored_sdks.appplatform.v2022_01_01_preview import models
 
 
 def create_or_update_buildpacks_binding(cmd, client, resource_group, service,
