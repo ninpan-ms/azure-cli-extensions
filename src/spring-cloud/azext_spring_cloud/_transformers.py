@@ -5,6 +5,7 @@
 
 
 # pylint: disable=line-too-long
+from msrestazure.tools import parse_resource_id
 
 
 def transform_spring_cloud_table_output(result):
@@ -39,10 +40,26 @@ def transform_app_table_output(result):
 
         if 'addonConfigs' in item['properties']:
             addon = item['properties']['addonConfigs']
-            item['Bind Service Registry'] = addon['ServiceRegistry']['enabled'] if addon.get('ServiceRegistry') else False
-            item['Bind Application Configuration Service'] = addon['ApplicationConfigurationService']['enabled'] if addon.get('ApplicationConfigurationService') else False
+            item['Bind Service Registry'] = _get_service_registry_binding(addon) or '-'
+            item['Bind Application Configuration Service'] = _get_acs_binding(addon) or '-'
 
     return result if is_list else result[0]
+
+
+def _get_service_registry_binding(addon):
+    return _parse_item_resource_id(addon, 'serviceRegistry', 'ServiceRegistry')
+
+
+def _get_acs_binding(addon):
+    return _parse_item_resource_id(addon, 'applicationConfigurationService', 'ApplicationConfigurationService')
+
+
+def _parse_item_resource_id(addon, key, secondary):
+    resource_id = (addon.get(key, None) or addon.get(secondary, {})).get('resourceId', None)
+    if not resource_id:
+        return None
+    resource_dict = parse_resource_id(resource_id)
+    return resource_dict.get('name', '')
 
 
 def transform_spring_cloud_deployment_output(result):

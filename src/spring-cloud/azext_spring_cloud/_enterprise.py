@@ -252,11 +252,11 @@ def _wait_build_finished(cmd, client, service, build_result_id):
         result = client.build_service.get_build_result(resource_group, service, build_service, build, build_result_name)
         pod_not_started = not result.properties.build_pod_name or not result.properties.build_stages
         still_building = _is_build_result_still_building(result)
-        return result, pod_not_started and still_building, result.properties.status
+        return result, pod_not_started and still_building, result.properties.provisioning_state
 
     def _wait_build_job_to_finish_callback():
         result = client.build_service.get_build_result(resource_group, service, build_service, build, build_result_name)
-        return result, _is_build_result_still_building(result), result.properties.status
+        return result, _is_build_result_still_building(result), result.properties.provisioning_state
 
     def _try_to_stream_build_logs(progress_bar, pod, stages):
         if not stages:
@@ -279,7 +279,7 @@ def _wait_build_finished(cmd, client, service, build_result_id):
         _do_long_running_build_operation(progress_bar, lambda: (None, True, "getting offline build logs"), "getting offline build logs", 1, 5)
         _try_print_build_logs_after_build(client, resource_group, service, build_service, build, build_result_name)
 
-    if result.properties.status != "Succeeded":
+    if result.properties.provisioning_state != "Succeeded":
         raise CLIError("Failed to build docker image, please check the build logs and retry.")
 
 
@@ -302,7 +302,7 @@ def _is_build_result_still_building(build_result):
     if not build_result or not build_result.properties:
         return None
     else:
-        return build_result.properties.status == "Building" or build_result.properties.status == "Queuing"
+        return build_result.properties.provisioning_state == "Building" or build_result.properties.provisioning_state == "Queuing"
 
 
 def _queue_build(client, resource_group, service, name, relative_path, builder=None, target_module=None):
@@ -337,7 +337,7 @@ def _compress_and_upload(cmd, client, upload_url, artifact_path):
 
 def _request_upload_url(client,  resource_group, service, name):
     try:
-        response = client.build_service.get_resource_upload_url(resource_group, service)
+        response = client.build_service.get_resource_upload_url(resource_group, service, 'default')
         if not response.upload_url:
             raise CLIError("Failed to get a SAS URL to upload context.")
         return response.upload_url, response.relative_path
