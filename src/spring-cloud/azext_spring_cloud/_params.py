@@ -19,6 +19,7 @@ from ._validators_enterprise import (validate_config_file_patterns, validate_cpu
                                      validate_buildpacks_binding_secrets, only_support_enterprise,
                                      validate_buildpacks_binding_not_exist, validate_buildpacks_binding_exist,
                                      validate_git_uri, validate_acs_patterns)
+from ._app_validator import (fulfill_deployment_param)
 from ._utils import ApiType
 
 from .vendored_sdks.appplatform.v2020_07_01.models import RuntimeVersion, TestKeyType
@@ -159,7 +160,7 @@ def load_arguments(self, _):
     for scope in ['spring-cloud app update', 'spring-cloud app start', 'spring-cloud app stop', 'spring-cloud app restart', 'spring-cloud app deploy', 'spring-cloud app scale', 'spring-cloud app set-deployment', 'spring-cloud app show-deploy-log']:
         with self.argument_context(scope) as c:
             c.argument('deployment', options_list=[
-                '--deployment', '-d'], help='Name of an existing deployment of the app. Default to the production deployment if not specified.', validator=validate_deployment_name)
+                '--deployment', '-d'], help='Name of an existing deployment of the app. Default to the production deployment if not specified.', validator=fulfill_deployment_param)
             c.argument('main_entry', options_list=[
                 '--main-entry', '-m'], help="The path to the .NET executable relative to zip root.")
 
@@ -175,7 +176,7 @@ def load_arguments(self, _):
         c.argument('since', help='Only return logs newer than a relative duration like 5s, 2m, or 1h. Maximum is 1h', validator=validate_log_since)
         c.argument('limit', type=int, help='Maximum kilobytes of logs to return. Ceiling number is 2048.', validator=validate_log_limit)
         c.argument('deployment', options_list=[
-            '--deployment', '-d'], help='Name of an existing deployment of the app. Default to the production deployment if not specified.', validator=validate_deployment_name)
+            '--deployment', '-d'], help='Name of an existing deployment of the app. Default to the production deployment if not specified.', validator=fulfill_deployment_param)
         c.argument('format_json', nargs='?', const='{timestamp} {level:>5} [{thread:>15.15}] {logger{39}:<40.40}: {message}\n{stackTrace}',
                    help='Format JSON logs if structured log is enabled')
 
@@ -252,13 +253,13 @@ def load_arguments(self, _):
     for scope in ['spring-cloud app deployment generate-heap-dump', 'spring-cloud app deployment generate-thread-dump']:
         with self.argument_context(scope) as c:
             c.argument('deployment', options_list=[
-                '--deployment', '-d'], help='Name of an existing deployment of the app. Default to the production deployment if not specified.', validator=validate_deployment_name)
+                '--deployment', '-d'], help='Name of an existing deployment of the app. Default to the production deployment if not specified.', validator=fulfill_deployment_param)
             c.argument('app_instance', help='Target app instance you want to dump.')
             c.argument('file_path', help='The mount file path for your dump file.')
 
     with self.argument_context('spring-cloud app deployment start-jfr') as c:
         c.argument('deployment', options_list=[
-            '--deployment', '-d'], help='Name of an existing deployment of the app. Default to the production deployment if not specified.', validator=validate_deployment_name)
+            '--deployment', '-d'], help='Name of an existing deployment of the app. Default to the production deployment if not specified.', validator=fulfill_deployment_param)
         c.argument('app_instance', help='Target app instance you want to dump.')
         c.argument('file_path', help='The mount file path for your dump file.')
         c.argument('duration', type=str, default="60s", help='Duration of JFR.')

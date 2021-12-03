@@ -10,7 +10,6 @@ from azext_spring_cloud._utils import handle_asc_exception
 from ._client_factory import (cf_app_services,
                               cf_spring_cloud,
                               cf_spring_cloud_20201101preview,
-                              cf_spring_cloud_20210601preview,
                               cf_spring_cloud_20210901preview,
                               cf_spring_cloud_enterprise,
                               cf_config_servers)
