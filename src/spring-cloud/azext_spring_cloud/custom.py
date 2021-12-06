@@ -462,12 +462,6 @@ def _default_deployment_resource_builder(cpu, memory, env, jvm_options, runtime_
     return deployment_resource
 
 
-def _check_active_deployment_exist(client, resource_group, service, app):
-    active_deployment_name = client.apps.get(resource_group, service, app).properties.active_deployment_name
-    if not active_deployment_name:
-        logger.warning(NO_PRODUCTION_DEPLOYMENT_SET_ERROR)
-
-
 def app_update(cmd, client, resource_group, service, name,
                assign_endpoint=None,
                deployment=None,
@@ -758,10 +752,9 @@ def app_tail_log(cmd, client, resource_group, service, name,
 
 
 def app_identity_assign(cmd, client, resource_group, service, name, role=None, scope=None):
-    _check_active_deployment_exist(client, resource_group, service, name)
-    app_resource = models.AppResource()
-    identity = models.ManagedIdentityProperties(type="systemassigned")
-    properties = models.AppResourceProperties()
+    app_resource = models_20210601preview.AppResource()
+    identity = models_20210601preview.ManagedIdentityProperties(type="systemassigned")
+    properties = models_20210601preview.AppResourceProperties()
     resource = client.services.get(resource_group, service)
     location = resource.location
 
@@ -816,7 +809,6 @@ def app_identity_remove(cmd, client, resource_group, service, name):
 
 
 def app_identity_show(cmd, client, resource_group, service, name):
-    _check_active_deployment_exist(client, resource_group, service, name)
     app = client.apps.get(resource_group, service, name)
     return app.identity
 
@@ -1275,12 +1267,10 @@ def config_repo_list(cmd, client, resource_group, name):
 
 
 def binding_list(cmd, client, resource_group, service, app):
-    _check_active_deployment_exist(client, resource_group, service, app)
     return client.bindings.list(resource_group, service, app)
 
 
 def binding_get(cmd, client, resource_group, service, app, name):
-    _check_active_deployment_exist(client, resource_group, service, app)
     return client.bindings.get(resource_group, service, app, name)
 
 
@@ -1294,7 +1284,6 @@ def binding_cosmos_add(cmd, client, resource_group, service, app, name,
                        database_name=None,
                        key_space=None,
                        collection_name=None):
-    _check_active_deployment_exist(client, resource_group, service, app)
     resource_id_dict = parse_resource_id(resource_id)
     resource_type = resource_id_dict['resource_type']
     resource_name = resource_id_dict['resource_name']
@@ -1328,7 +1317,6 @@ def binding_cosmos_update(cmd, client, resource_group, service, app, name,
                           database_name=None,
                           key_space=None,
                           collection_name=None):
-    _check_active_deployment_exist(client, resource_group, service, app)
     binding = client.bindings.get(resource_group, service, app, name).properties
     resource_id = binding.resource_id
     resource_name = binding.resource_name
@@ -1356,7 +1344,6 @@ def binding_mysql_add(cmd, client, resource_group, service, app, name,
                       key,
                       username,
                       database_name):
-    _check_active_deployment_exist(client, resource_group, service, app)
     resource_id_dict = parse_resource_id(resource_id)
     resource_type = resource_id_dict['resource_type']
     resource_name = resource_id_dict['resource_name']
@@ -1379,7 +1366,6 @@ def binding_mysql_update(cmd, client, resource_group, service, app, name,
                          key=None,
                          username=None,
                          database_name=None):
-    _check_active_deployment_exist(client, resource_group, service, app)
     binding_parameters = {}
     binding_parameters['username'] = username
     binding_parameters['databaseName'] = database_name
@@ -1395,7 +1381,6 @@ def binding_mysql_update(cmd, client, resource_group, service, app, name,
 def binding_redis_add(cmd, client, resource_group, service, app, name,
                       resource_id,
                       disable_ssl=None):
-    _check_active_deployment_exist(client, resource_group, service, app)
     use_ssl = not disable_ssl
     resource_id_dict = parse_resource_id(resource_id)
     resource_type = resource_id_dict['resource_type']
@@ -1422,7 +1407,6 @@ def binding_redis_add(cmd, client, resource_group, service, app, name,
 
 def binding_redis_update(cmd, client, resource_group, service, app, name,
                          disable_ssl=None):
-    _check_active_deployment_exist(client, resource_group, service, app)
     binding = client.bindings.get(resource_group, service, app, name).properties
     resource_id = binding.resource_id
     resource_name = binding.resource_name
@@ -1862,7 +1846,6 @@ def domain_bind(cmd, client, resource_group, service, app,
                 domain_name,
                 certificate=None,
                 enable_end_to_end_tls=None):
-    _check_active_deployment_exist(client, resource_group, service, app)
     properties = models.CustomDomainProperties()
     if certificate is not None:
         certificate_response = client.certificates.get(resource_group, service, certificate)
@@ -1895,12 +1878,10 @@ def _update_app_e2e_tls(cmd, resource_group, service, app, enable_end_to_end_tls
 
 
 def domain_show(cmd, client, resource_group, service, app, domain_name):
-    _check_active_deployment_exist(client, resource_group, service, app)
     return client.custom_domains.get(resource_group, service, app, domain_name)
 
 
 def domain_list(cmd, client, resource_group, service, app):
-    _check_active_deployment_exist(client, resource_group, service, app)
     return client.custom_domains.list(resource_group, service, app)
 
 
@@ -1908,7 +1889,6 @@ def domain_update(cmd, client, resource_group, service, app,
                   domain_name,
                   certificate=None,
                   enable_end_to_end_tls=None):
-    _check_active_deployment_exist(client, resource_group, service, app)
     properties = models.CustomDomainProperties()
     if certificate is not None:
         certificate_response = client.certificates.get(resource_group, service, certificate)
