@@ -29,22 +29,6 @@ from .vendored_sdks.appplatform.v2021_09_01_preview import models as models_2021
 logger = get_logger(__name__)
 
 
-def app_get(cmd, client,
-            resource_group,
-            service, name):
-    if is_enterprise_tier(cmd, resource_group, service):
-        return app_get_enterprise(cmd, get_client(cmd), resource_group, service, name)
-    else:
-        return app_get_standard(cmd, client, resource_group, service, name)
-
-
-def app_list(cmd, client, resource_group, service):
-    if is_enterprise_tier(cmd, resource_group, service):
-        return app_list_enterprise(cmd, get_client(cmd), resource_group, service)
-    else:
-        return app_list_standard(cmd, client, resource_group, service)
-
-
 def app_create(cmd, client, resource_group, service, name,
                assign_endpoint=None,
                cpu=None,
@@ -88,63 +72,6 @@ def app_update(cmd, client, resource_group, service, name,
                                    https_only, enable_end_to_end_tls)
 
 
-def app_delete(cmd, client,
-               resource_group,
-               service,
-               name):
-    client = get_client(cmd) if is_enterprise_tier(cmd, resource_group, service) else client
-    return app_delete_standard(cmd, client, resource_group, service, name)
-
-
-def app_start(cmd, client,
-              resource_group,
-              service,
-              name,
-              deployment=None,
-              no_wait=False):
-    if is_enterprise_tier(cmd, resource_group, service):
-        return app_start_enterprise(cmd, get_client(cmd), resource_group, service, name, deployment, no_wait)
-    else:
-        return app_start_standard(cmd, client, resource_group, service, name, deployment, no_wait)
-
-
-def app_stop(cmd, client,
-             resource_group,
-             service,
-             name,
-             deployment=None,
-             no_wait=False):
-    if is_enterprise_tier(cmd, resource_group, service):
-        return app_stop_enterprise(cmd, get_client(cmd), resource_group, service, name, deployment, no_wait)
-    else:
-        return app_stop_standard(cmd, client, resource_group, service, name, deployment, no_wait)
-
-
-def app_restart(cmd, client,
-                resource_group,
-                service,
-                name,
-                deployment=None,
-                no_wait=False):
-    if is_enterprise_tier(cmd, resource_group, service):
-        return app_restart_enterprise(cmd, get_client(cmd), resource_group, service, name, deployment, no_wait)
-    else:
-        return app_restart_standard(cmd, client, resource_group, service, name, deployment, no_wait)
-
-
-def app_scale(cmd, client, resource_group, service, name,
-              deployment=None,
-              cpu=None,
-              memory=None,
-              instance_count=None,
-              no_wait=False):
-    if is_enterprise_tier(cmd, resource_group, service):
-        return app_scale_enterprise(cmd, get_client(cmd), resource_group, service, name,
-                                    deployment, cpu, memory, instance_count, no_wait)
-    else:
-        return app_scale_standard(cmd, client, resource_group, service, name,
-                                  deployment, cpu, memory, instance_count, no_wait)
-
 
 def app_deploy(cmd, client, resource_group, service, name,
                version=None,
@@ -171,68 +98,63 @@ def app_deploy(cmd, client, resource_group, service, name,
                                    jvm_options, main_entry, env, no_wait)
 
 
-def app_identity_assign(cmd, client, resource_group, service, name, role=None, scope=None):
-    models = models_20210901preview
-    if is_enterprise_tier(cmd, resource_group, service):
-        client = get_client(cmd)
-        models = models_20220101preview
-    return identity_assign(cmd, client, models, resource_group, service, name, role, scope)
+# def app_identity_assign(cmd, client, resource_group, service, name, role=None, scope=None):
+#     models = models_20210901preview
+#     if is_enterprise_tier(cmd, resource_group, service):
+#         client = get_client(cmd)
+#         models = models_20220101preview
+#     return identity_assign(cmd, client, models, resource_group, service, name, role, scope)
 
 
-def app_identity_remove(cmd, client, resource_group, service, name):
-    models = models_20210901preview
-    if is_enterprise_tier(cmd, resource_group, service):
-        client = get_client(cmd)
-        models = models_20220101preview
-    return identity_remove(cmd, client, models, resource_group, service, name)
+# def app_identity_remove(cmd, client, resource_group, service, name):
+#     models = models_20210901preview
+#     if is_enterprise_tier(cmd, resource_group, service):
+#         client = get_client(cmd)
+#         models = models_20220101preview
+#     return identity_remove(cmd, client, models, resource_group, service, name)
 
 
-def app_identity_show(cmd, client, resource_group, service, name):
-    client = get_client(cmd) if is_enterprise_tier(cmd, resource_group, service) else client
-    return identity_show(cmd, client, resource_group, service, name)
+# def app_domain_bind(cmd, client, resource_group, service, app, domain_name,
+#                 certificate=None,
+#                 enable_end_to_end_tls=None):
+#     models = models_20210901preview
+#     if is_enterprise_tier(cmd, resource_group, service):
+#         client = get_client(cmd)
+#         models = models_20220101preview
+#     return domain_bind(cmd, client, models, resource_group, service, app, domain_name, certificate, enable_end_to_end_tls)
 
 
-def app_domain_bind(cmd, client, resource_group, service, app, domain_name,
-                certificate=None,
-                enable_end_to_end_tls=None):
-    models = models_20210901preview
-    if is_enterprise_tier(cmd, resource_group, service):
-        client = get_client(cmd)
-        models = models_20220101preview
-    return domain_bind(cmd, client, models, resource_group, service, app, domain_name, certificate, enable_end_to_end_tls)
+# def app_domain_show(cmd, client, resource_group, service, app, domain_name):
+#     if is_enterprise_tier(cmd, resource_group, service):
+#         client = get_client(cmd)
+#     return domain_show(cmd, client, resource_group, service, app, domain_name)
 
 
-def app_domain_show(cmd, client, resource_group, service, app, domain_name):
-    if is_enterprise_tier(cmd, resource_group, service):
-        client = get_client(cmd)
-    return domain_show(cmd, client, resource_group, service, app, domain_name)
+# def app_domain_list(cmd, client, resource_group, service, app):
+#     if is_enterprise_tier(cmd, resource_group, service):
+#         client = get_client(cmd)
+#     return domain_list(cmd, client, resource_group, service, app)
 
 
-def app_domain_list(cmd, client, resource_group, service, app):
-    if is_enterprise_tier(cmd, resource_group, service):
-        client = get_client(cmd)
-    return domain_list(cmd, client, resource_group, service, app)
+# def app_domain_update(cmd, client, resource_group, service, app, domain_name,
+#                 certificate=None,
+#                 enable_end_to_end_tls=None):
+#     models = models_20210901preview
+#     if is_enterprise_tier(cmd, resource_group, service):
+#         client = get_client(cmd)
+#         models = models_20220101preview
+#     return domain_update(cmd, client, models, resource_group, service, app, domain_name, certificate, enable_end_to_end_tls)
 
 
-def app_domain_update(cmd, client, resource_group, service, app, domain_name,
-                certificate=None,
-                enable_end_to_end_tls=None):
-    models = models_20210901preview
-    if is_enterprise_tier(cmd, resource_group, service):
-        client = get_client(cmd)
-        models = models_20220101preview
-    return domain_update(cmd, client, models, resource_group, service, app, domain_name, certificate, enable_end_to_end_tls)
+# def app_domain_unbind(cmd, client, resource_group, service, app, domain_name):
+#     if is_enterprise_tier(cmd, resource_group, service):
+#         client = get_client(cmd)
+#     return domain_unbind(cmd, client, resource_group, service, app, domain_name)
 
 
-def app_domain_unbind(cmd, client, resource_group, service, app, domain_name):
-    if is_enterprise_tier(cmd, resource_group, service):
-        client = get_client(cmd)
-    return domain_unbind(cmd, client, resource_group, service, app, domain_name)
-
-
-def app_append_loaded_public_certificate(cmd, client, resource_group, service, name, certificate_name, load_trust_store):
-    models = models_20210901preview
-    if is_enterprise_tier(cmd, resource_group, service):
-        client = get_client(cmd)
-        models = models_20220101preview
-    return append_loaded_public_certificate(cmd, client, resource_group, service, name, certificate_name, load_trust_store, models)
+# def app_append_loaded_public_certificate(cmd, client, resource_group, service, name, certificate_name, load_trust_store):
+#     models = models_20210901preview
+#     if is_enterprise_tier(cmd, resource_group, service):
+#         client = get_client(cmd)
+#         models = models_20220101preview
+#     return append_loaded_public_certificate(cmd, client, resource_group, service, name, certificate_name, load_trust_store, models)

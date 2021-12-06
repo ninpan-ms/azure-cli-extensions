@@ -206,7 +206,7 @@ def _update_application_insights_asc_update(cmd, resource_group, name, location,
 
 def spring_cloud_delete(cmd, client, resource_group, name, no_wait=False):
     logger.warning("Stop using Azure Spring Cloud? We appreciate your feedback: https://aka.ms/springclouddeletesurvey")
-    return sdk_no_wait(no_wait, client.begin_delete, resource_group_name=resource_group, service_name=name)
+    return sdk_no_wait(no_wait, client.services.begin_delete, resource_group_name=resource_group, service_name=name)
 
 
 def spring_cloud_start(cmd, client, resource_group, name, no_wait=False):
@@ -633,14 +633,10 @@ def app_get(cmd, client,
             service,
             name):
     app = client.apps.get(resource_group, service, name)
-    deployment_name = app.properties.active_deployment_name
-    if deployment_name:
-        deployment = client.deployments.get(
-            resource_group, service, name, deployment_name)
-        app.properties.active_deployment = deployment
-    else:
+    deployments = client.deployments.list(resource_group, service, name)
+    app.properties.active_deployment = next((x for x in deployments if x.properties.active), None)
+    if not app.properties.active_deployment:
         logger.warning(NO_PRODUCTION_DEPLOYMENT_SET_ERROR)
-
     return app
 
 
@@ -761,7 +757,7 @@ def app_tail_log(cmd, client, resource_group, service, name,
         raise exceptions[0]
 
 
-def app_identity_assign(cmd, client, models, resource_group, service, name, role=None, scope=None):
+def app_identity_assign(cmd, client, resource_group, service, name, role=None, scope=None):
     _check_active_deployment_exist(client, resource_group, service, name)
     app_resource = models.AppResource()
     identity = models.ManagedIdentityProperties(type="systemassigned")
@@ -806,7 +802,7 @@ def app_identity_assign(cmd, client, models, resource_group, service, name, role
     return app
 
 
-def app_identity_remove(cmd, client, model, resource_group, service, name):
+def app_identity_remove(cmd, client, resource_group, service, name):
     app_resource = models.AppResource()
     identity = models.ManagedIdentityProperties(type="none")
     properties = models.AppResourceProperties()

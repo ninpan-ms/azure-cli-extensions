@@ -4,6 +4,8 @@
 # --------------------------------------------------------------------------------------------
 from azure.cli.core.commands.client_factory import get_mgmt_service_client
 from azure.cli.core.profiles import ResourceType
+from azure.cli.core.azclierror import InvalidArgumentValueError
+from msrestazure.azure_exceptions import CloudError
 from .vendored_sdks.appplatform.v2020_07_01 import AppPlatformManagementClient
 from .vendored_sdks.appplatform.v2020_11_01_preview import (
     AppPlatformManagementClient as AppPlatformManagementClient_20201101preview
@@ -17,6 +19,14 @@ from .vendored_sdks.appplatform.v2021_06_01_preview import (
 from .vendored_sdks.appplatform.v2021_09_01_preview import (
     AppPlatformManagementClient as AppPlatformManagementClient_20210901preview
 )
+
+def cf_spring_cloud_enterprise_or_20210901preview(cli_ctx, kwargs):
+    return _cf_spring_cloud_enterprise_or_default(cli_ctx, cf_spring_cloud_20210901preview, kwargs)
+
+
+def cf_spring_cloud_enterprise_or_stable(cli_ctx, kwargs):
+    return _cf_spring_cloud_enterprise_or_default(cli_ctx, cf_spring_cloud, kwargs)
+
 
 def cf_spring_cloud_enterprise(cli_ctx, *_):
     return get_mgmt_service_client(cli_ctx, AppPlatformManagementClient_20220101preview)
@@ -68,3 +78,22 @@ def cf_certificates(cli_ctx, *_):
 
 def cf_custom_domains(cli_ctx, *_):
     return cf_spring_cloud(cli_ctx).custom_domains
+
+
+def _cf_spring_cloud_enterprise_or_default(cli_ctx, default_factory, kwargs):
+    resource_group = kwargs.get('resource_group', None)
+    service = kwargs.get('service', None) or kwargs.get('name', None)
+    if not resource_group or not service:
+        return default_factory(cli_ctx, kwargs)
+    resource = _get_and_ensure_service_exist(cli_ctx, resource_group, service)
+    if resource.sku.name == 'E0':
+        return cf_spring_cloud_enterprise(cli_ctx, kwargs)
+    return default_factory(cli_ctx, kwargs)
+
+
+def _get_and_ensure_service_exist(cli_ctx, resource_group, service):
+    client = cf_spring_cloud(cli_ctx)
+    try:
+        return client.services.get(resource_group, service)
+    except CloudError:
+        raise InvalidArgumentValueError('Spring {} under resource group {} not found.'.format(service, resource_group))
