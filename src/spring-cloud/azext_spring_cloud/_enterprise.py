@@ -5,6 +5,8 @@ from msrestazure.azure_exceptions import CloudError
 from msrestazure.tools import parse_resource_id
 from .vendored_sdks.appplatform.v2022_01_01_preview import models
 from ._utils import  get_azure_files_info, _pack_source_code
+from .custom import app_get
+from azure.cli.core.commands.client_factory import get_subscription_id
 from azure.cli.core.util import sdk_no_wait
 from .azure_storage_file import FileService
 from requests.auth import HTTPBasicAuth
@@ -28,20 +30,6 @@ LOG_RUNNING_PROMPT = "This command usually takes minutes to run. Add '--verbose'
 
 DEFAULT_BUILD_SERVICE_NAME = "default"
 
-
-def app_get_enterprise(cmd, client, resource_group, service, name):
-    app = client.apps.get(resource_group, service, name)
-    app.properties.activeDeployment = _get_active_deployment(client, resource_group, service, name)
-    return app
-
-
-def app_list_enterprise(cmd, client, resource_group, service):
-    apps = list(client.apps.list(resource_group, service))
-    deployments = list(
-        client.deployments.list_for_cluster(resource_group, service))
-    for app in apps:
-        app.properties.active_deployment = next(iter(x for x in deployments if x.properties.active and x.id.startswith(app.id + '/deployments/')), None)
-    return apps
 
 def app_create_enterprise(cmd, client, resource_group, service, name, 
                           assign_endpoint, cpu, memory, instance_count, jvm_options, env, assign_identity):
@@ -69,7 +57,7 @@ def app_create_enterprise(cmd, client, resource_group, service, name,
         app_resource = _update_app(assign_endpoint=assign_endpoint)
         app_poller = client.apps.begin_update(resource_group, service, name, app_resource)
     _wait_till_end(cmd, app_poller, deployment_poller)
-    return app_get_enterprise(cmd, client, resource_group, service, name)
+    return app_get(cmd, client, resource_group, service, name)
 
 
 def app_update_enterprise(cmd, client, resource_group, service, name,
@@ -86,8 +74,6 @@ def app_update_enterprise(cmd, client, resource_group, service, name,
     is_app_update = any(x is not None for x in [assign_endpoint])
     is_deployment_update = any(x is not None for x in [jvm_options, env, config_file_patterns])
     app_properties_needs_deployment_update = any(x is not None for x in [assign_endpoint])
-    if app_properties_needs_deployment_update or is_deployment_update:
-        deployment = _deployment_or_active_deployment_name(client, resource_group, service, name, deployment)
     app_poller = None
     deployment_poller = None
     if is_app_update:
@@ -99,9 +85,9 @@ def app_update_enterprise(cmd, client, resource_group, service, name,
                 deployment_settings=_format_deployment_settings(jvm_options=jvm_options, env=env, config_file_patterns=config_file_patterns)
             )
         )
-        deployment_poller = client.deployments.begin_update(resource_group, service, name, deployment, deployment_resource)
+        deployment_poller = client.deployments.begin_update(resource_group, service, name, deployment.name, deployment_resource)
     _wait_till_end(cmd, app_poller, deployment_poller)
-    return app_get_enterprise(cmd, client, resource_group, service, name)
+    return app_get(cmd, client, resource_group, service, name)
 
 
 def app_deploy_enterprise(cmd, client, resource_group, service, name,
@@ -119,77 +105,17 @@ def app_deploy_enterprise(cmd, client, resource_group, service, name,
     5. Send build result id to deployment
     '''
     logger.warning(LOG_RUNNING_PROMPT)
-    deployment = _deployment_or_active_deployment_name(client, resource_group, service, name, deployment)
     
     deployment_settings = _format_deployment_settings(jvm_options=jvm_options, env=env, config_file_patterns=config_file_patterns)
     user_source_info = _build_and_get_result(cmd, client, resource_group, service, name, version, artifact_path, builder, target_module, additional_steps=1)
-    logger.warning("[5/5] Deploying the built docker image to deployment {} under app {}".format(deployment, name))
+    logger.warning("[5/5] Deploying the built docker image to deployment {} under app {}".format(deployment.name, name))
     resource = models.DeploymentResource(
         properties=models.DeploymentResourceProperties(
             deployment_settings=deployment_settings,
             source=user_source_info
         )
     )
-    return sdk_no_wait(no_wait, client.deployments.begin_update, resource_group, service, name, deployment, resource)
-
-
-def app_start_enterprise(cmd, client,
-                         resource_group,
-                         service,
-                         name,
-                         deployment=None,
-                         no_wait=False):
-    deployment = _deployment_or_active_deployment_name(client, resource_group, service, name, deployment)
-    return sdk_no_wait(no_wait, client.deployments.begin_start,
-                       resource_group, service, name, deployment)
-
-
-def app_stop_enterprise(cmd, client,
-                        resource_group,
-                        service,
-                        name,
-                        deployment=None,
-                        no_wait=False):
-    deployment = _deployment_or_active_deployment_name(client, resource_group, service, name, deployment)
-    return sdk_no_wait(no_wait, client.deployments.begin_stop,
-                       resource_group, service, name, deployment)
-
-
-def app_restart_enterprise(cmd, client,
-                           resource_group,
-                           service,
-                           name,
-                           deployment=None,
-                           no_wait=False):
-    deployment = _deployment_or_active_deployment_name(client, resource_group, service, name, deployment)
-    return sdk_no_wait(no_wait, client.deployments.begin_restart,
-                       resource_group, service, name, deployment)
-
-
-def app_scale_enterprise(cmd, client, resource_group, service, name,
-                         deployment=None,
-                         cpu=None,
-                         memory=None,
-                         instance_count=None,
-                         no_wait=False):
-    deployment = _deployment_or_active_deployment_name(client, resource_group, service, name, deployment)
-    settings = _format_deployment_settings(cpu=cpu, memory=memory)
-    sku = _format_sku(instance_count)
-    resource = models.DeploymentResource(
-        properties=models.DeploymentResourceProperties(
-            deployment_settings=settings
-        ),
-        sku=sku
-    )
-    return sdk_no_wait(no_wait, client.deployments.begin_update,
-                       resource_group, service, name, deployment, resource)
-
-
-def deployment_delete_enterprise(cmd, client, resource_group, service, app, name):
-    deployment = client.deployments.get(client, resource_group, service, app, name)
-    if deployment.properties.active:
-        logger.warning(DELETE_PRODUCTION_DEPLOYMENT_WARNING)
-    return client.deployments.begin_delete(resource_group, service, app, name)
+    return sdk_no_wait(no_wait, client.deployments.begin_update, resource_group, service, name, deployment.name, resource)
     
 
 def deployment_create_enterprise(cmd, client, resource_group, service, app, name,
@@ -234,7 +160,7 @@ def _build_and_get_result(cmd, client, resource_group, service, name, version, a
     logger.warning("[2/{}] Uploading package to blob.".format(total_steps))
     _compress_and_upload(cmd, client, upload_url, artifact_path)
     logger.warning("[3/{}] Creating or Updating build '{}'.".format(total_steps, name))
-    build_result_id = _queue_build(client, resource_group, service, name, relative_path, builder, target_module)
+    build_result_id = _queue_build(cmd, client, resource_group, service, name, relative_path, builder, target_module)
     logger.warning("[4/{}] Waiting for building docker image to finish. This may take a few minutes.".format(total_steps))
     _wait_build_finished(cmd, client, service, build_result_id)
     return models.BuildResultUserSourceInfo(version=version, build_result_id=build_result_id)
@@ -305,16 +231,19 @@ def _is_build_result_still_building(build_result):
         return build_result.properties.provisioning_state == "Building" or build_result.properties.provisioning_state == "Queuing"
 
 
-def _queue_build(client, resource_group, service, name, relative_path, builder=None, target_module=None):
+def _queue_build(cmd, client, resource_group, service, name, relative_path, builder=None, target_module=None):
+    subscription = get_subscription_id(cmd.cli_ctx)
+    service_resource_id = '/subscriptions/{}/resourceGroups/{}/providers/Microsoft.AppPlatform/Spring/{}'.format(subscription, resource_group, service)
     properties = models.BuildProperties(
-        builder= builder,
+        builder='{}/buildservices/default/builders/{}'.format(service_resource_id, builder),
+        agent_pool='{}/buildservices/default/agentPools/default'.format(service_resource_id),
         relative_path=relative_path,
         env={"BP_MAVEN_BUILT_MODULE": target_module} if target_module else None)
     build = models.Build(properties=properties)
     try:
         return client.build_service.create_or_update_build(resource_group,
                                                            service,
-                                                           'default',
+                                                           builder,
                                                            name,
                                                            build).properties.triggered_build_result.id
     except (AttributeError, CloudError) as e:

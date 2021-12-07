@@ -5,9 +5,9 @@
 
 # pylint: disable=wrong-import-order
 from ._util_enterprise import (is_enterprise_tier, get_client)
-from ._enterprise import (app_get_enterprise, app_list_enterprise, app_create_enterprise, 
-                          app_update_enterprise, app_scale_enterprise, app_deploy_enterprise,
-                          app_start_enterprise, app_stop_enterprise, app_restart_enterprise)
+from ._enterprise import (app_create_enterprise,
+                          app_update_enterprise,
+                          app_deploy_enterprise)
 from .custom import (app_get as app_get_standard, app_list as app_list_standard, 
                      app_create as app_create_standard, app_update as app_update_standard, 
                      app_scale as app_scale_standard, app_deploy as app_deploy_standard,
