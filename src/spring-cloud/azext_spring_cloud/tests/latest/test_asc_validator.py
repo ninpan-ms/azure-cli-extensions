@@ -6,8 +6,9 @@ import unittest
 import copy
 from argparse import Namespace
 from azure.cli.core.util import CLIError
+from azure.cli.core.azclierror import InvalidArgumentValueError
 from ..._validators import (validate_vnet, validate_vnet_required_parameters, _validate_cidr_range,
-                            _set_default_cidr_range)
+                            _set_default_cidr_range, validate_sku)
 
 try:
     import unittest.mock as mock
@@ -277,3 +278,35 @@ class TestValidateIPRanges(unittest.TestCase):
         with self.assertRaises(CLIError) as context:
             validate_vnet(_get_test_cmd(), ns)
         self.assertTrue('--vnet and Azure Spring Cloud instance should be in the same location.' in str(context.exception))
+
+
+def _mock_term_client(accepted):
+    def _mock_get(offer_type, publisher_id, offer_id, plan_id):
+        term = mock.MagicMock()
+        term.accepted = accepted
+        return term
+    client = mock.MagicMock()
+    client.marketplace_agreements = mock.MagicMock()
+    client.marketplace_agreements.get = _mock_get
+    return client
+
+def _mock_accepted_term_client(cli_ctx, client_type, **kwargs):
+    return _mock_term_client(True)
+
+def _mock_not_accepted_term_client(cli_ctx, client_type, **kwargs):
+    return _mock_term_client(False)
+
+class TestSkuValidator(unittest.TestCase):
+    @mock.patch('azure.cli.core.commands.client_factory.get_mgmt_service_client', _mock_accepted_term_client)
+    def test_term_accept(self):
+        ns = Namespace(sku='Enterprise')
+        validate_sku(_get_test_cmd(), ns)
+        self.assertEqual('Enterprise', ns.sku.tier)
+
+    @mock.patch('azure.cli.core.commands.client_factory.get_mgmt_service_client', _mock_not_accepted_term_client)
+    def test_term_not_accept(self):
+        ns = Namespace(sku='Enterprise')
+        with self.assertRaises(InvalidArgumentValueError) as context:
+            validate_sku(_get_test_cmd(), ns)
+        self.assertTrue('Terms for Azure Spring Cloud Enterprise is not accepted.' in str(context.exception))
+

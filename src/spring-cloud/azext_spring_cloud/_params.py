@@ -105,7 +105,7 @@ def load_arguments(self, _):
 
     for scope in ['spring-cloud create', 'spring-cloud update']:
         with self.argument_context(scope) as c:
-            c.argument('sku', type=str, validator=validate_sku, help='Name of SKU, the value is "Basic" or "Standard"')
+            c.argument('sku', arg_type=get_enum_type(['Basic', 'Standard', 'Enterprise']), validator=validate_sku, default='Standard', help='Name of SKU, the value is "Basic", "Standard" or "Enterprise"')
             c.argument('tags', arg_type=tags_type)
 
     with self.argument_context('spring-cloud test-endpoint renew-key') as c:

@@ -51,7 +51,7 @@ def load_command_table(self, _):
 
     with self.command_group('spring-cloud', client_factory=cf_spring_cloud_enterprise_or_stable,
                             exception_handler=handle_asc_exception) as g:
-        g.custom_command('create', 'spring_cloud_create', supports_no_wait=True, client_factory=cf_spring_cloud)
+        g.custom_command('create', 'spring_cloud_create', supports_no_wait=True, client_factory=cf_spring_cloud_enterprise)
         g.custom_command('update', 'spring_cloud_update', supports_no_wait=True, client_factory=cf_spring_cloud_enterprise_or_stable)
         g.custom_command('delete', 'spring_cloud_delete', supports_no_wait=True)
         g.custom_command('start', 'spring_cloud_start', supports_no_wait=True, client_factory=cf_spring_cloud_enterprise_or_20210901preview)

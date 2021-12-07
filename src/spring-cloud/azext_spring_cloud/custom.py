@@ -66,7 +66,7 @@ def spring_cloud_create(cmd, client, resource_group, name, location=None,
                         service_runtime_network_resource_group=None, app_network_resource_group=None,
                         app_insights_key=None, app_insights=None, sampling_rate=None,
                         disable_app_insights=None, enable_java_agent=None,
-                        sku='Standard', tags=None, no_wait=False):
+                        sku=None, tags=None, no_wait=False):
     """
     If app_insights_key, app_insights and disable_app_insights are all None,
     will still create an application insights and enable application insights.
@@ -90,9 +90,7 @@ def spring_cloud_create(cmd, client, resource_group, name, location=None,
             service_runtime_network_resource_group=service_runtime_network_resource_group
         )
 
-    full_sku = models.Sku(name=_get_sku_name(sku), tier=sku)
-
-    resource = models.ServiceResource(location=location, sku=full_sku, properties=properties, tags=tags)
+    resource = models.ServiceResource(location=location, sku=sku, properties=properties, tags=tags)
 
     poller = client.services.begin_create_or_update(
         resource_group, name, resource)
