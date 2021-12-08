@@ -153,6 +153,23 @@ def deployment_create_enterprise(cmd, client, resource_group, service, app, name
                        resource_group, service, app, name, resource)
 
 
+def set_deployment(cmd, client, resource_group, service, name, deployment):
+    resource = client.deployments.get(resource_group, service, name, deployment)
+    if resource.properties.active:
+        raise InvalidArgumentValueError('Deployment {} is already the production deployment'.format(deployment))
+    active_deployment_collection = models.ActiveDeploymentCollection(
+        active_deployments=[deployment]
+    )
+    return client.apps.set_active_deployment(resource_group, service, name, active_deployment_collection)
+
+
+def unset_deployment(cmd, client, resource_group, service, name):
+    active_deployment_collection = models.ActiveDeploymentCollection(
+        active_deployments=[]
+    )
+    return client.apps.set_active_deployment(resource_group, service, name, active_deployment_collection)
+
+
 def _build_and_get_result(cmd, client, resource_group, service, name, version, artifact_path, builder, target_module, additional_steps=0):
     total_steps = 4 + additional_steps
     logger.warning("[1/{}] Requesting for upload URL.".format(total_steps))
