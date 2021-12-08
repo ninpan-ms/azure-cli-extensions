@@ -40,7 +40,7 @@ def app_create(cmd, client, resource_group, service, name,
                enable_persistent_storage=None,
                assign_identity=None):
     if is_enterprise_tier(cmd, resource_group, service):
-        # runtime_version, enable_persistent_storage assign_ideneity not support
+        # runtime_version, enable_persistent_storage not support
         return app_create_enterprise(cmd, get_client(cmd), resource_group, service, name,
                                      assign_endpoint, cpu, memory, instance_count, jvm_options, 
                                      env, assign_identity)
