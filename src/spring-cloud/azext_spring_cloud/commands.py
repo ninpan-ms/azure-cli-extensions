@@ -85,16 +85,16 @@ def load_command_table(self, _):
         g.custom_command('create', 'app_create')
         g.custom_command('update', 'app_update')
         g.custom_command('deploy', 'app_deploy', supports_no_wait=True)
+        g.custom_command('set-deployment', 'app_set_deployment',
+                         supports_no_wait=True)
+        g.custom_command('unset-deployment', 'app_unset_deployment',
+                         supports_no_wait=True)
 
 
     with self.command_group('spring-cloud app', client_factory=cf_spring_cloud_enterprise_or_20210901preview,
                             exception_handler=handle_asc_exception) as g:
         g.custom_command('scale', 'app_scale', supports_no_wait=True)
         g.custom_command('show-deploy-log', 'app_get_build_log')
-        g.custom_command('set-deployment', 'app_set_deployment',
-                         supports_no_wait=True)
-        g.custom_command('unset-deployment', 'app_unset_deployment',
-                         supports_no_wait=True)
         g.custom_command('delete', 'app_delete')
         g.custom_command('list', 'app_list',
                          table_transformer=transform_app_table_output)

@@ -158,16 +158,16 @@ def set_deployment(cmd, client, resource_group, service, name, deployment):
     if resource.properties.active:
         raise InvalidArgumentValueError('Deployment {} is already the production deployment'.format(deployment))
     active_deployment_collection = models.ActiveDeploymentCollection(
-        active_deployments=[deployment]
+        active_deployment_names=[deployment]
     )
-    return client.apps.set_active_deployment(resource_group, service, name, active_deployment_collection)
+    return client.apps.set_active_deployments(resource_group, service, name, active_deployment_collection)
 
 
 def unset_deployment(cmd, client, resource_group, service, name):
     active_deployment_collection = models.ActiveDeploymentCollection(
-        active_deployments=[]
+        active_deployment_names=[]
     )
-    return client.apps.set_active_deployment(resource_group, service, name, active_deployment_collection)
+    return client.apps.set_active_deployments(resource_group, service, name, active_deployment_collection)
 
 
 def _build_and_get_result(cmd, client, resource_group, service, name, version, artifact_path, builder, target_module, additional_steps=0):

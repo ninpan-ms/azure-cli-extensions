@@ -7,21 +7,13 @@
 from ._util_enterprise import (is_enterprise_tier, get_client)
 from ._enterprise import (app_create_enterprise,
                           app_update_enterprise,
-                          app_deploy_enterprise)
-from .custom import (app_get as app_get_standard, app_list as app_list_standard, 
-                     app_create as app_create_standard, app_update as app_update_standard, 
-                     app_scale as app_scale_standard, app_deploy as app_deploy_standard,
-                     app_delete as app_delete_standard, app_restart as app_restart_standard,
-                     app_start as app_start_standard, app_stop as app_stop_standard,
-                     app_identity_assign as identity_assign,
-                     app_identity_remove as identity_remove,
-                     app_identity_show as identity_show,
-                     domain_bind as domain_bind,
-                     domain_show as domain_show,
-                     domain_list as domain_list,
-                     domain_update as domain_update,
-                     domain_unbind as domain_unbind,
-                     app_append_loaded_public_certificate as append_loaded_public_certificate)
+                          app_deploy_enterprise,
+                          set_deployment,
+                          unset_deployment)
+from .custom import (app_create as app_create_standard, app_update as app_update_standard, 
+                     app_deploy as app_deploy_standard,
+                     app_set_deployment as set_deployment_standard,
+                     app_unset_deployment as unset_deployment_standard)
 from knack.log import get_logger
 from .vendored_sdks.appplatform.v2022_01_01_preview import models as models_20220101preview
 from .vendored_sdks.appplatform.v2021_09_01_preview import models as models_20210901preview
@@ -96,3 +88,18 @@ def app_deploy(cmd, client, resource_group, service, name,
         return app_deploy_standard(cmd, client, resource_group, service, name,
                                    version, deployment, disable_validation, artifact_path, target_module, runtime_version, 
                                    jvm_options, main_entry, env, no_wait)
+
+
+def app_set_deployment(cmd, client, resource_group, service, name, deployment):
+    if is_enterprise_tier(cmd, resource_group, service):
+        return set_deployment(cmd, get_client(cmd), resource_group, service, name, deployment)
+    else:
+        return set_deployment_standard(cmd, client, resource_group, service, name, deployment)
+
+
+
+def app_unset_deployment(cmd, client, resource_group, service, name):
+    if is_enterprise_tier(cmd, resource_group, service):
+        return unset_deployment(cmd, get_client(cmd), resource_group, service, name)
+    else:
+        return unset_deployment_standard(cmd, client, resource_group, service, name)
