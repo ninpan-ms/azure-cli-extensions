@@ -154,20 +154,21 @@ def deployment_create_enterprise(cmd, client, resource_group, service, app, name
 
 
 def set_deployment(cmd, client, resource_group, service, name, deployment):
-    resource = client.deployments.get(resource_group, service, name, deployment)
-    if resource.properties.active:
-        raise InvalidArgumentValueError('Deployment {} is already the production deployment'.format(deployment))
     active_deployment_collection = models.ActiveDeploymentCollection(
         active_deployment_names=[deployment]
     )
-    return client.apps.set_active_deployments(resource_group, service, name, active_deployment_collection)
+    poller = client.apps.begin_set_active_deployments(resource_group, service, name, active_deployment_collection)
+    _wait_till_end(cmd, poller)
+    return app_get(cmd, client, resource_group, service, name)
 
 
 def unset_deployment(cmd, client, resource_group, service, name):
     active_deployment_collection = models.ActiveDeploymentCollection(
         active_deployment_names=[]
     )
-    return client.apps.set_active_deployments(resource_group, service, name, active_deployment_collection)
+    poller = client.apps.begin_set_active_deployments(resource_group, service, name, active_deployment_collection)
+    _wait_till_end(cmd, poller)
+    return app_get(cmd, client, resource_group, service, name)
 
 
 def _build_and_get_result(cmd, client, resource_group, service, name, version, artifact_path, builder, target_module, additional_steps=0):

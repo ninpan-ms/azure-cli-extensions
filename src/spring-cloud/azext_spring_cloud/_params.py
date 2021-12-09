@@ -19,7 +19,7 @@ from ._validators_enterprise import (validate_config_file_patterns, validate_cpu
                                      validate_buildpacks_binding_secrets, only_support_enterprise,
                                      validate_buildpacks_binding_not_exist, validate_buildpacks_binding_exist,
                                      validate_git_uri, validate_acs_patterns)
-from ._app_validator import (fulfill_deployment_param, active_deployment_exist, active_deployment_exist_under_app)
+from ._app_validator import (fulfill_deployment_param, active_deployment_exist, active_deployment_exist_under_app, ensure_not_active_deployment)
 from ._utils import ApiType
 
 from .vendored_sdks.appplatform.v2020_07_01.models import RuntimeVersion, TestKeyType
@@ -192,7 +192,7 @@ def load_arguments(self, _):
 
     with self.argument_context('spring-cloud app set-deployment') as c:
         c.argument('deployment', options_list=[
-            '--deployment', '-d'], help='Name of an existing deployment of the app.', validator=validate_deployment_name)
+            '--deployment', '-d'], help='Name of an existing deployment of the app.', validator=ensure_not_active_deployment)
 
     for scope in ['spring-cloud app create', 'spring-cloud app update']:
         with self.argument_context(scope) as c:

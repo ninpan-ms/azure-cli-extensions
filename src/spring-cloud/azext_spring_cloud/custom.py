@@ -812,15 +812,6 @@ def app_identity_show(cmd, client, resource_group, service, name):
 
 
 def app_set_deployment(cmd, client, resource_group, service, name, deployment):
-    deployments = _get_all_deployments(client, resource_group, service, name)
-    active_deployment = client.apps.get(
-        resource_group, service, name).properties.active_deployment_name
-    if deployment == active_deployment:
-        raise CLIError("Deployment '" + deployment +
-                       "' is already the production deployment")
-    if deployment not in deployments:
-        raise CLIError("Deployment '" + deployment +
-                       "' not found, please use 'az spring-cloud app deployment create' to create the new deployment")
     properties = models_20210601preview.AppResourceProperties(
         active_deployment_name=deployment)
 
