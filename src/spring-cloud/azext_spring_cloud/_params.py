@@ -212,7 +212,7 @@ def load_arguments(self, _):
         with self.argument_context(scope) as c:
             c.argument('config_file_patterns', type=str,
                     help="Only support in enterprise tier now. Config file patterns separated with \',\' to decide which patterns of Application Configuration Service will be used. Use '\"\"' to clear existing configurations.",
-                    validator=validate_config_file_patterns)
+                    validator=validate_config_file_patterns, is_preview=True)
 
     with self.argument_context('spring-cloud app scale') as c:
         c.argument('cpu', type=str, help='CPU resource quantity. Should be 500m or number of CPU cores.', validator=validate_cpu)
