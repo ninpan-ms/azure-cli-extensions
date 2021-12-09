@@ -44,8 +44,18 @@ def validate_location(namespace):
 
 def validate_sku(cmd, namespace):
     if namespace.sku.lower() == 'enterprise':
+        _validate_saas_provider(cmd, namespace)
         _validate_terms(cmd, namespace)
     namespace.sku = models.Sku(name=_get_sku_name(namespace.sku), tier=namespace.sku)
+
+
+def _validate_saas_provider(cmd, namespace):
+    from azure.cli.core.commands.client_factory import get_mgmt_service_client
+    from azure.cli.core.profiles import ResourceType
+    client = get_mgmt_service_client(cmd.cli_ctx, ResourceType.MGMT_RESOURCE_RESOURCES).providers
+    if client.get('Microsoft.SaaS').registration_state != 'Registered':
+        raise InvalidArgumentValueError('Microsoft.SaaS resource provider is not registered.\n'
+                                        'Run "az provider register -n Microsoft.SaaS" to register.')
 
 
 def _validate_terms(cmd, namespace):

@@ -280,25 +280,34 @@ class TestValidateIPRanges(unittest.TestCase):
         self.assertTrue('--vnet and Azure Spring Cloud instance should be in the same location.' in str(context.exception))
 
 
-def _mock_term_client(accepted):
+def _mock_term_client(accepted, registered):
     def _mock_get(offer_type, publisher_id, offer_id, plan_id):
         term = mock.MagicMock()
         term.accepted = accepted
         return term
+    def _mock_provider_get(namespace):
+        provider = mock.MagicMock()
+        provider.registration_state = 'Registered' if registered else 'NotRegistered'
+        return provider
     client = mock.MagicMock()
     client.marketplace_agreements = mock.MagicMock()
     client.marketplace_agreements.get = _mock_get
+    client.providers = mock.MagicMock()
+    client.providers.get = _mock_provider_get
     return client
 
-def _mock_accepted_term_client(cli_ctx, client_type, **kwargs):
-    return _mock_term_client(True)
+def _mock_happy_client(cli_ctx, client_type, **kwargs):
+    return _mock_term_client(True, True)
 
 def _mock_not_accepted_term_client(cli_ctx, client_type, **kwargs):
-    return _mock_term_client(False)
+    return _mock_term_client(False, True)
+
+def _mock_not_registered_client(cli_ctx, client_type, **kwargs):
+    return _mock_term_client(True, False)
 
 class TestSkuValidator(unittest.TestCase):
-    @mock.patch('azure.cli.core.commands.client_factory.get_mgmt_service_client', _mock_accepted_term_client)
-    def test_term_accept(self):
+    @mock.patch('azure.cli.core.commands.client_factory.get_mgmt_service_client', _mock_happy_client)
+    def test_happy_path(self):
         ns = Namespace(sku='Enterprise')
         validate_sku(_get_test_cmd(), ns)
         self.assertEqual('Enterprise', ns.sku.tier)
@@ -309,4 +318,11 @@ class TestSkuValidator(unittest.TestCase):
         with self.assertRaises(InvalidArgumentValueError) as context:
             validate_sku(_get_test_cmd(), ns)
         self.assertTrue('Terms for Azure Spring Cloud Enterprise is not accepted.' in str(context.exception))
+
+    @mock.patch('azure.cli.core.commands.client_factory.get_mgmt_service_client', _mock_not_registered_client)
+    def test_provider_not_registered(self):
+        ns = Namespace(sku='Enterprise')
+        with self.assertRaises(InvalidArgumentValueError) as context:
+            validate_sku(_get_test_cmd(), ns)
+        self.assertTrue('Microsoft.SaaS resource provider is not registered.' in str(context.exception))
 
