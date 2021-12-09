@@ -38,11 +38,10 @@ try:
     from ._models_py3 import BuildServiceAgentPoolProperties
     from ._models_py3 import BuildServiceAgentPoolResource
     from ._models_py3 import BuildServiceAgentPoolResourceCollection
-    from ._models_py3 import BuildServiceAgentPoolTierProperties
+    from ._models_py3 import BuildServiceAgentPoolSizeProperties
     from ._models_py3 import BuildServiceCollection
     from ._models_py3 import BuildServiceProperties
     from ._models_py3 import BuildServicePropertiesResourceRequests
-    from ._models_py3 import BuildServiceSupportedItem
     from ._models_py3 import BuildStageProperties
     from ._models_py3 import BuilderProperties
     from ._models_py3 import BuilderResource
@@ -159,9 +158,13 @@ try:
     from ._models_py3 import StorageProperties
     from ._models_py3 import StorageResource
     from ._models_py3 import StorageResourceCollection
-    from ._models_py3 import SupportedBuildpacksDefinition
+    from ._models_py3 import SupportedBuildpackResource
+    from ._models_py3 import SupportedBuildpackResourceProperties
+    from ._models_py3 import SupportedBuildpacksCollection
     from ._models_py3 import SupportedRuntimeVersion
-    from ._models_py3 import SupportedStacksDefinition
+    from ._models_py3 import SupportedStackResource
+    from ._models_py3 import SupportedStackResourceProperties
+    from ._models_py3 import SupportedStacksCollection
     from ._models_py3 import SystemData
     from ._models_py3 import TemporaryDisk
     from ._models_py3 import TestKeys
@@ -202,11 +205,10 @@ except (SyntaxError, ImportError):
     from ._models import BuildServiceAgentPoolProperties  # type: ignore
     from ._models import BuildServiceAgentPoolResource  # type: ignore
     from ._models import BuildServiceAgentPoolResourceCollection  # type: ignore
-    from ._models import BuildServiceAgentPoolTierProperties  # type: ignore
+    from ._models import BuildServiceAgentPoolSizeProperties  # type: ignore
     from ._models import BuildServiceCollection  # type: ignore
     from ._models import BuildServiceProperties  # type: ignore
     from ._models import BuildServicePropertiesResourceRequests  # type: ignore
-    from ._models import BuildServiceSupportedItem  # type: ignore
     from ._models import BuildStageProperties  # type: ignore
     from ._models import BuilderProperties  # type: ignore
     from ._models import BuilderResource  # type: ignore
@@ -323,9 +325,13 @@ except (SyntaxError, ImportError):
     from ._models import StorageProperties  # type: ignore
     from ._models import StorageResource  # type: ignore
     from ._models import StorageResourceCollection  # type: ignore
-    from ._models import SupportedBuildpacksDefinition  # type: ignore
+    from ._models import SupportedBuildpackResource  # type: ignore
+    from ._models import SupportedBuildpackResourceProperties  # type: ignore
+    from ._models import SupportedBuildpacksCollection  # type: ignore
     from ._models import SupportedRuntimeVersion  # type: ignore
-    from ._models import SupportedStacksDefinition  # type: ignore
+    from ._models import SupportedStackResource  # type: ignore
+    from ._models import SupportedStackResourceProperties  # type: ignore
+    from ._models import SupportedStacksCollection  # type: ignore
     from ._models import SystemData  # type: ignore
     from ._models import TemporaryDisk  # type: ignore
     from ._models import TestKeys  # type: ignore
@@ -398,11 +404,10 @@ __all__ = [
     'BuildServiceAgentPoolProperties',
     'BuildServiceAgentPoolResource',
     'BuildServiceAgentPoolResourceCollection',
-    'BuildServiceAgentPoolTierProperties',
+    'BuildServiceAgentPoolSizeProperties',
     'BuildServiceCollection',
     'BuildServiceProperties',
     'BuildServicePropertiesResourceRequests',
-    'BuildServiceSupportedItem',
     'BuildStageProperties',
     'BuilderProperties',
     'BuilderResource',
@@ -519,9 +524,13 @@ __all__ = [
     'StorageProperties',
     'StorageResource',
     'StorageResourceCollection',
-    'SupportedBuildpacksDefinition',
+    'SupportedBuildpackResource',
+    'SupportedBuildpackResourceProperties',
+    'SupportedBuildpacksCollection',
     'SupportedRuntimeVersion',
-    'SupportedStacksDefinition',
+    'SupportedStackResource',
+    'SupportedStackResourceProperties',
+    'SupportedStacksCollection',
     'SystemData',
     'TemporaryDisk',
     'TestKeys',

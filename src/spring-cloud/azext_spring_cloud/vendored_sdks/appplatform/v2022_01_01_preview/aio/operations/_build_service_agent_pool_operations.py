@@ -195,7 +195,7 @@ class BuildServiceAgentPoolOperations:
         service_name: str,
         build_service_name: str,
         agent_pool_name: str,
-        tier: "_models.BuildServiceAgentPoolTierProperties",
+        pool_size: "_models.BuildServiceAgentPoolSizeProperties",
         **kwargs: Any
     ) -> "_models.BuildServiceAgentPoolResource":
         cls = kwargs.pop('cls', None)  # type: ClsType["_models.BuildServiceAgentPoolResource"]
@@ -228,13 +228,13 @@ class BuildServiceAgentPoolOperations:
         header_parameters['Accept'] = self._serialize.header("accept", accept, 'str')
 
         body_content_kwargs = {}  # type: Dict[str, Any]
-        body_content = self._serialize.body(tier, 'BuildServiceAgentPoolTierProperties')
+        body_content = self._serialize.body(pool_size, 'BuildServiceAgentPoolSizeProperties')
         body_content_kwargs['content'] = body_content
         request = self._client.put(url, query_parameters, header_parameters, **body_content_kwargs)
         pipeline_response = await self._client._pipeline.run(request, stream=False, **kwargs)
         response = pipeline_response.http_response
 
-        if response.status_code not in [200, 201, 202]:
+        if response.status_code not in [200, 201]:
             map_error(status_code=response.status_code, response=response, error_map=error_map)
             raise HttpResponseError(response=response, error_format=ARMErrorFormat)
 
@@ -242,9 +242,6 @@ class BuildServiceAgentPoolOperations:
             deserialized = self._deserialize('BuildServiceAgentPoolResource', pipeline_response)
 
         if response.status_code == 201:
-            deserialized = self._deserialize('BuildServiceAgentPoolResource', pipeline_response)
-
-        if response.status_code == 202:
             deserialized = self._deserialize('BuildServiceAgentPoolResource', pipeline_response)
 
         if cls:
@@ -259,7 +256,7 @@ class BuildServiceAgentPoolOperations:
         service_name: str,
         build_service_name: str,
         agent_pool_name: str,
-        tier: "_models.BuildServiceAgentPoolTierProperties",
+        pool_size: "_models.BuildServiceAgentPoolSizeProperties",
         **kwargs: Any
     ) -> AsyncLROPoller["_models.BuildServiceAgentPoolResource"]:
         """Create or update build service agent pool.
@@ -273,8 +270,8 @@ class BuildServiceAgentPoolOperations:
         :type build_service_name: str
         :param agent_pool_name: The name of the build service agent pool resource.
         :type agent_pool_name: str
-        :param tier: Parameters for the update operation.
-        :type tier: ~azure.mgmt.appplatform.v2022_01_01_preview.models.BuildServiceAgentPoolTierProperties
+        :param pool_size: Parameters for the update operation.
+        :type pool_size: ~azure.mgmt.appplatform.v2022_01_01_preview.models.BuildServiceAgentPoolSizeProperties
         :keyword callable cls: A custom type or function that will be passed the direct response
         :keyword str continuation_token: A continuation token to restart a poller from a saved state.
         :keyword polling: By default, your polling method will be AsyncARMPolling.
@@ -298,7 +295,7 @@ class BuildServiceAgentPoolOperations:
                 service_name=service_name,
                 build_service_name=build_service_name,
                 agent_pool_name=agent_pool_name,
-                tier=tier,
+                pool_size=pool_size,
                 cls=lambda x,y,z: x,
                 **kwargs
             )
@@ -334,146 +331,3 @@ class BuildServiceAgentPoolOperations:
         else:
             return AsyncLROPoller(self._client, raw_result, get_long_running_output, polling_method)
     begin_update_put.metadata = {'url': '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AppPlatform/Spring/{serviceName}/buildServices/{buildServiceName}/agentPools/{agentPoolName}'}  # type: ignore
-
-    async def _update_patch_initial(
-        self,
-        resource_group_name: str,
-        service_name: str,
-        build_service_name: str,
-        agent_pool_name: str,
-        tier: "_models.BuildServiceAgentPoolTierProperties",
-        **kwargs: Any
-    ) -> "_models.BuildServiceAgentPoolResource":
-        cls = kwargs.pop('cls', None)  # type: ClsType["_models.BuildServiceAgentPoolResource"]
-        error_map = {
-            401: ClientAuthenticationError, 404: ResourceNotFoundError, 409: ResourceExistsError
-        }
-        error_map.update(kwargs.pop('error_map', {}))
-        api_version = "2022-01-01-preview"
-        content_type = kwargs.pop("content_type", "application/json")
-        accept = "application/json"
-
-        # Construct URL
-        url = self._update_patch_initial.metadata['url']  # type: ignore
-        path_format_arguments = {
-            'subscriptionId': self._serialize.url("self._config.subscription_id", self._config.subscription_id, 'str'),
-            'resourceGroupName': self._serialize.url("resource_group_name", resource_group_name, 'str'),
-            'serviceName': self._serialize.url("service_name", service_name, 'str'),
-            'buildServiceName': self._serialize.url("build_service_name", build_service_name, 'str'),
-            'agentPoolName': self._serialize.url("agent_pool_name", agent_pool_name, 'str'),
-        }
-        url = self._client.format_url(url, **path_format_arguments)
-
-        # Construct parameters
-        query_parameters = {}  # type: Dict[str, Any]
-        query_parameters['api-version'] = self._serialize.query("api_version", api_version, 'str')
-
-        # Construct headers
-        header_parameters = {}  # type: Dict[str, Any]
-        header_parameters['Content-Type'] = self._serialize.header("content_type", content_type, 'str')
-        header_parameters['Accept'] = self._serialize.header("accept", accept, 'str')
-
-        body_content_kwargs = {}  # type: Dict[str, Any]
-        body_content = self._serialize.body(tier, 'BuildServiceAgentPoolTierProperties')
-        body_content_kwargs['content'] = body_content
-        request = self._client.patch(url, query_parameters, header_parameters, **body_content_kwargs)
-        pipeline_response = await self._client._pipeline.run(request, stream=False, **kwargs)
-        response = pipeline_response.http_response
-
-        if response.status_code not in [200, 202]:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
-            raise HttpResponseError(response=response, error_format=ARMErrorFormat)
-
-        if response.status_code == 200:
-            deserialized = self._deserialize('BuildServiceAgentPoolResource', pipeline_response)
-
-        if response.status_code == 202:
-            deserialized = self._deserialize('BuildServiceAgentPoolResource', pipeline_response)
-
-        if cls:
-            return cls(pipeline_response, deserialized, {})
-
-        return deserialized
-    _update_patch_initial.metadata = {'url': '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AppPlatform/Spring/{serviceName}/buildServices/{buildServiceName}/agentPools/{agentPoolName}'}  # type: ignore
-
-    async def begin_update_patch(
-        self,
-        resource_group_name: str,
-        service_name: str,
-        build_service_name: str,
-        agent_pool_name: str,
-        tier: "_models.BuildServiceAgentPoolTierProperties",
-        **kwargs: Any
-    ) -> AsyncLROPoller["_models.BuildServiceAgentPoolResource"]:
-        """Update build service agent pool.
-
-        :param resource_group_name: The name of the resource group that contains the resource. You can
-         obtain this value from the Azure Resource Manager API or the portal.
-        :type resource_group_name: str
-        :param service_name: The name of the Service resource.
-        :type service_name: str
-        :param build_service_name: The name of the build service resource.
-        :type build_service_name: str
-        :param agent_pool_name: The name of the build service agent pool resource.
-        :type agent_pool_name: str
-        :param tier: Parameters for the update operation.
-        :type tier: ~azure.mgmt.appplatform.v2022_01_01_preview.models.BuildServiceAgentPoolTierProperties
-        :keyword callable cls: A custom type or function that will be passed the direct response
-        :keyword str continuation_token: A continuation token to restart a poller from a saved state.
-        :keyword polling: By default, your polling method will be AsyncARMPolling.
-         Pass in False for this operation to not poll, or pass in your own initialized polling object for a personal polling strategy.
-        :paramtype polling: bool or ~azure.core.polling.AsyncPollingMethod
-        :keyword int polling_interval: Default waiting time between two polls for LRO operations if no Retry-After header is present.
-        :return: An instance of AsyncLROPoller that returns either BuildServiceAgentPoolResource or the result of cls(response)
-        :rtype: ~azure.core.polling.AsyncLROPoller[~azure.mgmt.appplatform.v2022_01_01_preview.models.BuildServiceAgentPoolResource]
-        :raises ~azure.core.exceptions.HttpResponseError:
-        """
-        polling = kwargs.pop('polling', True)  # type: Union[bool, AsyncPollingMethod]
-        cls = kwargs.pop('cls', None)  # type: ClsType["_models.BuildServiceAgentPoolResource"]
-        lro_delay = kwargs.pop(
-            'polling_interval',
-            self._config.polling_interval
-        )
-        cont_token = kwargs.pop('continuation_token', None)  # type: Optional[str]
-        if cont_token is None:
-            raw_result = await self._update_patch_initial(
-                resource_group_name=resource_group_name,
-                service_name=service_name,
-                build_service_name=build_service_name,
-                agent_pool_name=agent_pool_name,
-                tier=tier,
-                cls=lambda x,y,z: x,
-                **kwargs
-            )
-
-        kwargs.pop('error_map', None)
-        kwargs.pop('content_type', None)
-
-        def get_long_running_output(pipeline_response):
-            deserialized = self._deserialize('BuildServiceAgentPoolResource', pipeline_response)
-
-            if cls:
-                return cls(pipeline_response, deserialized, {})
-            return deserialized
-
-        path_format_arguments = {
-            'subscriptionId': self._serialize.url("self._config.subscription_id", self._config.subscription_id, 'str'),
-            'resourceGroupName': self._serialize.url("resource_group_name", resource_group_name, 'str'),
-            'serviceName': self._serialize.url("service_name", service_name, 'str'),
-            'buildServiceName': self._serialize.url("build_service_name", build_service_name, 'str'),
-            'agentPoolName': self._serialize.url("agent_pool_name", agent_pool_name, 'str'),
-        }
-
-        if polling is True: polling_method = AsyncARMPolling(lro_delay, lro_options={'final-state-via': 'azure-async-operation'}, path_format_arguments=path_format_arguments,  **kwargs)
-        elif polling is False: polling_method = AsyncNoPolling()
-        else: polling_method = polling
-        if cont_token:
-            return AsyncLROPoller.from_continuation_token(
-                polling_method=polling_method,
-                continuation_token=cont_token,
-                client=self._client,
-                deserialization_callback=get_long_running_output
-            )
-        else:
-            return AsyncLROPoller(self._client, raw_result, get_long_running_output, polling_method)
-    begin_update_patch.metadata = {'url': '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AppPlatform/Spring/{serviceName}/buildServices/{buildServiceName}/agentPools/{agentPoolName}'}  # type: ignore

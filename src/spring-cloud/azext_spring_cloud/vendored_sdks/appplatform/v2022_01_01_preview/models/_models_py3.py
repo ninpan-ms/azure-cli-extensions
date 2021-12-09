@@ -17,22 +17,22 @@ from ._app_platform_management_client_enums import *
 class ActiveDeploymentCollection(msrest.serialization.Model):
     """Object that includes an array of Deployment resource name and set them as active.
 
-    :param active_deployments: Collection of Deployment name.
-    :type active_deployments: list[str]
+    :param active_deployment_names: Collection of Deployment name.
+    :type active_deployment_names: list[str]
     """
 
     _attribute_map = {
-        'active_deployments': {'key': 'activeDeployments', 'type': '[str]'},
+        'active_deployment_names': {'key': 'activeDeploymentNames', 'type': '[str]'},
     }
 
     def __init__(
         self,
         *,
-        active_deployments: Optional[List[str]] = None,
+        active_deployment_names: Optional[List[str]] = None,
         **kwargs
     ):
         super(ActiveDeploymentCollection, self).__init__(**kwargs)
-        self.active_deployments = active_deployments
+        self.active_deployment_names = active_deployment_names
 
 
 class ApiPortalCustomDomainProperties(msrest.serialization.Model):
@@ -1185,37 +1185,22 @@ class BuildpackBindingResourceCollection(msrest.serialization.Model):
 class BuildpackProperties(msrest.serialization.Model):
     """Buildpack properties payload.
 
-    Variables are only populated by the server, and will be ignored when sending a request.
-
     :param id: Id of the buildpack.
     :type id: str
-    :param version: Version of the buildpack.
-    :type version: str
-    :ivar optional: optional property of the buildpack.
-    :vartype optional: bool
     """
-
-    _validation = {
-        'optional': {'readonly': True},
-    }
 
     _attribute_map = {
         'id': {'key': 'id', 'type': 'str'},
-        'version': {'key': 'version', 'type': 'str'},
-        'optional': {'key': 'optional', 'type': 'bool'},
     }
 
     def __init__(
         self,
         *,
         id: Optional[str] = None,
-        version: Optional[str] = None,
         **kwargs
     ):
         super(BuildpackProperties, self).__init__(**kwargs)
         self.id = id
-        self.version = version
-        self.optional = None
 
 
 class BuildpacksGroupProperties(msrest.serialization.Model):
@@ -1556,9 +1541,9 @@ class BuildServiceAgentPoolProperties(msrest.serialization.Model):
 
     :ivar provisioning_state: Provisioning state of the build service agent pool.
     :vartype provisioning_state: str
-    :param tier: build service agent pool tier properties.
-    :type tier:
-     ~azure.mgmt.appplatform.v2022_01_01_preview.models.BuildServiceAgentPoolTierProperties
+    :param pool_size: build service agent pool size properties.
+    :type pool_size:
+     ~azure.mgmt.appplatform.v2022_01_01_preview.models.BuildServiceAgentPoolSizeProperties
     """
 
     _validation = {
@@ -1567,18 +1552,18 @@ class BuildServiceAgentPoolProperties(msrest.serialization.Model):
 
     _attribute_map = {
         'provisioning_state': {'key': 'provisioningState', 'type': 'str'},
-        'tier': {'key': 'tier', 'type': 'BuildServiceAgentPoolTierProperties'},
+        'pool_size': {'key': 'poolSize', 'type': 'BuildServiceAgentPoolSizeProperties'},
     }
 
     def __init__(
         self,
         *,
-        tier: Optional["BuildServiceAgentPoolTierProperties"] = None,
+        pool_size: Optional["BuildServiceAgentPoolSizeProperties"] = None,
         **kwargs
     ):
         super(BuildServiceAgentPoolProperties, self).__init__(**kwargs)
         self.provisioning_state = None
-        self.tier = tier
+        self.pool_size = pool_size
 
 
 class BuildServiceAgentPoolResource(ProxyResource):
@@ -1652,16 +1637,16 @@ class BuildServiceAgentPoolResourceCollection(msrest.serialization.Model):
         self.next_link = next_link
 
 
-class BuildServiceAgentPoolTierProperties(msrest.serialization.Model):
-    """Build service agent pool tier properties.
+class BuildServiceAgentPoolSizeProperties(msrest.serialization.Model):
+    """Build service agent pool size properties.
 
     Variables are only populated by the server, and will be ignored when sending a request.
 
-    :param name: The name of build service agent pool tier.
+    :param name: The name of build service agent pool size.
     :type name: str
-    :ivar cpu: The cpu property of build service agent pool tier.
+    :ivar cpu: The cpu property of build service agent pool size.
     :vartype cpu: str
-    :ivar memory: The memory property of build service agent pool tier.
+    :ivar memory: The memory property of build service agent pool size.
     :vartype memory: str
     """
 
@@ -1682,7 +1667,7 @@ class BuildServiceAgentPoolTierProperties(msrest.serialization.Model):
         name: Optional[str] = None,
         **kwargs
     ):
-        super(BuildServiceAgentPoolTierProperties, self).__init__(**kwargs)
+        super(BuildServiceAgentPoolSizeProperties, self).__init__(**kwargs)
         self.name = name
         self.cpu = None
         self.memory = None
@@ -1782,32 +1767,6 @@ class BuildServicePropertiesResourceRequests(msrest.serialization.Model):
         super(BuildServicePropertiesResourceRequests, self).__init__(**kwargs)
         self.cpu = None
         self.memory = None
-
-
-class BuildServiceSupportedItem(msrest.serialization.Model):
-    """The supported item in build service.
-
-    :param id: The id of this resource.
-    :type id: str
-    :param version: The version of this resource.
-    :type version: str
-    """
-
-    _attribute_map = {
-        'id': {'key': 'id', 'type': 'str'},
-        'version': {'key': 'version', 'type': 'str'},
-    }
-
-    def __init__(
-        self,
-        *,
-        id: Optional[str] = None,
-        version: Optional[str] = None,
-        **kwargs
-    ):
-        super(BuildServiceSupportedItem, self).__init__(**kwargs)
-        self.id = id
-        self.version = version
 
 
 class BuildStageProperties(msrest.serialization.Model):
@@ -5877,26 +5836,96 @@ class StorageResourceCollection(msrest.serialization.Model):
         self.next_link = next_link
 
 
-class SupportedBuildpacksDefinition(msrest.serialization.Model):
-    """Supported buildpacks definition payload.
+class SupportedBuildpackResource(ProxyResource):
+    """Supported buildpack resource payload.
 
-    :param buildpacks: A dictionary of all supported buildpacks.
-    :type buildpacks:
-     list[~azure.mgmt.appplatform.v2022_01_01_preview.models.BuildServiceSupportedItem]
+    Variables are only populated by the server, and will be ignored when sending a request.
+
+    :ivar id: Fully qualified resource Id for the resource.
+    :vartype id: str
+    :ivar name: The name of the resource.
+    :vartype name: str
+    :ivar type: The type of the resource.
+    :vartype type: str
+    :ivar system_data: Metadata pertaining to creation and last modification of the resource.
+    :vartype system_data: ~azure.mgmt.appplatform.v2022_01_01_preview.models.SystemData
+    :param properties: Supported buildpack resource properties.
+    :type properties:
+     ~azure.mgmt.appplatform.v2022_01_01_preview.models.SupportedBuildpackResourceProperties
     """
 
+    _validation = {
+        'id': {'readonly': True},
+        'name': {'readonly': True},
+        'type': {'readonly': True},
+        'system_data': {'readonly': True},
+    }
+
     _attribute_map = {
-        'buildpacks': {'key': 'buildpacks', 'type': '[BuildServiceSupportedItem]'},
+        'id': {'key': 'id', 'type': 'str'},
+        'name': {'key': 'name', 'type': 'str'},
+        'type': {'key': 'type', 'type': 'str'},
+        'system_data': {'key': 'systemData', 'type': 'SystemData'},
+        'properties': {'key': 'properties', 'type': 'SupportedBuildpackResourceProperties'},
     }
 
     def __init__(
         self,
         *,
-        buildpacks: Optional[List["BuildServiceSupportedItem"]] = None,
+        properties: Optional["SupportedBuildpackResourceProperties"] = None,
         **kwargs
     ):
-        super(SupportedBuildpacksDefinition, self).__init__(**kwargs)
-        self.buildpacks = buildpacks
+        super(SupportedBuildpackResource, self).__init__(**kwargs)
+        self.properties = properties
+
+
+class SupportedBuildpackResourceProperties(msrest.serialization.Model):
+    """Supported buildpack resource properties.
+
+    :param buildpack_id: The id of supported buildpack.
+    :type buildpack_id: str
+    """
+
+    _attribute_map = {
+        'buildpack_id': {'key': 'buildpackId', 'type': 'str'},
+    }
+
+    def __init__(
+        self,
+        *,
+        buildpack_id: Optional[str] = None,
+        **kwargs
+    ):
+        super(SupportedBuildpackResourceProperties, self).__init__(**kwargs)
+        self.buildpack_id = buildpack_id
+
+
+class SupportedBuildpacksCollection(msrest.serialization.Model):
+    """Object that includes an array of supported buildpacks resources and a possible link for next set.
+
+    :param value: Collection of supported buildpacks resources.
+    :type value:
+     list[~azure.mgmt.appplatform.v2022_01_01_preview.models.SupportedBuildpackResource]
+    :param next_link: URL client should use to fetch the next page (per server side paging).
+     It's null for now, added for future use.
+    :type next_link: str
+    """
+
+    _attribute_map = {
+        'value': {'key': 'value', 'type': '[SupportedBuildpackResource]'},
+        'next_link': {'key': 'nextLink', 'type': 'str'},
+    }
+
+    def __init__(
+        self,
+        *,
+        value: Optional[List["SupportedBuildpackResource"]] = None,
+        next_link: Optional[str] = None,
+        **kwargs
+    ):
+        super(SupportedBuildpacksCollection, self).__init__(**kwargs)
+        self.value = value
+        self.next_link = next_link
 
 
 class SupportedRuntimeVersion(msrest.serialization.Model):
@@ -5933,26 +5962,100 @@ class SupportedRuntimeVersion(msrest.serialization.Model):
         self.version = version
 
 
-class SupportedStacksDefinition(msrest.serialization.Model):
-    """Supported stacks definition payload.
+class SupportedStackResource(ProxyResource):
+    """Supported stack resource payload.
 
-    :param stacks: A dictionary of all supported stacks.
-    :type stacks:
-     list[~azure.mgmt.appplatform.v2022_01_01_preview.models.BuildServiceSupportedItem]
+    Variables are only populated by the server, and will be ignored when sending a request.
+
+    :ivar id: Fully qualified resource Id for the resource.
+    :vartype id: str
+    :ivar name: The name of the resource.
+    :vartype name: str
+    :ivar type: The type of the resource.
+    :vartype type: str
+    :ivar system_data: Metadata pertaining to creation and last modification of the resource.
+    :vartype system_data: ~azure.mgmt.appplatform.v2022_01_01_preview.models.SystemData
+    :param properties: Supported stack resource properties.
+    :type properties:
+     ~azure.mgmt.appplatform.v2022_01_01_preview.models.SupportedStackResourceProperties
     """
 
+    _validation = {
+        'id': {'readonly': True},
+        'name': {'readonly': True},
+        'type': {'readonly': True},
+        'system_data': {'readonly': True},
+    }
+
     _attribute_map = {
-        'stacks': {'key': 'stacks', 'type': '[BuildServiceSupportedItem]'},
+        'id': {'key': 'id', 'type': 'str'},
+        'name': {'key': 'name', 'type': 'str'},
+        'type': {'key': 'type', 'type': 'str'},
+        'system_data': {'key': 'systemData', 'type': 'SystemData'},
+        'properties': {'key': 'properties', 'type': 'SupportedStackResourceProperties'},
     }
 
     def __init__(
         self,
         *,
-        stacks: Optional[List["BuildServiceSupportedItem"]] = None,
+        properties: Optional["SupportedStackResourceProperties"] = None,
         **kwargs
     ):
-        super(SupportedStacksDefinition, self).__init__(**kwargs)
-        self.stacks = stacks
+        super(SupportedStackResource, self).__init__(**kwargs)
+        self.properties = properties
+
+
+class SupportedStackResourceProperties(msrest.serialization.Model):
+    """Supported stack resource properties.
+
+    :param stack_id: The id of supported stack.
+    :type stack_id: str
+    :param version: The version of supported stack.
+    :type version: str
+    """
+
+    _attribute_map = {
+        'stack_id': {'key': 'stackId', 'type': 'str'},
+        'version': {'key': 'version', 'type': 'str'},
+    }
+
+    def __init__(
+        self,
+        *,
+        stack_id: Optional[str] = None,
+        version: Optional[str] = None,
+        **kwargs
+    ):
+        super(SupportedStackResourceProperties, self).__init__(**kwargs)
+        self.stack_id = stack_id
+        self.version = version
+
+
+class SupportedStacksCollection(msrest.serialization.Model):
+    """Object that includes an array of supported stacks resources and a possible link for next set.
+
+    :param value: Collection of supported stacks resources.
+    :type value: list[~azure.mgmt.appplatform.v2022_01_01_preview.models.SupportedStackResource]
+    :param next_link: URL client should use to fetch the next page (per server side paging).
+     It's null for now, added for future use.
+    :type next_link: str
+    """
+
+    _attribute_map = {
+        'value': {'key': 'value', 'type': '[SupportedStackResource]'},
+        'next_link': {'key': 'nextLink', 'type': 'str'},
+    }
+
+    def __init__(
+        self,
+        *,
+        value: Optional[List["SupportedStackResource"]] = None,
+        next_link: Optional[str] = None,
+        **kwargs
+    ):
+        super(SupportedStacksCollection, self).__init__(**kwargs)
+        self.value = value
+        self.next_link = next_link
 
 
 class SystemData(msrest.serialization.Model):

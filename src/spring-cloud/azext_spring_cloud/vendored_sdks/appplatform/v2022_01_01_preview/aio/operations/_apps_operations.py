@@ -640,7 +640,7 @@ class AppsOperations:
         return deserialized
     get_resource_upload_url.metadata = {'url': '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AppPlatform/Spring/{serviceName}/apps/{appName}/getResourceUploadUrl'}  # type: ignore
 
-    async def set_active_deployment(
+    async def _set_active_deployments_initial(
         self,
         resource_group_name: str,
         service_name: str,
@@ -648,22 +648,6 @@ class AppsOperations:
         active_deployment_collection: "_models.ActiveDeploymentCollection",
         **kwargs: Any
     ) -> "_models.ActiveDeploymentCollection":
-        """Set existing Deployment under the app as active.
-
-        :param resource_group_name: The name of the resource group that contains the resource. You can
-         obtain this value from the Azure Resource Manager API or the portal.
-        :type resource_group_name: str
-        :param service_name: The name of the Service resource.
-        :type service_name: str
-        :param app_name: The name of the App resource.
-        :type app_name: str
-        :param active_deployment_collection: A list of Deployment name to be active.
-        :type active_deployment_collection: ~azure.mgmt.appplatform.v2022_01_01_preview.models.ActiveDeploymentCollection
-        :keyword callable cls: A custom type or function that will be passed the direct response
-        :return: ActiveDeploymentCollection, or the result of cls(response)
-        :rtype: ~azure.mgmt.appplatform.v2022_01_01_preview.models.ActiveDeploymentCollection
-        :raises: ~azure.core.exceptions.HttpResponseError
-        """
         cls = kwargs.pop('cls', None)  # type: ClsType["_models.ActiveDeploymentCollection"]
         error_map = {
             401: ClientAuthenticationError, 404: ResourceNotFoundError, 409: ResourceExistsError
@@ -674,7 +658,7 @@ class AppsOperations:
         accept = "application/json"
 
         # Construct URL
-        url = self.set_active_deployment.metadata['url']  # type: ignore
+        url = self._set_active_deployments_initial.metadata['url']  # type: ignore
         path_format_arguments = {
             'subscriptionId': self._serialize.url("self._config.subscription_id", self._config.subscription_id, 'str'),
             'resourceGroupName': self._serialize.url("resource_group_name", resource_group_name, 'str'),
@@ -699,17 +683,98 @@ class AppsOperations:
         pipeline_response = await self._client._pipeline.run(request, stream=False, **kwargs)
         response = pipeline_response.http_response
 
-        if response.status_code not in [200]:
+        if response.status_code not in [200, 202]:
             map_error(status_code=response.status_code, response=response, error_map=error_map)
             raise HttpResponseError(response=response, error_format=ARMErrorFormat)
 
-        deserialized = self._deserialize('ActiveDeploymentCollection', pipeline_response)
+        if response.status_code == 200:
+            deserialized = self._deserialize('ActiveDeploymentCollection', pipeline_response)
+
+        if response.status_code == 202:
+            deserialized = self._deserialize('ActiveDeploymentCollection', pipeline_response)
 
         if cls:
             return cls(pipeline_response, deserialized, {})
 
         return deserialized
-    set_active_deployment.metadata = {'url': '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AppPlatform/Spring/{serviceName}/apps/{appName}/setActiveDeployment'}  # type: ignore
+    _set_active_deployments_initial.metadata = {'url': '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AppPlatform/Spring/{serviceName}/apps/{appName}/setActiveDeployments'}  # type: ignore
+
+    async def begin_set_active_deployments(
+        self,
+        resource_group_name: str,
+        service_name: str,
+        app_name: str,
+        active_deployment_collection: "_models.ActiveDeploymentCollection",
+        **kwargs: Any
+    ) -> AsyncLROPoller["_models.ActiveDeploymentCollection"]:
+        """Set existing Deployment under the app as active.
+
+        :param resource_group_name: The name of the resource group that contains the resource. You can
+         obtain this value from the Azure Resource Manager API or the portal.
+        :type resource_group_name: str
+        :param service_name: The name of the Service resource.
+        :type service_name: str
+        :param app_name: The name of the App resource.
+        :type app_name: str
+        :param active_deployment_collection: A list of Deployment name to be active.
+        :type active_deployment_collection: ~azure.mgmt.appplatform.v2022_01_01_preview.models.ActiveDeploymentCollection
+        :keyword callable cls: A custom type or function that will be passed the direct response
+        :keyword str continuation_token: A continuation token to restart a poller from a saved state.
+        :keyword polling: By default, your polling method will be AsyncARMPolling.
+         Pass in False for this operation to not poll, or pass in your own initialized polling object for a personal polling strategy.
+        :paramtype polling: bool or ~azure.core.polling.AsyncPollingMethod
+        :keyword int polling_interval: Default waiting time between two polls for LRO operations if no Retry-After header is present.
+        :return: An instance of AsyncLROPoller that returns either ActiveDeploymentCollection or the result of cls(response)
+        :rtype: ~azure.core.polling.AsyncLROPoller[~azure.mgmt.appplatform.v2022_01_01_preview.models.ActiveDeploymentCollection]
+        :raises ~azure.core.exceptions.HttpResponseError:
+        """
+        polling = kwargs.pop('polling', True)  # type: Union[bool, AsyncPollingMethod]
+        cls = kwargs.pop('cls', None)  # type: ClsType["_models.ActiveDeploymentCollection"]
+        lro_delay = kwargs.pop(
+            'polling_interval',
+            self._config.polling_interval
+        )
+        cont_token = kwargs.pop('continuation_token', None)  # type: Optional[str]
+        if cont_token is None:
+            raw_result = await self._set_active_deployments_initial(
+                resource_group_name=resource_group_name,
+                service_name=service_name,
+                app_name=app_name,
+                active_deployment_collection=active_deployment_collection,
+                cls=lambda x,y,z: x,
+                **kwargs
+            )
+
+        kwargs.pop('error_map', None)
+        kwargs.pop('content_type', None)
+
+        def get_long_running_output(pipeline_response):
+            deserialized = self._deserialize('ActiveDeploymentCollection', pipeline_response)
+
+            if cls:
+                return cls(pipeline_response, deserialized, {})
+            return deserialized
+
+        path_format_arguments = {
+            'subscriptionId': self._serialize.url("self._config.subscription_id", self._config.subscription_id, 'str'),
+            'resourceGroupName': self._serialize.url("resource_group_name", resource_group_name, 'str'),
+            'serviceName': self._serialize.url("service_name", service_name, 'str'),
+            'appName': self._serialize.url("app_name", app_name, 'str'),
+        }
+
+        if polling is True: polling_method = AsyncARMPolling(lro_delay, lro_options={'final-state-via': 'azure-async-operation'}, path_format_arguments=path_format_arguments,  **kwargs)
+        elif polling is False: polling_method = AsyncNoPolling()
+        else: polling_method = polling
+        if cont_token:
+            return AsyncLROPoller.from_continuation_token(
+                polling_method=polling_method,
+                continuation_token=cont_token,
+                client=self._client,
+                deserialization_callback=get_long_running_output
+            )
+        else:
+            return AsyncLROPoller(self._client, raw_result, get_long_running_output, polling_method)
+    begin_set_active_deployments.metadata = {'url': '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AppPlatform/Spring/{serviceName}/apps/{appName}/setActiveDeployments'}  # type: ignore
 
     async def validate_domain(
         self,
