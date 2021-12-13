@@ -6,26 +6,29 @@
 # pylint: disable=unused-argument, logging-format-interpolation, protected-access, wrong-import-order, too-many-lines
 import json
 
-from ._enterprise import app_get_enterprise
-from ._util_enterprise import (is_enterprise_tier, get_client)
 from .vendored_sdks.appplatform.v2022_01_01_preview import models as models
-from azure.cli.core.commands import cached_put
+from azure.cli.core.commands.client_factory import get_subscription_id
 from azure.cli.core.util import sdk_no_wait
 from knack.log import get_logger
 from knack.util import CLIError
+from msrestazure.tools import resource_id
 
-APPLICATION_CONFIGURATION_SERVICE_NAME = "ApplicationConfigurationService"
+APPLICATION_CONFIGURATION_SERVICE_NAME = "applicationConfigurationService"
+RESOURCE_ID = "resourceId"
+
+RESOURCE_TYPE = "configurationServices"
+DEFAULT_NAME = "default"
 
 logger = get_logger(__name__)
 
 def application_configuration_service_show(cmd, client, service, resource_group):
-    return client.configuration_services.get(resource_group, service)
+    return client.configuration_services.get(resource_group, service, DEFAULT_NAME)
 
 
 def application_configuration_service_clear(cmd, client, service, resource_group):
     properties = models.ConfigurationServiceGitProperty()
     acs_resource = models.ConfigurationServiceResource(properties=properties)
-    return client.configuration_services.begin_create_or_update(resource_group, service, acs_resource)
+    return client.configuration_services.begin_create_or_update(resource_group, service, DEFAULT_NAME, acs_resource)
 
 
 def application_configuration_service_git_add(cmd, client, service, resource_group,
@@ -51,7 +54,7 @@ def application_configuration_service_git_add(cmd, client, service, resource_gro
     _validate_acs_settings(client, resource_group, service, acs_resource.properties.settings)
 
     logger.warning("[2/2] Adding item to Application Configuration Service settings, (this operation can take a while to complete)")
-    return sdk_no_wait(no_wait, client.configuration_services.begin_create_or_update, resource_group, service, acs_resource)
+    return sdk_no_wait(no_wait, client.configuration_services.begin_create_or_update, resource_group, service, DEFAULT_NAME, acs_resource)
 
 
 def application_configuration_service_git_update(cmd, client, service, resource_group, name,
@@ -67,18 +70,17 @@ def application_configuration_service_git_update(cmd, client, service, resource_
                                                  strict_host_key_checking=None,
                                                  no_wait=False):
     acs_resource = _get_or_default_acs_resource(client, resource_group, service)
-
     repo = _get_existing_repo(acs_resource.properties.settings.git_property.repositories, name)
     repo = _replace_repo_with_input(repo, patterns, uri, label, search_paths, username, password, host_key, host_key_algorithm, private_key, strict_host_key_checking)
 
     _validate_acs_settings(client, resource_group, service, acs_resource.properties.settings)
 
     logger.warning("[2/2] Updating item of Application Configuration Service settings, (this operation can take a while to complete)")
-    return sdk_no_wait(no_wait, client.configuration_services.begin_create_or_update, resource_group, service, acs_resource)
+    return sdk_no_wait(no_wait, client.configuration_services.begin_create_or_update, resource_group, service, DEFAULT_NAME, acs_resource)
 
 
 def application_configuration_service_git_remove(cmd, client, service, resource_group, name, no_wait=False):
-    acs_resource = _get_or_default_acs_resource(acs_resource)
+    acs_resource = _get_or_default_acs_resource(client, resource_group, service)
 
     repo = _get_existing_repo(acs_resource.properties.settings.git_property.repositories, name)
     acs_resource.properties.settings.git_property.repositories.remove(repo)
@@ -86,11 +88,11 @@ def application_configuration_service_git_remove(cmd, client, service, resource_
     _validate_acs_settings(client, resource_group, service, acs_resource.properties.settings)
 
     logger.warning("[2/2] Removing item of Application Configuration Service settings, (this operation can take a while to complete)")
-    return sdk_no_wait(no_wait, client.configuration_services.begin_create_or_update, resource_group, service, acs_resource)
+    return sdk_no_wait(no_wait, client.configuration_services.begin_create_or_update, resource_group, service, DEFAULT_NAME, acs_resource)
 
 
 def application_configuration_service_git_list(cmd, client, service, resource_group):
-    acs_resource = client.configuration_services.get(resource_group, service)
+    acs_resource = client.configuration_services.get(resource_group, service, DEFAULT_NAME)
     acs_settings = acs_resource.properties.settings
 
     if not acs_settings or not acs_settings.git_property or not acs_settings.git_property.repositories:
@@ -111,11 +113,23 @@ def _acs_bind_or_unbind_app(cmd, client, service, resource_group, app_name, enab
     app = client.apps.get(resource_group, service, app_name)
     app.properties.addon_configs = _get_app_addon_configs_with_acs(app.properties.addon_configs)
 
-    if app.properties.addon_configs[APPLICATION_CONFIGURATION_SERVICE_NAME].enabled == enabled:
+    if (app.properties.addon_configs[APPLICATION_CONFIGURATION_SERVICE_NAME][RESOURCE_ID] != "") == enabled:
         logger.warning('App "{}" has been {}binded'.format(app_name, '' if enabled else 'un'))
         return
 
-    app.properties.addon_configs[APPLICATION_CONFIGURATION_SERVICE_NAME].enabled = enabled
+    acs_id = resource_id(
+        subscription=get_subscription_id(cmd.cli_ctx),
+        resource_group=resource_group,
+        namespace='Microsoft.AppPlatform',
+        type='Spring',
+        name=service,
+        child_type_1=RESOURCE_TYPE,
+        child_name_1=DEFAULT_NAME
+    )
+    if enabled:
+        app.properties.addon_configs[APPLICATION_CONFIGURATION_SERVICE_NAME][RESOURCE_ID] = acs_id
+    else:
+        app.properties.addon_configs[APPLICATION_CONFIGURATION_SERVICE_NAME][RESOURCE_ID] = ""
     return client.apps.begin_update(resource_group, service, app_name, app)
 
 
@@ -123,7 +137,9 @@ def _get_app_addon_configs_with_acs(addon_configs):
     if addon_configs is None:
         addon_configs = {}
     if addon_configs.get(APPLICATION_CONFIGURATION_SERVICE_NAME) is None:
-        addon_configs[APPLICATION_CONFIGURATION_SERVICE_NAME] = models.AddonProfile()
+        addon_configs[APPLICATION_CONFIGURATION_SERVICE_NAME] = {}
+    if addon_configs[APPLICATION_CONFIGURATION_SERVICE_NAME].get(RESOURCE_ID) is None:
+        addon_configs[APPLICATION_CONFIGURATION_SERVICE_NAME][RESOURCE_ID] = ""
     return addon_configs
 
 
@@ -154,7 +170,7 @@ def _get_existing_repo(repos, name):
 
 
 def _get_or_default_acs_resource(client, resource_group, service):
-    acs_resource = client.configuration_services.get(resource_group, service)
+    acs_resource = client.configuration_services.get(resource_group, service, DEFAULT_NAME)
     if acs_resource is None:
         acs_resource = models.ConfigurationServiceResource()
     acs_resource.properties = _get_acs_properties(acs_resource.properties)
@@ -193,7 +209,7 @@ def _validate_acs_settings(client, resource_group, service, acs_settings):
         return
 
     try:
-        result = sdk_no_wait(False, client.configuration_services.begin_validate, resource_group, service, acs_settings).result()
+        result = sdk_no_wait(False, client.configuration_services.begin_validate, resource_group, service, DEFAULT_NAME, acs_settings).result()
     except Exception as err:  # pylint: disable=broad-except
         raise CLIError("{0}. You may raise a support ticket if needed by the following link: https://docs.microsoft.com/azure/spring-cloud/spring-cloud-faq?pivots=programming-language-java#how-can-i-provide-feedback-and-report-issues".format(err))
 

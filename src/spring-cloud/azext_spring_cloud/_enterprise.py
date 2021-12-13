@@ -295,13 +295,11 @@ def _request_upload_url(client,  resource_group, service, name):
 
 
 def _get_addon_configs(config_file_patterns):
-    patterns = models.AddonProfile(
-        properties = {
+    addon_configs = {
+        APPLICATION_CONFIGURATION_SERVICE_NAME: {
             APPLICATION_CONFIGURATION_SERVICE_PROPERTY_PATTERN: config_file_patterns
         }
-    )
-    addon_configs = {}
-    addon_configs[APPLICATION_CONFIGURATION_SERVICE_NAME] = patterns
+    }
     return addon_configs
 
 

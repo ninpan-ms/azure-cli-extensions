@@ -4,20 +4,21 @@
 # --------------------------------------------------------------------------------------------
 
 # pylint: disable=unused-argument, logging-format-interpolation, protected-access, wrong-import-order, too-many-lines
-from ._enterprise import app_get_enterprise
-from ._util_enterprise import (is_enterprise_tier, get_client)
 from .vendored_sdks.appplatform.v2022_01_01_preview import models as models
-from azure.cli.core.commands import cached_put
-from azure.cli.core.util import sdk_no_wait
+from azure.cli.core.commands.client_factory import get_subscription_id
 from knack.log import get_logger
-from knack.util import CLIError
+from msrestazure.tools import resource_id
 
-SERVICE_REGISTRY_NAME = "ServiceRegistry"
+SERVICE_REGISTRY_NAME = "serviceRegistry"
+RESOURCE_ID = "resourceId"
+
+RESOURCE_TYPE = "serviceRegistries"
+DEFAULT_NAME = "default"
 
 logger = get_logger(__name__)
 
 def service_registry_show(cmd, client, service, resource_group):
-    return client.service_registries.get(resource_group, service)
+    return client.service_registries.get(resource_group, service, DEFAULT_NAME)
 
 
 def service_registry_bind(cmd, client, service, resource_group, app):
@@ -30,13 +31,34 @@ def service_registry_unbind(cmd, client, service, resource_group, app):
 
 def _service_registry_bind_or_unbind_app(cmd, client, service, resource_group, app_name, enabled):
     app = client.apps.get(resource_group, service, app_name)
-    app.properties.addon_configs = {
-        SERVICE_REGISTRY_NAME: models.AddonProfile()
-    } if app.properties.addon_configs is None else app.properties.addon_configs
+    app.properties.addon_configs = _get_app_addon_configs_with_service_registry(app.properties.addon_configs)
 
-    if app.properties.addon_configs[SERVICE_REGISTRY_NAME].enabled == enabled:
+    if (app.properties.addon_configs[SERVICE_REGISTRY_NAME][RESOURCE_ID] != "") == enabled:
         logger.warning('App "{}" has been {}binded'.format(app_name, '' if enabled else 'un'))
         return
 
-    app.properties.addon_configs[SERVICE_REGISTRY_NAME].enabled = enabled
+    service_registry_id = resource_id(
+        subscription=get_subscription_id(cmd.cli_ctx),
+        resource_group=resource_group,
+        namespace='Microsoft.AppPlatform',
+        type='Spring',
+        name=service,
+        child_type_1=RESOURCE_TYPE,
+        child_name_1=DEFAULT_NAME
+    )
+
+    if enabled:
+        app.properties.addon_configs[SERVICE_REGISTRY_NAME][RESOURCE_ID] = service_registry_id
+    else:
+        app.properties.addon_configs[SERVICE_REGISTRY_NAME][RESOURCE_ID] = ""
     return client.apps.begin_update(resource_group, service, app_name, app)
+
+
+def _get_app_addon_configs_with_service_registry(addon_configs):
+    if addon_configs is None:
+        addon_configs = {}
+    if addon_configs.get(SERVICE_REGISTRY_NAME) is None:
+        addon_configs[SERVICE_REGISTRY_NAME] = {}
+    if addon_configs[SERVICE_REGISTRY_NAME].get(RESOURCE_ID) is None:
+        addon_configs[SERVICE_REGISTRY_NAME][RESOURCE_ID] = ""
+    return addon_configs

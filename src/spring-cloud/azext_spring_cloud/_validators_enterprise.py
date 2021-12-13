@@ -41,9 +41,8 @@ def validate_memory(namespace):
 
 def validate_git_uri(namespace):
     uri = namespace.uri
-    if uri and (uri.startswith("https://") or uri.startswith("git@")):
-        return
-    raise CLIError("Git URI should start with \"https://\" or \"git@\"")
+    if uri and (not uri.startswith("https://")) and (not uri.startswith("git@")):
+        raise CLIError("Git URI should start with \"https://\" or \"git@\"")
 
 
 def validate_config_file_patterns(namespace):
@@ -52,7 +51,8 @@ def validate_config_file_patterns(namespace):
 
 
 def validate_acs_patterns(namespace):
-    _validate_patterns(namespace.patterns)
+    if namespace.patterns:
+        _validate_patterns(namespace.patterns)
 
 
 def _validate_patterns(patterns):
