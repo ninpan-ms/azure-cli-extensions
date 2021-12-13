@@ -647,8 +647,8 @@ class AppsOperations:
         app_name: str,
         active_deployment_collection: "_models.ActiveDeploymentCollection",
         **kwargs: Any
-    ) -> "_models.ActiveDeploymentCollection":
-        cls = kwargs.pop('cls', None)  # type: ClsType["_models.ActiveDeploymentCollection"]
+    ) -> "_models.AppResource":
+        cls = kwargs.pop('cls', None)  # type: ClsType["_models.AppResource"]
         error_map = {
             401: ClientAuthenticationError, 404: ResourceNotFoundError, 409: ResourceExistsError
         }
@@ -688,10 +688,10 @@ class AppsOperations:
             raise HttpResponseError(response=response, error_format=ARMErrorFormat)
 
         if response.status_code == 200:
-            deserialized = self._deserialize('ActiveDeploymentCollection', pipeline_response)
+            deserialized = self._deserialize('AppResource', pipeline_response)
 
         if response.status_code == 202:
-            deserialized = self._deserialize('ActiveDeploymentCollection', pipeline_response)
+            deserialized = self._deserialize('AppResource', pipeline_response)
 
         if cls:
             return cls(pipeline_response, deserialized, {})
@@ -706,7 +706,7 @@ class AppsOperations:
         app_name: str,
         active_deployment_collection: "_models.ActiveDeploymentCollection",
         **kwargs: Any
-    ) -> AsyncLROPoller["_models.ActiveDeploymentCollection"]:
+    ) -> AsyncLROPoller["_models.AppResource"]:
         """Set existing Deployment under the app as active.
 
         :param resource_group_name: The name of the resource group that contains the resource. You can
@@ -724,12 +724,12 @@ class AppsOperations:
          Pass in False for this operation to not poll, or pass in your own initialized polling object for a personal polling strategy.
         :paramtype polling: bool or ~azure.core.polling.AsyncPollingMethod
         :keyword int polling_interval: Default waiting time between two polls for LRO operations if no Retry-After header is present.
-        :return: An instance of AsyncLROPoller that returns either ActiveDeploymentCollection or the result of cls(response)
-        :rtype: ~azure.core.polling.AsyncLROPoller[~azure.mgmt.appplatform.v2022_01_01_preview.models.ActiveDeploymentCollection]
+        :return: An instance of AsyncLROPoller that returns either AppResource or the result of cls(response)
+        :rtype: ~azure.core.polling.AsyncLROPoller[~azure.mgmt.appplatform.v2022_01_01_preview.models.AppResource]
         :raises ~azure.core.exceptions.HttpResponseError:
         """
         polling = kwargs.pop('polling', True)  # type: Union[bool, AsyncPollingMethod]
-        cls = kwargs.pop('cls', None)  # type: ClsType["_models.ActiveDeploymentCollection"]
+        cls = kwargs.pop('cls', None)  # type: ClsType["_models.AppResource"]
         lro_delay = kwargs.pop(
             'polling_interval',
             self._config.polling_interval
@@ -749,7 +749,7 @@ class AppsOperations:
         kwargs.pop('content_type', None)
 
         def get_long_running_output(pipeline_response):
-            deserialized = self._deserialize('ActiveDeploymentCollection', pipeline_response)
+            deserialized = self._deserialize('AppResource', pipeline_response)
 
             if cls:
                 return cls(pipeline_response, deserialized, {})
