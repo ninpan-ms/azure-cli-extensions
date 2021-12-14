@@ -32,7 +32,13 @@ DEFAULT_BUILD_SERVICE_NAME = "default"
 
 
 def app_create_enterprise(cmd, client, resource_group, service, name, 
-                          assign_endpoint, cpu, memory, instance_count, jvm_options, env, assign_identity):
+                          assign_endpoint=None, 
+                          cpu=None, 
+                          memory=None, 
+                          instance_count=None, 
+                          jvm_options=None, 
+                          env=None, 
+                          assign_identity=None):
     '''app_create_enterprise
     Create app with an active deployment, deployment should be deployed with default banner
     1. Create app
@@ -61,11 +67,11 @@ def app_create_enterprise(cmd, client, resource_group, service, name,
 
 
 def app_update_enterprise(cmd, client, resource_group, service, name,
-                         assign_endpoint,
-                         deployment,
-                         jvm_options,
-                         env,
-                         config_file_patterns):
+                         assign_endpoint=None,
+                         deployment=None,
+                         jvm_options=None,
+                         env=None,
+                         config_file_patterns=None):
     '''app_update_enterprise
     1. update app properties (make sure some properties requires active deployment exist)
     2. update deployment properties
@@ -91,8 +97,15 @@ def app_update_enterprise(cmd, client, resource_group, service, name,
 
 
 def app_deploy_enterprise(cmd, client, resource_group, service, name,
-                          version, deployment, artifact_path, builder, target_module, jvm_options,
-                          env, config_file_patterns, no_wait):
+                          version=None, 
+                          deployment=None, 
+                          artifact_path=None, 
+                          builder=None,
+                          target_module=None,
+                          jvm_options=None,
+                          env=None,
+                          config_file_patterns=None,
+                          no_wait=None):
     '''app_deploy_enterprise
     Deploy artifact to deployment under the existing app.
     Update active deployment's pattern if --config-profile-patterns are provided.

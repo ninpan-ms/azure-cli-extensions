@@ -26,20 +26,38 @@ def app_create(cmd, client, resource_group, service, name,
                cpu=None,
                memory=None,
                instance_count=None,
+               disable_probe=None,
                runtime_version=None,
                jvm_options=None,
                env=None,
                enable_persistent_storage=None,
-               assign_identity=None):
+               assign_identity=None,
+               persistent_storage=None,
+               loaded_public_certificate_file=None):
     if is_enterprise_tier(cmd, resource_group, service):
         # runtime_version, enable_persistent_storage not support
-        return app_create_enterprise(cmd, get_client(cmd), resource_group, service, name,
-                                     assign_endpoint, cpu, memory, instance_count, jvm_options, 
-                                     env, assign_identity)
+        return app_create_enterprise(cmd, get_client(cmd), resource_group, service, name, 
+                                     assign_endpoint=assign_endpoint, 
+                                     cpu=cpu, 
+                                     memory=memory, 
+                                     instance_count=instance_count, 
+                                     jvm_options=jvm_options, 
+                                     env=env, 
+                                     assign_identity=assign_identity)
     else:
         return app_create_standard(cmd, client, resource_group, service, name,
-                                   assign_endpoint, cpu, memory, instance_count, runtime_version, 
-                                   jvm_options, env, enable_persistent_storage, assign_identity)
+                                   assign_endpoint=assign_endpoint,
+                                   cpu=cpu,
+                                   memory=memory,
+                                   instance_count=instance_count,
+                                   disable_probe=disable_probe,
+                                   runtime_version=runtime_version,
+                                   jvm_options=jvm_options,
+                                   env=env,
+                                   enable_persistent_storage=enable_persistent_storage,
+                                   assign_identity=assign_identity,
+                                   persistent_storage=persistent_storage,
+                                   loaded_public_certificate_file=loaded_public_certificate_file)
 
 
 def app_update(cmd, client, resource_group, service, name,
@@ -50,18 +68,34 @@ def app_update(cmd, client, resource_group, service, name,
                main_entry=None,
                env=None,
                config_file_patterns=None,
+               disable_probe=None,
                enable_persistent_storage=None,
                https_only=None,
-               enable_end_to_end_tls=None):
+               enable_end_to_end_tls=None,
+               persistent_storage=None,
+               loaded_public_certificate_file=None):
     if is_enterprise_tier(cmd, resource_group, service):
         # runtime_version, enable_persistent_storage, main_entry, https_only, enable_end_to_end_tls not support
         return app_update_enterprise(cmd, get_client(cmd), resource_group, service, name,
-                                     assign_endpoint, deployment, jvm_options, env, config_file_patterns)
+                                     assign_endpoint=assign_endpoint,
+                                     deployment=deployment,
+                                     jvm_options=jvm_options,
+                                     env=env,
+                                     config_file_patterns=config_file_patterns)
     else:
         return app_update_standard(cmd, client, resource_group, service, name,
-                                   assign_endpoint, deployment, runtime_version, jvm_options,
-                                   main_entry, env, enable_persistent_storage,
-                                   https_only, enable_end_to_end_tls)
+                                   assign_endpoint=assign_endpoint,
+                                   deployment=deployment,
+                                   runtime_version=runtime_version,
+                                   jvm_options=jvm_options,
+                                   main_entry=main_entry,
+                                   env=env,
+                                   disable_probe=disable_probe,
+                                   enable_persistent_storage=enable_persistent_storage,
+                                   https_only=https_only,
+                                   enable_end_to_end_tls=enable_end_to_end_tls,
+                                   persistent_storage=persistent_storage,
+                                   loaded_public_certificate_file=loaded_public_certificate_file)
 
 
 
@@ -71,23 +105,42 @@ def app_deploy(cmd, client, resource_group, service, name,
                disable_validation=None,
                artifact_path=None,
                builder=None,
+               source_path=None,
                target_module=None,
                runtime_version=None,
                jvm_options=None,
                main_entry=None,
                env=None,
                config_file_patterns=None,
+               disable_probe=None,
                no_wait=False):
     if is_enterprise_tier(cmd, resource_group, service):
         # runtime_version, assign_ideneity, main_entry not support
         return app_deploy_enterprise(cmd, get_client(cmd), resource_group, service, name,
-                                     version, deployment, artifact_path, builder, target_module, 
-                                     jvm_options, env, config_file_patterns, no_wait)
+                                     version=version, 
+                                     deployment=deployment, 
+                                     artifact_path=artifact_path, 
+                                     builder=builder,
+                                     target_module=target_module,
+                                     jvm_options=jvm_options,
+                                     env=env,
+                                     config_file_patterns=config_file_patterns,
+                                     no_wait=no_wait)
     else:
         # config_file_patterns not support
         return app_deploy_standard(cmd, client, resource_group, service, name,
-                                   version, deployment, disable_validation, artifact_path, target_module, runtime_version, 
-                                   jvm_options, main_entry, env, no_wait)
+                                   version=version,
+                                   deployment=deployment,
+                                   disable_validation=disable_validation,
+                                   artifact_path=artifact_path,
+                                   source_path=source_path,
+                                   target_module=target_module,
+                                   runtime_version=runtime_version,
+                                   jvm_options=jvm_options,
+                                   main_entry=main_entry,
+                                   env=env,
+                                   disable_probe=disable_probe,
+                                   no_wait=no_wait)
 
 
 def app_set_deployment(cmd, client, resource_group, service, name, deployment):
