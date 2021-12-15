@@ -92,7 +92,7 @@ def _cf_spring_cloud_enterprise_or_default(cli_ctx, default_factory, kwargs):
 
 
 def _get_and_ensure_service_exist(cli_ctx, resource_group, service):
-    client = cf_spring_cloud(cli_ctx)
+    client = cf_spring_cloud_enterprise(cli_ctx)
     try:
         return client.services.get(resource_group, service)
     except CloudError:

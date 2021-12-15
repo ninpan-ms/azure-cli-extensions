@@ -11,7 +11,7 @@ from .vendored_sdks.appplatform.v2020_07_01 import (
 from azure.cli.core.commands.client_factory import get_mgmt_service_client
 
 def is_enterprise_tier(cmd, resource_group, name):
-    resource = get_mgmt_service_client(cmd.cli_ctx, AppPlatformManagementClient_20200701).services.get(resource_group, name)
+    resource = get_client(cmd).services.get(resource_group, name)
     return resource.sku.name == 'E0'
 
 def get_client(cmd):
