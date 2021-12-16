@@ -85,6 +85,26 @@ def load_arguments(self, _):
                    default='S1',
                    is_preview=True,
                    help='Only support in enterprise tier now. Size of build agent pool.')
+        c.argument('enable_application_configuration_service',
+                   arg_type=get_three_state_flag(),
+                   default=False,
+                   is_preview=True,
+                   help='Only support in enterprise tier now. Enable Application Configuration Service.')
+        c.argument('enable_service_registry',
+                   arg_type=get_three_state_flag(),
+                   default=False,
+                   is_preview=True,
+                   help='Only support in enterprise tier now. Enable Service Registry.')
+        c.argument('enable_gateway',
+                   arg_type=get_three_state_flag(),
+                   default=False,
+                   is_preview=True,
+                   help='Only support in enterprise tier now. Enable Spring Cloud Gateway.')
+        c.argument('enable_api_portal',
+                   arg_type=get_three_state_flag(),
+                   default=False,
+                   is_preview=True,
+                   help='Only support in enterprise tier now. Enable API portal.')
 
     with self.argument_context('spring-cloud update') as c:
         c.argument('sku', arg_type=get_enum_type(['Basic', 'Standard', 'Enterprise']), validator=validate_sku, help='Name of SKU.')

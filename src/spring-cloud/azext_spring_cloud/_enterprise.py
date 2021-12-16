@@ -6,6 +6,10 @@ from msrestazure.tools import parse_resource_id
 from .vendored_sdks.appplatform.v2022_01_01_preview import models
 from ._utils import  get_azure_files_info, _pack_source_code
 from ._build_service import _update_default_build_agent_pool
+from ._tanzu_component import (create_application_configuration_service,
+                               create_service_registry,
+                               create_gateway,
+                               create_api_portal)
 from .custom import (app_get, _create_service)
 from azure.cli.core.commands.client_factory import get_subscription_id
 from azure.cli.core.util import sdk_no_wait
@@ -37,6 +41,8 @@ def spring_cloud_create(cmd, client, resource_group, name, location=None,
                         service_runtime_network_resource_group=None, app_network_resource_group=None,
                         app_insights_key=None, app_insights=None, sampling_rate=None,
                         disable_app_insights=None, enable_java_agent=None,
+                        enable_application_configuration_service=None, enable_service_registry=None,
+                        enable_gateway=None, enable_api_portal=None,
                         sku=None, tags=None, build_pool_size=None, no_wait=False):
     poller = _create_service(cmd, client, resource_group, name, 
                              location=location,
@@ -48,6 +54,10 @@ def spring_cloud_create(cmd, client, resource_group, name, location=None,
                              sku=sku,
                              tags=tags)
     _update_default_build_agent_pool(cmd, client, resource_group, name, build_pool_size)
+    create_application_configuration_service(cmd, client, resource_group, name, enable_application_configuration_service)
+    create_service_registry(cmd, client, resource_group, name, enable_service_registry)
+    create_gateway(cmd, client, resource_group, name, enable_gateway)
+    create_api_portal(cmd, client, resource_group, name, enable_api_portal)
     return poller
 
 
