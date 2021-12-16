@@ -18,7 +18,7 @@ from ._validators_enterprise import (validate_config_file_patterns, validate_cpu
                                      validate_buildpacks_binding_properties,
                                      validate_buildpacks_binding_secrets, only_support_enterprise,
                                      validate_buildpacks_binding_not_exist, validate_buildpacks_binding_exist,
-                                     validate_git_uri, validate_acs_patterns)
+                                     validate_git_uri, validate_acs_patterns, validate_routes)
 from ._app_validator import (fulfill_deployment_param, active_deployment_exist, active_deployment_exist_under_app, ensure_not_active_deployment)
 from ._utils import ApiType
 
@@ -442,7 +442,7 @@ def load_arguments(self, _):
     for scope in ['spring-cloud gateway update',
                   'spring-cloud api-portal update']:
         with self.argument_context(scope) as c:
-            c.argument('instance_count', type=int, help='Number of instance.', validator=validate_instance_count)
+            c.argument('instance_count', type=int, help='Number of instance.')
             c.argument('assign_endpoint', arg_type=get_three_state_flag(), help='If true, assign endpoint URL for direct access.')
             c.argument('https_only', arg_type=get_three_state_flag(), help='If true, access endpoint via https')
             c.argument('scope', arg_group='Single Sign On (SSO)', help="Comma-separated list of the specific actions applications can be allowed to do on a user's behalf.")
@@ -451,8 +451,8 @@ def load_arguments(self, _):
             c.argument('issuer_uri', arg_group='Single Sign On (SSO)', help="The URI of Issuer Identifier.")
 
     with self.argument_context('spring-cloud gateway update') as c:
-        c.argument('cpu', type=str, help='CPU resource quantity. Should be 500m or number of CPU cores.', validator=validate_cpu)
-        c.argument('memory', type=str, help='Memory resource quantity. Should be 512Mi or #Gi, e.g., 1Gi, 3Gi.', validator=validate_memory)
+        c.argument('cpu', type=str, help='CPU resource quantity. Should be 500m or number of CPU cores.')
+        c.argument('memory', type=str, help='Memory resource quantity. Should be 512Mi or #Gi, e.g., 1Gi, 3Gi.')
         c.argument('api_title', arg_group='API metadata', help="Title describing the context of the APIs available on the Gateway instance.")
         c.argument('api_description', arg_group='API metadata', help="Detailed description of the APIs available on the Gateway instance.")
         c.argument('api_documentation_location', arg_group='API metadata', help="Location of additional documentation for the APIs available on the Gateway instance.")
@@ -486,8 +486,8 @@ def load_arguments(self, _):
                   'spring-cloud gateway route-config update']:
         with self.argument_context(scope) as c:
             c.argument('app_name', type=str, help="The Azure Spring Cloud app name to configure the route.")
-            c.argument('routes_json', type=str, help="The JSON array of API routes.")
-            c.argument('routes_file', type=str, help="The file path of JSON array of API routes.")
+            c.argument('routes_json', type=str, help="The JSON array of API routes.", validator=validate_routes)
+            c.argument('routes_file', type=str, help="The file path of JSON array of API routes.", validator=validate_routes)
 
     for scope in ['spring-cloud build-service buildpacks-binding create',
                   'spring-cloud build-service buildpacks-binding set']:

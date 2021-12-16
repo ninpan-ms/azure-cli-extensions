@@ -20,6 +20,7 @@ from ._transformers import (transform_spring_cloud_table_output,
                             transform_spring_cloud_deployment_output,
                             transform_spring_cloud_certificate_output,
                             transform_spring_cloud_custom_domain_output)
+from ._validators_enterprise import (validate_gateway_update, validate_api_portal_update)
 
 
 # pylint: disable=too-many-statements
@@ -232,7 +233,7 @@ def load_command_table(self, _):
                             exception_handler=handle_asc_exception,
                             is_preview=True) as g:
         g.custom_command('show', 'gateway_show')
-        g.custom_command('update', 'gateway_update')
+        g.custom_command('update', 'gateway_update', validator=validate_gateway_update)
         g.custom_command('clear', 'gateway_clear')
 
     with self.command_group('spring-cloud gateway custom-domain',
@@ -260,7 +261,7 @@ def load_command_table(self, _):
                             exception_handler=handle_asc_exception,
                             is_preview=True) as g:
         g.custom_command('show', 'api_portal_show')
-        g.custom_command('update', 'api_portal_update')
+        g.custom_command('update', 'api_portal_update', validator=validate_api_portal_update)
         g.custom_command('clear', 'api_portal_clear')
 
     with self.command_group('spring-cloud api-portal custom-domain',

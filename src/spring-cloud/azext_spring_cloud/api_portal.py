@@ -4,7 +4,6 @@
 # --------------------------------------------------------------------------------------------
 
 from .vendored_sdks.appplatform.v2022_01_01_preview import models as models
-from knack.util import CLIError
 
 DEFAULT_NAME = "default"
 
@@ -21,16 +20,10 @@ def api_portal_update(cmd, client, resource_group, service,
                       client_id=None,
                       client_secret=None,
                       issuer_uri=None):
-    all_provided = scope and client_id and client_secret and issuer_uri
-    none_provided = scope is None and client_id is None and client_secret is None and issuer_uri is None
-    if not all_provided and not none_provided :
-        raise CLIError("Single Sign On configurations '--scope --client-id --client-secret --issuer-uri' should be all provided or none provided.")
-
     api_portal = client.api_portals.get(resource_group, service, DEFAULT_NAME)
 
     sso_properties = api_portal.properties.sso_properties
-    if all_provided:
-        scope = scope.split(",")
+    if scope and client_id and client_secret and issuer_uri:
         sso_properties = models.SsoProperties(
             scope=scope,
             client_id=client_id,

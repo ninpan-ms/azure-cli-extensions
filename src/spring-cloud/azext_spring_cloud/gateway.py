@@ -4,7 +4,6 @@
 # --------------------------------------------------------------------------------------------
 
 import json
-from sys import version
 from .vendored_sdks.appplatform.v2022_01_01_preview import models
 from ._resource_quantity import validate_cpu, validate_memory
 from knack.util import CLIError
@@ -33,18 +32,10 @@ def gateway_update(cmd, client, resource_group, service,
                    allow_credentials=None,
                    exposed_headers=None
                    ):
-    cpu = validate_cpu(cpu)
-    memory = validate_memory(memory)
-    all_provided = scope and client_id and client_secret and issuer_uri
-    none_provided = scope is None and client_id is None and client_secret is None and issuer_uri is None
-    if not all_provided and not none_provided :
-        raise CLIError("Single Sign On configurations '--scope --client-id --client-secret --issuer-uri' should be all provided or none provided.")
-
     gateway = client.gateways.get(resource_group, service, DEFAULT_NAME)
 
     sso_properties = gateway.properties.sso_properties
-    if all_provided:
-        scope = scope.split(",")
+    if scope and client_id and client_secret and issuer_uri:
         sso_properties = models.SsoProperties(
             scope=scope,
             client_id=client_id,
@@ -105,9 +96,7 @@ def gateway_custom_domain_update(cmd, client, resource_group, service,
     if certificate is not None:
         certificate_response = client.gateways.certificates.get(
             resource_group, service, certificate)
-        properties = models.GatewayCustomDomainProperties(
-            thumbprint=certificate_response.properties.thumbprint
-        )
+        properties.thumbprint = certificate_response.properties.thumbprint
 
     custom_domain_resource = models.GatewayCustomDomainResource(
         properties=properties)
@@ -133,63 +122,25 @@ def gateway_route_config_create(cmd, client, resource_group, service, name,
                                 app_name=None,
                                 routes_json=None,
                                 routes_file=None):
-    if routes_json is not None and routes_file is not None:
-        raise CLIError(
-            "You can only specify either --routes-json or --routes-file.")
+    _validate_route_config_exist(client, resource_group, service, name)
 
-    route_configs = client.gateway_route_configs.list(
-        resource_group, service, DEFAULT_NAME)
-    if name in (route_config.name for route_config in list(route_configs)):
-        raise CLIError("Route config " + name + " already exists")
+    app_resource_id = _update_app_resource_id(client, resource_group, service, app_name, None)
+    routes = _update_routes(routes_file, routes_json, [])
 
-    app_resource = client.apps.get(resource_group, service, app_name)
-
-    routes = []
-    if routes_file is not None:
-        with open(routes_file, 'r') as json_file:
-            routes = json.load(json_file)
-
-    if routes_json is not None:
-        routes = json.loads(routes_json)
-
-    properties = models.GatewayRouteConfigProperties(
-        app_resource_id=app_resource.id, routes=routes)
-
-    route_config_resource = models.GatewayRouteConfigResource(
-        properties=properties)
-    return client.gateway_route_configs.begin_create_or_update(resource_group, service, DEFAULT_NAME, name, route_config_resource)
+    return _create_or_update_gateway_route_configs(client, resource_group, service, name, app_resource_id, routes)
 
 
 def gateway_route_config_update(cmd, client, resource_group, service, name,
                                 app_name=None,
                                 routes_json=None,
                                 routes_file=None):
-    if routes_json is not None and routes_file is not None:
-        raise CLIError(
-            "You can only specify either --routes-json or --routes-file.")
-
     gateway_route_config = client.gateway_route_configs.get(
         resource_group, service, DEFAULT_NAME, name)
 
-    app_resource_id = gateway_route_config.properties.app_resource_id
-    if app_name is not None:
-        app_resource = client.apps.get(resource_group, service, app_name)
-        app_resource_id = app_resource.id
+    app_resource_id = _update_app_resource_id(client, resource_group, service, app_name, gateway_route_config.properties.app_resource_id)
+    routes = _update_routes(routes_file, routes_json, gateway_route_config.properties.routes)
 
-    routes = gateway_route_config.properties.routes
-    if routes_file is not None:
-        with open(routes_file, 'r') as json_file:
-            routes = json.load(json_file)
-
-    if routes_json is not None:
-        routes = json.loads(routes_json)
-
-    properties = models.GatewayRouteConfigProperties(
-        app_resource_id=app_resource_id, routes=routes)
-
-    route_config_resource = models.GatewayRouteConfigResource(
-        properties=properties)
-    return client.gateway_route_configs.begin_create_or_update(resource_group, service, DEFAULT_NAME, name, route_config_resource)
+    return _create_or_update_gateway_route_configs(client, resource_group, service, name, app_resource_id, routes)
 
 
 def gateway_route_config_remove(cmd, client, resource_group, service, name):
@@ -230,3 +181,35 @@ def _update_cors(existing, allowed_origins, allowed_methods, allowed_headers, ma
     if exposed_headers:
         cors.exposed_headers = exposed_headers.split(",")
     return cors
+
+
+def _validate_route_config_exist(client, resource_group, service, name):
+    route_configs = client.gateway_route_configs.list(
+        resource_group, service, DEFAULT_NAME)
+    if name in (route_config.name for route_config in list(route_configs)):
+        raise CLIError("Route config " + name + " already exists")
+
+
+def _update_app_resource_id(client, resource_group, service, app_name, app_resource_id):
+    if app_name is not None:
+        app_resource = client.apps.get(resource_group, service, app_name)
+        app_resource_id = app_resource.id
+    return app_resource_id
+
+
+def _update_routes(routes_file, routes_json, rotues):
+    if routes_file is not None:
+        with open(routes_file, 'r') as json_file:
+            routes = json.load(json_file)
+
+    if routes_json is not None:
+        routes = json.loads(routes_json)
+    return routes
+
+
+def _create_or_update_gateway_route_configs(client, resource_group, service, name, app_resource_id, routes):
+    properties = models.GatewayRouteConfigProperties(
+        app_resource_id=app_resource_id, routes=routes)
+    route_config_resource = models.GatewayRouteConfigResource(
+        properties=properties)
+    return client.gateway_route_configs.begin_create_or_update(resource_group, service, DEFAULT_NAME, name, route_config_resource)
