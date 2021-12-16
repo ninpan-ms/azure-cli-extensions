@@ -249,7 +249,7 @@ def handle_asc_exception(ex):
     try:
         raise CLIError(ex.inner_exception.error.message)
     except AttributeError:
-        if hasattr(ex, 'response'):
+        if hasattr(ex, 'response') and ex.response.internal_response.text:
             response_dict = json.loads(ex.response.internal_response.text)
             raise CLIError(response_dict["error"]["message"])
         else:

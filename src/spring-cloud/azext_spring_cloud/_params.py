@@ -18,7 +18,8 @@ from ._validators_enterprise import (validate_config_file_patterns, validate_cpu
                                      validate_buildpacks_binding_properties,
                                      validate_buildpacks_binding_secrets, only_support_enterprise,
                                      validate_buildpacks_binding_not_exist, validate_buildpacks_binding_exist,
-                                     validate_git_uri, validate_acs_patterns, validate_routes)
+                                     validate_git_uri, validate_acs_patterns, validate_routes, validate_builder,
+                                     validate_build_pool_size)
 from ._app_validator import (fulfill_deployment_param, active_deployment_exist, active_deployment_exist_under_app, ensure_not_active_deployment)
 from ._utils import ApiType
 
@@ -47,6 +48,7 @@ def load_arguments(self, _):
     # https://dev.azure.com/msazure/AzureDMSS/_workitems/edit/11002857/
     with self.argument_context('spring-cloud create') as c:
         c.argument('location', arg_type=get_location_type(self.cli_ctx), validator=validate_location)
+        c.argument('sku', arg_type=get_enum_type(['Basic', 'Standard', 'Enterprise']), validator=validate_sku, default='Standard', help='Name of SKU.')
         c.argument('reserved_cidr_range', help='Comma-separated list of IP address ranges in CIDR format. The IP ranges are reserved to host underlying Azure Spring Cloud infrastructure, which should be 3 at least /16 unused IP ranges, must not overlap with any Subnet IP ranges.', validator=validate_vnet_required_parameters)
         c.argument('vnet', help='The name or ID of an existing Virtual Network into which to deploy the Spring Cloud instance.', validator=validate_vnet_required_parameters)
         c.argument('app_subnet', help='The name or ID of an existing subnet in "vnet" into which to deploy the Spring Cloud app. Required when deploying into a Virtual Network. Smaller subnet sizes are supported, please refer: https://aka.ms/azure-spring-cloud-smaller-subnet-vnet-docs', validator=validate_vnet_required_parameters)
@@ -77,8 +79,15 @@ def load_arguments(self, _):
                         "--app-insights-key or --app-insights, "
                         "will create a new Application Insights instance in the same resource group.",
                    validator=validate_tracing_parameters_asc_create)
+        c.argument('build_pool_size',
+                   arg_type=get_enum_type(['S1', 'S2', 'S3', 'S4', 'S5']),
+                   validator=validate_build_pool_size,
+                   default='S1',
+                   is_preview=True,
+                   help='Only support in enterprise tier now. Size of build agent pool.')
 
     with self.argument_context('spring-cloud update') as c:
+        c.argument('sku', arg_type=get_enum_type(['Basic', 'Standard', 'Enterprise']), validator=validate_sku, help='Name of SKU.')
         c.argument('app_insights_key',
                    help="Connection string (recommended) or Instrumentation key of the existing Application Insights.",
                    validator=validate_tracing_parameters_asc_update,
@@ -102,12 +111,15 @@ def load_arguments(self, _):
                    deprecate_info=c.deprecate(target='az spring-cloud update --disable-app-insights',
                                               redirect='az spring-cloud app-insights update --disable',
                                               hide=True))
+        c.argument('build_pool_size',
+                   arg_type=get_enum_type(['S1', 'S2', 'S3', 'S4', 'S5']),
+                   is_preview=True,
+                   help='Only support in enterprise tier now. Size of build agent pool.')
 
     for scope in ['spring-cloud create', 'spring-cloud update']:
         with self.argument_context(scope) as c:
-            c.argument('sku', arg_type=get_enum_type(['Basic', 'Standard', 'Enterprise']), validator=validate_sku, default='Standard', help='Name of SKU, the value is "Basic", "Standard" or "Enterprise"')
             c.argument('tags', arg_type=tags_type)
-
+    
     with self.argument_context('spring-cloud test-endpoint renew-key') as c:
         c.argument('type', type=str, arg_type=get_enum_type(
             TestKeyType), help='Type of test-endpoint key')
@@ -236,7 +248,7 @@ def load_arguments(self, _):
                 'main_entry', options_list=[
                     '--main-entry', '-m'], help="A string containing the path to the .NET executable relative to zip root.")
             c.argument(
-                'builder', help="The name of builder.", default="default")
+                'builder', help="Only support in enterprise tier now. The name of builder.", default="default", validator=validate_builder, is_preview=True)
             c.argument(
                 'target_module', help='Child module to be deployed, required for multiple jar packages built from source code.')
             c.argument(

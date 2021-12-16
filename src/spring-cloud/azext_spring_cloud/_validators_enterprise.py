@@ -17,7 +17,8 @@ from ._resource_quantity import (
 from ._util_enterprise import (
     is_enterprise_tier, get_client
 )
-from ._validators import (validate_instance_count)
+from ._validators import (validate_instance_count, _parse_sku_name)
+from .vendored_sdks.appplatform.v2022_01_01_preview.models import _app_platform_management_client_enums as AppPlatformEnums
 
 
 logger = get_logger(__name__)
@@ -148,3 +149,19 @@ def _validate_sso(namespace):
 def validate_routes(namespace):
     if namespace.routes_json is not None and namespace.routes_file is not None:
         raise CLIError("You can only specify either --routes-json or --routes-file.")
+
+
+def validate_builder(cmd, namespace):
+    client = get_client(cmd)
+    builder = client.build_service_builder.get(namespace.resource_group,
+                                               namespace.service,
+                                               DEFAULT_BUILD_SERVICE_NAME,
+                                               namespace.builder)
+    if builder.properties.provisioning_state != AppPlatformEnums.BuilderProvisioningState.SUCCEEDED:
+        raise CLIError('The provision state of builder {} is not succeeded, please choose a succeeded builder.'
+                       .format(namespace.builder))
+
+
+def validate_build_pool_size(namespace):
+    if _parse_sku_name(namespace.sku) != 'enterprise':
+        namespace.build_pool_size = None

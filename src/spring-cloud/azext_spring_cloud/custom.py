@@ -22,6 +22,7 @@ from .vendored_sdks.appplatform.v2020_07_01 import models
 from .vendored_sdks.appplatform.v2020_11_01_preview import models as models_20201101preview
 from .vendored_sdks.appplatform.v2021_06_01_preview import models as models_20210601preview
 from .vendored_sdks.appplatform.v2021_09_01_preview import models as models_20210901preview
+from .vendored_sdks.appplatform.v2022_01_01_preview import models as models_20220101preview
 from .vendored_sdks.appplatform.v2020_07_01.models import _app_platform_management_client_enums as AppPlatformEnums
 from .vendored_sdks.appplatform.v2020_11_01_preview import (
     AppPlatformManagementClient as AppPlatformManagementClient_20201101preview
@@ -48,6 +49,7 @@ import sys
 import json
 import base64
 from collections import defaultdict
+from ._build_service import _update_default_build_agent_pool
 
 logger = get_logger(__name__)
 DEFAULT_DEPLOYMENT_NAME = "default"
@@ -60,13 +62,14 @@ NO_PRODUCTION_DEPLOYMENT_SET_ERROR = "This app has no production deployment, use
 DELETE_PRODUCTION_DEPLOYMENT_WARNING = "You are going to delete production deployment, the app will be inaccessible after this operation."
 LOG_RUNNING_PROMPT = "This command usually takes minutes to run. Add '--verbose' parameter if needed."
 
+DEFAULT_BUILD_SERVICE_NAME = "default"
 
 def spring_cloud_create(cmd, client, resource_group, name, location=None,
                         vnet=None, service_runtime_subnet=None, app_subnet=None, reserved_cidr_range=None,
                         service_runtime_network_resource_group=None, app_network_resource_group=None,
                         app_insights_key=None, app_insights=None, sampling_rate=None,
                         disable_app_insights=None, enable_java_agent=None,
-                        sku=None, tags=None, no_wait=False):
+                        sku=None, tags=None, build_pool_size=None, no_wait=False):
     """
     If app_insights_key, app_insights and disable_app_insights are all None,
     will still create an application insights and enable application insights.
@@ -101,6 +104,9 @@ def spring_cloud_create(cmd, client, resource_group, name, location=None,
     _update_application_insights_asc_create(cmd, resource_group, name, location,
                                             app_insights_key, app_insights, sampling_rate,
                                             disable_app_insights, no_wait)
+    _update_default_build_agent_pool(
+        cmd, client, resource_group, name, build_pool_size)
+
     return poller
 
 
@@ -127,7 +133,7 @@ def _update_application_insights_asc_create(cmd, resource_group, name, location,
 
 
 def spring_cloud_update(cmd, client, resource_group, name, app_insights_key=None, app_insights=None,
-                        disable_app_insights=None, sku=None, tags=None, no_wait=False):
+                        disable_app_insights=None, sku=None, tags=None, build_pool_size=None, no_wait=False):
     """
     TODO (jiec) app_insights_key, app_insights and disable_app_insights are marked as deprecated.
     Will be decommissioned in future releases.
@@ -139,8 +145,7 @@ def spring_cloud_update(cmd, client, resource_group, name, app_insights_key=None
 
     # update service sku
     if sku is not None:
-        full_sku = models.Sku(name=_get_sku_name(sku), tier=sku)
-        updated_resource.sku = full_sku
+        updated_resource.sku = sku
         update_service_sku = True
 
     resource = client.services.get(resource_group, name)
@@ -149,6 +154,9 @@ def spring_cloud_update(cmd, client, resource_group, name, app_insights_key=None
 
     _update_application_insights_asc_update(cmd, resource_group, name, location,
                                             app_insights_key, app_insights, disable_app_insights, no_wait)
+
+    _update_default_build_agent_pool(
+        cmd, client, resource_group, name, build_pool_size)
 
     # update service tags
     if tags is not None:

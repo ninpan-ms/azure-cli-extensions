@@ -274,7 +274,7 @@ def _queue_build(cmd, client, resource_group, service, name, relative_path, buil
     try:
         return client.build_service.create_or_update_build(resource_group,
                                                            service,
-                                                           builder,
+                                                           DEFAULT_BUILD_SERVICE_NAME,
                                                            name,
                                                            build).properties.triggered_build_result.id
     except (AttributeError, CloudError) as e:
