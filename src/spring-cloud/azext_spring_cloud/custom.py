@@ -139,8 +139,7 @@ def spring_cloud_update(cmd, client, resource_group, name, app_insights_key=None
 
     # update service sku
     if sku is not None:
-        full_sku = models.Sku(name=_get_sku_name(sku), tier=sku)
-        updated_resource.sku = full_sku
+        updated_resource.sku = sku
         update_service_sku = True
 
     resource = client.services.get(resource_group, name)

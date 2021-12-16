@@ -43,6 +43,8 @@ def validate_location(namespace):
 
 
 def validate_sku(cmd, namespace):
+    if not namespace.sku:
+        return
     if namespace.sku.lower() == 'enterprise':
         _validate_saas_provider(cmd, namespace)
         _validate_terms(cmd, namespace)
