@@ -69,7 +69,7 @@ def spring_cloud_create(cmd, client, resource_group, name, location=None,
                         service_runtime_network_resource_group=None, app_network_resource_group=None,
                         app_insights_key=None, app_insights=None, sampling_rate=None,
                         disable_app_insights=None, enable_java_agent=None,
-                        sku=None, tags=None, build_pool_size=None, no_wait=False):
+                        sku=None, tags=None, no_wait=False):
     """
     If app_insights_key, app_insights and disable_app_insights are all None,
     will still create an application insights and enable application insights.
@@ -80,6 +80,25 @@ def spring_cloud_create(cmd, client, resource_group, name, location=None,
     # TODO (jiec) Deco this method when we deco parameter "--enable-java-agent"
     _warn_enable_java_agent(enable_java_agent)
 
+    poller = _create_service(cmd, client, resource_group, name, 
+                             location=location,
+                             service_runtime_subnet=service_runtime_subnet,
+                             app_subnet=app_subnet,
+                             reserved_cidr_range=reserved_cidr_range,
+                             service_runtime_network_resource_group=service_runtime_network_resource_group,
+                             app_network_resource_group=app_network_resource_group,
+                             sku=sku,
+                             tags=tags)
+    _update_application_insights_asc_create(cmd, resource_group, name, location,
+                                            app_insights_key, app_insights, sampling_rate,
+                                            disable_app_insights, no_wait)
+    return poller
+
+
+def _create_service(cmd, client, resource_group, name, location=None,
+                    service_runtime_subnet=None, app_subnet=None, reserved_cidr_range=None,
+                    service_runtime_network_resource_group=None, app_network_resource_group=None,
+                    sku=None, tags=None):
     if location is None:
         location = _get_rg_location(cmd.cli_ctx, resource_group)
     properties = models.ClusterResourceProperties()
@@ -100,13 +119,6 @@ def spring_cloud_create(cmd, client, resource_group, name, location=None,
     logger.warning(" - Creating Service ..")
     while poller.done() is False:
         sleep(5)
-
-    _update_application_insights_asc_create(cmd, resource_group, name, location,
-                                            app_insights_key, app_insights, sampling_rate,
-                                            disable_app_insights, no_wait)
-    _update_default_build_agent_pool(
-        cmd, client, resource_group, name, build_pool_size)
-
     return poller
 
 

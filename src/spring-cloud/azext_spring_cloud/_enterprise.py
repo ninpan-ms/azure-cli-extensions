@@ -5,7 +5,8 @@ from msrestazure.azure_exceptions import CloudError
 from msrestazure.tools import parse_resource_id
 from .vendored_sdks.appplatform.v2022_01_01_preview import models
 from ._utils import  get_azure_files_info, _pack_source_code
-from .custom import app_get
+from ._build_service import _update_default_build_agent_pool
+from .custom import (app_get, _create_service)
 from azure.cli.core.commands.client_factory import get_subscription_id
 from azure.cli.core.util import sdk_no_wait
 from .azure_storage_file import FileService
@@ -29,6 +30,26 @@ DELETE_PRODUCTION_DEPLOYMENT_WARNING = "You are going to delete production deplo
 LOG_RUNNING_PROMPT = "This command usually takes minutes to run. Add '--verbose' parameter if needed."
 
 DEFAULT_BUILD_SERVICE_NAME = "default"
+
+
+def spring_cloud_create(cmd, client, resource_group, name, location=None,
+                        vnet=None, service_runtime_subnet=None, app_subnet=None, reserved_cidr_range=None,
+                        service_runtime_network_resource_group=None, app_network_resource_group=None,
+                        app_insights_key=None, app_insights=None, sampling_rate=None,
+                        disable_app_insights=None, enable_java_agent=None,
+                        sku=None, tags=None, build_pool_size=None, no_wait=False):
+    poller = _create_service(cmd, client, resource_group, name, 
+                             location=location,
+                             service_runtime_subnet=service_runtime_subnet,
+                             app_subnet=app_subnet,
+                             reserved_cidr_range=reserved_cidr_range,
+                             service_runtime_network_resource_group=service_runtime_network_resource_group,
+                             app_network_resource_group=app_network_resource_group,
+                             sku=sku,
+                             tags=tags)
+    _update_default_build_agent_pool(cmd, client, resource_group, name, build_pool_size)
+    return poller
+
 
 
 def app_create_enterprise(cmd, client, resource_group, service, name, 

@@ -25,6 +25,11 @@ from ._validators_enterprise import (validate_gateway_update, validate_api_porta
 
 # pylint: disable=too-many-statements
 def load_command_table(self, _):
+    spring_cloud_routing_util = CliCommandType(
+        operations_tmpl='azext_spring_cloud.tier_routing_spring_cloud#{}',
+        client_factory=cf_spring_cloud_20210901preview
+    )
+
     app_routing_util = CliCommandType(
         operations_tmpl='azext_spring_cloud.tier_routing_app#{}',
         client_factory=cf_spring_cloud_20210901preview
@@ -75,9 +80,13 @@ def load_command_table(self, _):
         client_factory=cf_spring_cloud_enterprise
     )
 
+    with self.command_group('spring-cloud', custom_command_type=spring_cloud_routing_util,
+                            exception_handler=handle_asc_exception) as g:
+        g.custom_command('create', 'spring_cloud_create', supports_no_wait=True)
+
+
     with self.command_group('spring-cloud', client_factory=cf_spring_cloud_enterprise_or_stable,
                             exception_handler=handle_asc_exception) as g:
-        g.custom_command('create', 'spring_cloud_create', supports_no_wait=True, client_factory=cf_spring_cloud_enterprise)
         g.custom_command('update', 'spring_cloud_update', supports_no_wait=True, client_factory=cf_spring_cloud_enterprise_or_stable)
         g.custom_command('delete', 'spring_cloud_delete', supports_no_wait=True)
         g.custom_command('start', 'spring_cloud_start', supports_no_wait=True, client_factory=cf_spring_cloud_enterprise_or_20210901preview)

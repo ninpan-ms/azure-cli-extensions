@@ -458,7 +458,7 @@ def validate_vnet_required_parameters(namespace):
        not namespace.reserved_cidr_range and \
        not namespace.vnet:
         return
-    if namespace.sku and _parse_sku_name(namespace) == 'basic':
+    if namespace.sku and _parse_sku_name(namespace.sku) == 'basic':
         raise InvalidArgumentValueError('Virtual Network Injection is not supported for Basic tier.')
     if not namespace.app_subnet \
        or not namespace.service_runtime_subnet:
@@ -473,10 +473,12 @@ def validate_node_resource_group(namespace):
     _validate_resource_group_name(namespace.app_network_resource_group, 'app-network-resource-group')
 
 
-def _parse_sku_name(namespace):
-    if type(namespace.sku) is str or type(namespace.sku) is DefaultStr:
-        return namespace.sku.lower()
-    return namespace.sku.tier.lower()
+def _parse_sku_name(sku):
+    if not sku:
+        return 'standard'
+    if type(sku) is str or type(sku) is DefaultStr:
+        return sku.lower()
+    return sku.tier.lower()
 
 
 def _validate_resource_group_name(name, message_name):
