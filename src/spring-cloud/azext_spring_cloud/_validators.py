@@ -5,6 +5,7 @@
 
 # pylint: disable=too-few-public-methods, unused-argument, redefined-builtin
 
+from os import name
 from re import match
 from re import search
 from ipaddress import ip_network
