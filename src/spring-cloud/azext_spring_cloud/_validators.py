@@ -49,7 +49,20 @@ def validate_sku(cmd, namespace):
     if namespace.sku.lower() == 'enterprise':
         _validate_saas_provider(cmd, namespace)
         _validate_terms(cmd, namespace)
+    else:
+        _validate_enteprise_only(cmd, namespace)
     namespace.sku = models.Sku(name=_get_sku_name(namespace.sku), tier=namespace.sku)
+
+
+def _validate_enteprise_only(cmd, namespace):
+    if namespace.enable_service_registry:
+        raise InvalidArgumentValueError('--enable-service-registry can be enabled only when --sku=Enterprise')
+    if namespace.enable_api_portal:
+        raise InvalidArgumentValueError('--enable-api-portal can be enabled only when --sku=Enterprise')
+    if namespace.enable_application_configuration_service:
+        raise InvalidArgumentValueError('--enable-application-configuration-service can be enabled only when --sku=Enterprise')
+    if namespace.enable_gateway:
+        raise InvalidArgumentValueError('--enable-gateway can be enabled only when --sku=Enterprise')
 
 
 def _validate_saas_provider(cmd, namespace):

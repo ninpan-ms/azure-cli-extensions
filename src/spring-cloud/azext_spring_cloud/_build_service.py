@@ -18,5 +18,5 @@ def _update_default_build_agent_pool(cmd, client, resource_group, name, build_po
                 name=build_pool_size))
         agent_pool_resource = models_20220101preview.BuildServiceAgentPoolResource(
             properties=build_properties)
-        client.build_service_agent_pool.begin_update_put(
+        return client.build_service_agent_pool.begin_update_put(
             resource_group, name, DEFAULT_BUILD_SERVICE_NAME, DEFAULT_BUILD_AGENT_POOL_NAME, agent_pool_resource)

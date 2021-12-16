@@ -18,20 +18,20 @@ def create_application_configuration_service(cmd, client, resource_group, servic
     if enable_application_configuration_service:
         logger.warning(" - Creating Application Configuration Service ..")
         acs_resource = models.ConfigurationServiceResource()
-        client.configuration_services.begin_create_or_update(resource_group, service, DEFAULT_NAME, acs_resource)
+        return client.configuration_services.begin_create_or_update(resource_group, service, DEFAULT_NAME, acs_resource)
 
 
 def create_service_registry(cmd, client, resource_group, service, enable_service_registry):
     if enable_service_registry:
         logger.warning(" - Creating Service Registry ..")
-        client.service_registries.begin_create_or_update(resource_group, service, DEFAULT_NAME)
+        return client.service_registries.begin_create_or_update(resource_group, service, DEFAULT_NAME)
 
 
 def create_gateway(cmd, client, resource_group, service, enable_gateway):
     if enable_gateway:
         logger.warning(" - Creating Spring Cloud Gateway ..")
         gateway_resource = models.GatewayResource()
-        client.gateways.begin_create_or_update(resource_group, service, DEFAULT_NAME, gateway_resource)
+        return client.gateways.begin_create_or_update(resource_group, service, DEFAULT_NAME, gateway_resource)
 
 
 def create_api_portal(cmd, client, resource_group, service, enable_api_portal):
@@ -52,4 +52,4 @@ def create_api_portal(cmd, client, resource_group, service, enable_api_portal):
                 gateway_ids=[gateway_id]
             )
         )
-        client.api_portals.begin_create_or_update(resource_group, service, DEFAULT_NAME, api_portal_resource)
+        return client.api_portals.begin_create_or_update(resource_group, service, DEFAULT_NAME, api_portal_resource)

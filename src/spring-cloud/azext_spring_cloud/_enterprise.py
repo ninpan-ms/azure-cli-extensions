@@ -44,7 +44,7 @@ def spring_cloud_create(cmd, client, resource_group, name, location=None,
                         enable_application_configuration_service=None, enable_service_registry=None,
                         enable_gateway=None, enable_api_portal=None,
                         sku=None, tags=None, build_pool_size=None, no_wait=False):
-    poller = _create_service(cmd, client, resource_group, name, 
+    resource = _create_service(cmd, client, resource_group, name, 
                              location=location,
                              service_runtime_subnet=service_runtime_subnet,
                              app_subnet=app_subnet,
@@ -53,12 +53,16 @@ def spring_cloud_create(cmd, client, resource_group, name, location=None,
                              app_network_resource_group=app_network_resource_group,
                              sku=sku,
                              tags=tags)
-    _update_default_build_agent_pool(cmd, client, resource_group, name, build_pool_size)
-    create_application_configuration_service(cmd, client, resource_group, name, enable_application_configuration_service)
-    create_service_registry(cmd, client, resource_group, name, enable_service_registry)
-    create_gateway(cmd, client, resource_group, name, enable_gateway)
-    create_api_portal(cmd, client, resource_group, name, enable_api_portal)
-    return poller
+    pollers = [
+        _update_default_build_agent_pool(cmd, client, resource_group, name, build_pool_size),
+        create_application_configuration_service(cmd, client, resource_group, name, enable_application_configuration_service),
+        create_service_registry(cmd, client, resource_group, name, enable_service_registry),
+        create_gateway(cmd, client, resource_group, name, enable_gateway),
+        create_api_portal(cmd, client, resource_group, name, enable_api_portal)]
+    pollers = [x for x in pollers if x]
+    if not no_wait:
+        _wait_till_end(cmd, *pollers)
+    return resource
 
 
 
