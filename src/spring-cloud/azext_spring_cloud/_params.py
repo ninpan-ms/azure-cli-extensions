@@ -18,7 +18,8 @@ from ._validators_enterprise import (validate_config_file_patterns, validate_cpu
                                      validate_buildpacks_binding_properties,
                                      validate_buildpacks_binding_secrets, only_support_enterprise,
                                      validate_buildpacks_binding_not_exist, validate_buildpacks_binding_exist,
-                                     validate_git_uri, validate_acs_patterns)
+                                     validate_git_uri, validate_acs_patterns, validate_builder,
+                                     validate_build_pool_size)
 from ._app_validator import (fulfill_deployment_param, active_deployment_exist, active_deployment_exist_under_app, ensure_not_active_deployment)
 from ._utils import ApiType
 
@@ -78,6 +79,12 @@ def load_arguments(self, _):
                         "--app-insights-key or --app-insights, "
                         "will create a new Application Insights instance in the same resource group.",
                    validator=validate_tracing_parameters_asc_create)
+        c.argument('build_pool_size',
+                   arg_type=get_enum_type(['S1', 'S2', 'S3', 'S4', 'S5']),
+                   validator=validate_build_pool_size,
+                   default='S1',
+                   is_preview=True,
+                   help='Only support in enterprise tier now. Size of build agent pool.')
 
     with self.argument_context('spring-cloud update') as c:
         c.argument('sku', arg_type=get_enum_type(['Basic', 'Standard', 'Enterprise']), validator=validate_sku, help='Name of SKU.')
@@ -104,6 +111,10 @@ def load_arguments(self, _):
                    deprecate_info=c.deprecate(target='az spring-cloud update --disable-app-insights',
                                               redirect='az spring-cloud app-insights update --disable',
                                               hide=True))
+        c.argument('build_pool_size',
+                   arg_type=get_enum_type(['S1', 'S2', 'S3', 'S4', 'S5']),
+                   is_preview=True,
+                   help='Only support in enterprise tier now. Size of build agent pool.')
 
     for scope in ['spring-cloud create', 'spring-cloud update']:
         with self.argument_context(scope) as c:
@@ -237,7 +248,7 @@ def load_arguments(self, _):
                 'main_entry', options_list=[
                     '--main-entry', '-m'], help="A string containing the path to the .NET executable relative to zip root.")
             c.argument(
-                'builder', help="The name of builder.", default="default")
+                'builder', help="Only support in enterprise tier now. The name of builder.", default="default", validator=validate_builder, is_preview=True)
             c.argument(
                 'target_module', help='Child module to be deployed, required for multiple jar packages built from source code.')
             c.argument(
