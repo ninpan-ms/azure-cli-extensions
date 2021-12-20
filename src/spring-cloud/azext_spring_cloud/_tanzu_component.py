@@ -47,8 +47,8 @@ def create_api_portal(cmd, client, resource_group, service, enable_api_portal):
             child_name_1=DEFAULT_NAME
         )
         
-        api_portal_resource = models.GatewayResource(
-            properties = models.GatewayProperties(
+        api_portal_resource = models.ApiPortalResource(
+            properties = models.ApiPortalProperties(
                 gateway_ids=[gateway_id]
             )
         )
