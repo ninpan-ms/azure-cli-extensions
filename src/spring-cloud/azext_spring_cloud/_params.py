@@ -19,7 +19,8 @@ from ._validators_enterprise import (validate_config_file_patterns, validate_cpu
                                      validate_buildpacks_binding_secrets, only_support_enterprise,
                                      validate_buildpacks_binding_not_exist, validate_buildpacks_binding_exist,
                                      validate_git_uri, validate_acs_patterns, validate_routes, validate_builder,
-                                     validate_build_pool_size)
+                                     validate_build_pool_size, validate_builder_resource, validate_builder_create,
+                                     validate_builder_update)
 from ._app_validator import (fulfill_deployment_param, active_deployment_exist, active_deployment_exist_under_app, ensure_not_active_deployment)
 from ._utils import ApiType
 
@@ -520,6 +521,23 @@ def load_arguments(self, _):
             c.argument('app_name', type=str, help="The Azure Spring Cloud app name to configure the route.")
             c.argument('routes_json', type=str, help="The JSON array of API routes.", validator=validate_routes)
             c.argument('routes_file', type=str, help="The file path of JSON array of API routes.", validator=validate_routes)
+
+    for scope in ['spring-cloud build-service builder create',
+                  'spring-cloud build-service builder update']:
+        with self.argument_context(scope) as c:
+            c.argument('builder_json', type=str, help="The JSON array of builder.", validator=validate_builder_resource)
+            c.argument('builder_file', type=str, help="The file path of JSON array of builder.", validator=validate_builder_resource)
+
+    with self.argument_context('spring-cloud build-service builder create') as c:
+        c.argument('name', type=str, help="The builder name.", validator=validate_builder_create)
+
+    with self.argument_context('spring-cloud build-service builder update') as c:
+        c.argument('name', type=str, help="The builder name.", validator=validate_builder_update)
+
+    for scope in ['spring-cloud build-service builder show',
+                  'spring-cloud build-service builder delete']:
+        with self.argument_context(scope) as c:
+            c.argument('name', type=str, help="The builder name.")
 
     for scope in ['spring-cloud build-service buildpacks-binding create',
                   'spring-cloud build-service buildpacks-binding set']:

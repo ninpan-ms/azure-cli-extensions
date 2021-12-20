@@ -75,6 +75,11 @@ def load_command_table(self, _):
         client_factory=cf_spring_cloud_enterprise
     )
 
+    builder_cmd_group = CliCommandType(
+        operations_tmpl="azext_spring_cloud._build_service#{}",
+        client_factory=cf_spring_cloud_enterprise
+    )
+
     buildpacks_binding_cmd_group = CliCommandType(
         operations_tmpl="azext_spring_cloud.buildpacks_binding#{}",
         client_factory=cf_spring_cloud_enterprise
@@ -283,6 +288,15 @@ def load_command_table(self, _):
         g.custom_command('bind', 'api_portal_custom_domain_update')
         g.custom_command('unbind', 'api_portal_custom_domain_unbind')
         g.custom_command('update', 'api_portal_custom_domain_update')
+    
+    with self.command_group('spring-cloud build-service builder',
+                            custom_command_type=builder_cmd_group,
+                            exception_handler=handle_asc_exception, is_preview=True) as g:
+        # create and set commands are differentiate by their parameter validators
+        g.custom_command('create', 'create_or_update_builder')
+        g.custom_command('update', 'create_or_update_builder')
+        g.custom_command('show', 'builder_show')
+        g.custom_command('delete', 'builder_delete')
 
     with self.command_group('spring-cloud build-service buildpacks-binding',
                             custom_command_type=buildpacks_binding_cmd_group,

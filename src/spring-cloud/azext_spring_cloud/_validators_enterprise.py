@@ -162,6 +162,35 @@ def validate_builder(cmd, namespace):
                        .format(namespace.builder))
 
 
+def validate_builder_create(cmd, namespace):
+    client = get_client(cmd)
+    try:
+        builder = client.build_service_builder.get(namespace.resource_group,
+                                                   namespace.service,
+                                                   DEFAULT_BUILD_SERVICE_NAME,
+                                                   namespace.name)
+        if builder is not None:
+            raise CLIError('Builder {} already exists.'.format(namespace.name))
+    except ResourceNotFoundError:
+        pass
+
+
+def validate_builder_update(cmd, namespace):
+    client = get_client(cmd)
+    try:
+        client.build_service_builder.get(namespace.resource_group,
+                                         namespace.service,
+                                         DEFAULT_BUILD_SERVICE_NAME,
+                                         namespace.name)
+    except ResourceNotFoundError:
+        raise CLIError('Builder {} does not exist.'.format(namespace.name))
+
+
+def validate_builder_resource(namespace):
+    if namespace.builder_json is not None and namespace.builder_file is not None:
+        raise CLIError("You can only specify either --builder-json or --builder-file.")
+
+
 def validate_build_pool_size(namespace):
     if _parse_sku_name(namespace.sku) != 'enterprise':
         namespace.build_pool_size = None

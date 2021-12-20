@@ -655,6 +655,43 @@ helps['spring-cloud application-configuration-service unbind'] = """
           text: az spring-cloud application-configuration-service unbind --app MyApp -s MyService -g MyResourceGroup
 """
 
+helps['spring-cloud build-service builder'] = """
+    type: group
+    short-summary: (Enterprise Tier Only) Commands to manage Builder Resource
+"""
+
+helps['spring-cloud build-service builder create'] = """
+    type: command
+    short-summary: Create a builder.
+    examples:
+        - name: Create a builder using JSON file.
+          text: az spring-cloud build-service buildpacks-binding create --name my-builder --builder-json MyJson.json
+"""
+
+helps['spring-cloud build-service builder update'] = """
+    type: command
+    short-summary: Update a builder.
+    examples:
+        - name: Update a builder using JSON file.
+          text: az spring-cloud build-service buildpacks-binding update --name my-builder --builder-json MyJson.json
+"""
+
+helps['spring-cloud build-service builder show'] = """
+    type: command
+    short-summary: Show a builder.
+    examples:
+        - name: Show a builder.
+          text: az spring-cloud build-service buildpacks-binding show --name my-builder
+"""
+
+helps['spring-cloud build-service builder delete'] = """
+    type: command
+    short-summary: Delete a builder.
+    examples:
+        - name: Delete a builder.
+          text: az spring-cloud build-service buildpacks-binding delete --name my-builder
+"""
+
 helps['spring-cloud build-service buildpacks-binding'] = """
     type: group
     short-summary: (Enterprise Tier Only) Commands to manage Buildpacks Binding

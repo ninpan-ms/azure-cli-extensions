@@ -5,6 +5,7 @@
 
 # pylint: disable=too-few-public-methods, unused-argument, redefined-builtin
 
+import json
 from .vendored_sdks.appplatform.v2022_01_01_preview import models as models_20220101preview
 
 DEFAULT_BUILD_SERVICE_NAME = "default"
@@ -20,3 +21,30 @@ def _update_default_build_agent_pool(cmd, client, resource_group, name, build_po
             properties=build_properties)
         return client.build_service_agent_pool.begin_update_put(
             resource_group, name, DEFAULT_BUILD_SERVICE_NAME, DEFAULT_BUILD_AGENT_POOL_NAME, agent_pool_resource)
+
+
+def create_or_update_builder(cmd, client, resource_group, service, name, builder_json=None, builder_file=None):
+    builder = _update_builder(builder_file, builder_json, [])
+    builder_resource = models_20220101preview.BuilderResource(
+        properties=builder
+    )
+    return client.build_service_builder.begin_create_or_update(resource_group, service, DEFAULT_BUILD_SERVICE_NAME,
+                                                               name, builder_resource)
+
+
+def builder_show(cmd, client, resource_group, service, name,):
+    return client.build_service_builder.get(resource_group, service, DEFAULT_BUILD_SERVICE_NAME, name)
+
+
+def builder_delete(cmd, client, resource_group, service, name):
+    return client.build_service_builder.begin_delete(resource_group, service, DEFAULT_BUILD_SERVICE_NAME, name)
+
+
+def _update_builder(builder_file, builder_json, builder):
+    if builder_file is not None:
+        with open(builder_file, 'r') as json_file:
+            builder = json.load(json_file)
+
+    if builder_json is not None:
+        builder = json.loads(builder_json)
+    return builder
