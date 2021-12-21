@@ -352,7 +352,7 @@ helps['spring-cloud app deployment start-jfr'] = """
 
 helps['spring-cloud config-server'] = """
     type: group
-    short-summary: Commands to manage Config Server in Azure Spring Cloud.
+    short-summary: (Support Standard Tier and Basic Tier) Commands to manage Config Server in Azure Spring Cloud.
 """
 
 helps['spring-cloud config-server show'] = """
@@ -579,7 +579,7 @@ helps['spring-cloud app-insights update'] = """
 
 helps['spring-cloud service-registry'] = """
     type: group
-    short-summary: (Enterprise Tier Only) Commands to manage Service Registry in Azure Spring Cloud.
+    short-summary: (Support Enterprise Tier Only) Commands to manage Service Registry in Azure Spring Cloud.
 """
 
 helps['spring-cloud service-registry show'] = """
@@ -605,7 +605,7 @@ helps['spring-cloud service-registry unbind'] = """
 
 helps['spring-cloud application-configuration-service'] = """
     type: group
-    short-summary: (Enterprise Tier Only) Commands to manage Application Configuration Service in Azure Spring Cloud.
+    short-summary: (Support Enterprise Tier Only) Commands to manage Application Configuration Service in Azure Spring Cloud.
 """
 
 helps['spring-cloud application-configuration-service show'] = """
@@ -665,7 +665,7 @@ helps['spring-cloud application-configuration-service unbind'] = """
 
 helps['spring-cloud build-service builder'] = """
     type: group
-    short-summary: (Enterprise Tier Only) Commands to manage Builder Resource
+    short-summary: (Support Enterprise Tier Only) Commands to manage Builder Resource
 """
 
 helps['spring-cloud build-service builder create'] = """
@@ -702,7 +702,7 @@ helps['spring-cloud build-service builder delete'] = """
 
 helps['spring-cloud build-service buildpacks-binding'] = """
     type: group
-    short-summary: (Enterprise Tier Only) Commands to manage buildpack Binding
+    short-summary: (Support Enterprise Tier Only) Commands to manage buildpack Binding
 """
 
 helps['spring-cloud build-service builder buildpack-binding create'] = """
@@ -753,7 +753,7 @@ helps['spring-cloud build-service builder buildpack-binding delete'] = """
 
 helps['spring-cloud gateway'] = """
     type: group
-    short-summary: (Enterprise Tier Only) Commands to manage gateway in Azure Spring Cloud.
+    short-summary: (Support Enterprise Tier Only) Commands to manage gateway in Azure Spring Cloud.
 """
 
 helps['spring-cloud gateway clear'] = """
@@ -860,7 +860,7 @@ helps['spring-cloud gateway custom-domain unbind'] = """
 
 helps['spring-cloud api-portal'] = """
     type: group
-    short-summary: (Enterprise Tier Only) Commands to manage API portal in Azure Spring Cloud.
+    short-summary: (Support Enterprise Tier Only) Commands to manage API portal in Azure Spring Cloud.
 """
 
 helps['spring-cloud api-portal clear'] = """

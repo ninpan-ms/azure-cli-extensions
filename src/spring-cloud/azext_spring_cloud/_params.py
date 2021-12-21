@@ -85,41 +85,41 @@ def load_arguments(self, _):
                    validator=validate_build_pool_size,
                    default='S1',
                    is_preview=True,
-                   help='Only support in enterprise tier now. Size of build agent pool.')
+                   help='(Support Enterprise Tier Only) Size of build agent pool.')
         c.argument('enable_application_configuration_service',
                    arg_type=get_three_state_flag(),
                    default=False,
                    is_preview=True,
-                   help='Only support in enterprise tier now. Enable Application Configuration Service.')
+                   help='(Support Enterprise Tier Only) Enable Application Configuration Service.')
         c.argument('enable_service_registry',
                    arg_type=get_three_state_flag(),
                    default=False,
                    is_preview=True,
-                   help='Only support in enterprise tier now. Enable Service Registry.')
+                   help='(Support Enterprise Tier Only) Enable Service Registry.')
         c.argument('enable_gateway',
                    arg_group="Spring Cloud Gateway",
                    arg_type=get_three_state_flag(),
                    default=False,
                    is_preview=True,
-                   help='Only support in enterprise tier now. Enable Spring Cloud Gateway.')
+                   help='(Support Enterprise Tier Only) Enable Spring Cloud Gateway.')
         c.argument('gateway_instance_count',
                    arg_group="Spring Cloud Gateway",
                    type=int,
                    validator=validate_gateway_instance_count,
                    is_preview=True,
-                   help='Only support in enterprise tier now. Number of Spring Cloud Gateway instances.')
+                   help='(Support Enterprise Tier Only) Number of Spring Cloud Gateway instances.')
         c.argument('enable_api_portal',
                    arg_group="API portal",
                    arg_type=get_three_state_flag(),
                    default=False,
                    is_preview=True,
-                   help='Only support in enterprise tier now. Enable API portal.')
+                   help='(Support Enterprise Tier Only) Enable API portal.')
         c.argument('api_portal_instance_count',
                    arg_group="API portal",
                    type=int,
                    validator=validate_api_portal_instance_count,
                    is_preview=True,
-                   help='Only support in enterprise tier now. Number of API portal instances.')
+                   help='(Support Enterprise Tier Only) Number of API portal instances.')
 
     with self.argument_context('spring-cloud update') as c:
         c.argument('sku', arg_type=get_enum_type(['Basic', 'Standard', 'Enterprise']), validator=validate_sku, help='Name of SKU.')
@@ -149,7 +149,7 @@ def load_arguments(self, _):
         c.argument('build_pool_size',
                    arg_type=get_enum_type(['S1', 'S2', 'S3', 'S4', 'S5']),
                    is_preview=True,
-                   help='Only support in enterprise tier now. Size of build agent pool.')
+                   help='(Support Enterprise Tier Only) Size of build agent pool.')
 
     for scope in ['spring-cloud create', 'spring-cloud update']:
         with self.argument_context(scope) as c:
@@ -258,7 +258,7 @@ def load_arguments(self, _):
     for scope in ['spring-cloud app update', 'spring-cloud app deployment create', 'spring-cloud app deploy']:
         with self.argument_context(scope) as c:
             c.argument('config_file_patterns', type=str,
-                    help="Only support in enterprise tier now. Config file patterns separated with \',\' to decide which patterns of Application Configuration Service will be used. Use '\"\"' to clear existing configurations.",
+                    help="(Support Enterprise Tier Only) Config file patterns separated with \',\' to decide which patterns of Application Configuration Service will be used. Use '\"\"' to clear existing configurations.",
                     validator=validate_config_file_patterns, is_preview=True)
 
     with self.argument_context('spring-cloud app scale') as c:
@@ -283,7 +283,7 @@ def load_arguments(self, _):
                 'main_entry', options_list=[
                     '--main-entry', '-m'], help="A string containing the path to the .NET executable relative to zip root.")
             c.argument(
-                'builder', help="Only support in enterprise tier now. The name of builder.", default="default", validator=validate_builder, is_preview=True)
+                'builder', help="(Support Enterprise Tier Only) The name of builder.", default="default", validator=validate_builder, is_preview=True)
             c.argument(
                 'target_module', help='Child module to be deployed, required for multiple jar packages built from source code.')
             c.argument(
