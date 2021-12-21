@@ -14,7 +14,7 @@ GATEWAY_RESOURCE_TYPE = "gateways"
 DEFAULT_NAME = "default"
 logger = get_logger(__name__)
 
-def create_application_configuration_service(cmd, client, resource_group, service, enable_application_configuration_service=None):
+def create_application_configuration_service(cmd, client, resource_group, service, enable_application_configuration_service):
     if enable_application_configuration_service:
         logger.warning(" - Creating Application Configuration Service ..")
         acs_resource = models.ConfigurationServiceResource()
@@ -27,14 +27,17 @@ def create_service_registry(cmd, client, resource_group, service, enable_service
         return client.service_registries.begin_create_or_update(resource_group, service, DEFAULT_NAME)
 
 
-def create_gateway(cmd, client, resource_group, service, enable_gateway):
+def create_gateway(cmd, client, resource_group, service, enable_gateway, gateway_instance_count, sku):
     if enable_gateway:
         logger.warning(" - Creating Spring Cloud Gateway ..")
         gateway_resource = models.GatewayResource()
+        if gateway_instance_count and sku:
+            gateway_resource.sku = models.Sku(name=sku.name, tier=sku.tier,
+                                              capacity=gateway_instance_count)
         return client.gateways.begin_create_or_update(resource_group, service, DEFAULT_NAME, gateway_resource)
 
 
-def create_api_portal(cmd, client, resource_group, service, enable_api_portal):
+def create_api_portal(cmd, client, resource_group, service, enable_api_portal, api_portal_instance_count, sku):
     if enable_api_portal:
         logger.warning(" - Creating API portal ..")
         gateway_id = resource_id(
@@ -52,4 +55,7 @@ def create_api_portal(cmd, client, resource_group, service, enable_api_portal):
                 gateway_ids=[gateway_id]
             )
         )
+        if api_portal_instance_count and sku:
+            api_portal_resource.sku = models.Sku(name=sku.name, tier=sku.tier,
+                                                 capacity=api_portal_instance_count)
         return client.api_portals.begin_create_or_update(resource_group, service, DEFAULT_NAME, api_portal_resource)

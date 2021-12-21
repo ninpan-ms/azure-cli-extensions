@@ -194,3 +194,15 @@ def validate_builder_resource(namespace):
 def validate_build_pool_size(namespace):
     if _parse_sku_name(namespace.sku) != 'enterprise':
         namespace.build_pool_size = None
+
+
+def validate_gateway_instance_count(namespace):
+    if namespace.gateway_instance_count is not None:
+        if namespace.gateway_instance_count < 1:
+            raise CLIError("--gateway-instance-count must be greater than 0")
+
+
+def validate_api_portal_instance_count(namespace):
+    if namespace.api_portal_instance_count is not None:
+        if namespace.api_portal_instance_count < 1:
+            raise CLIError("--api-portal-instance-count must be greater than 0")
