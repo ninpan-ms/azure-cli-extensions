@@ -43,9 +43,10 @@ def spring_cloud_create(cmd, client, resource_group, name, location=None,
                         app_insights_key=None, app_insights=None, sampling_rate=None,
                         disable_app_insights=None, enable_java_agent=None,
                         enable_application_configuration_service=None, enable_service_registry=None,
-                        enable_gateway=None, enable_api_portal=None,
+                        enable_gateway=None, gateway_instance_count=None,
+                        enable_api_portal=None, api_portal_instance_count=None,
                         sku=None, tags=None, build_pool_size=None, no_wait=False):
-    resource = _create_service(cmd, client, resource_group, name, 
+    poller = _create_service(cmd, client, resource_group, name,
                              location=location,
                              service_runtime_subnet=service_runtime_subnet,
                              app_subnet=app_subnet,
@@ -54,19 +55,20 @@ def spring_cloud_create(cmd, client, resource_group, name, location=None,
                              app_network_resource_group=app_network_resource_group,
                              sku=sku,
                              tags=tags)
+
+    service = client.services.get(resource_group, name)
     pollers = [
         _update_default_build_agent_pool(cmd, client, resource_group, name, build_pool_size),
         create_application_configuration_service(cmd, client, resource_group, name, enable_application_configuration_service),
         create_service_registry(cmd, client, resource_group, name, enable_service_registry),
-        create_gateway(cmd, client, resource_group, name, enable_gateway),
-        create_api_portal(cmd, client, resource_group, name, enable_api_portal),
+        create_gateway(cmd, client, resource_group, name, enable_gateway, gateway_instance_count, service.sku),
+        create_api_portal(cmd, client, resource_group, name, enable_api_portal, api_portal_instance_count, service.sku),
         create_default_buildpack_binding_for_application_insights(cmd, client, resource_group, name, location, app_insights_key,
-                                                                  app_insights, sampling_rate, disable_app_insights)
-    ]
+                                                                  app_insights, sampling_rate, disable_app_insights)]
     pollers = [x for x in pollers if x]
     if not no_wait:
         _wait_till_end(cmd, *pollers)
-    return resource
+    return poller
 
 
 def app_create_enterprise(cmd, client, resource_group, service, name, 

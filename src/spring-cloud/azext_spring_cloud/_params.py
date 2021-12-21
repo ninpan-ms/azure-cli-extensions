@@ -20,7 +20,7 @@ from ._validators_enterprise import (validate_config_file_patterns, validate_cpu
                                      validate_buildpack_binding_not_exist, validate_buildpack_binding_exist,
                                      validate_git_uri, validate_acs_patterns, validate_routes, validate_builder,
                                      validate_build_pool_size, validate_builder_resource, validate_builder_create,
-                                     validate_builder_update)
+                                     validate_builder_update, validate_gateway_instance_count, validate_api_portal_instance_count)
 from ._app_validator import (fulfill_deployment_param, active_deployment_exist, active_deployment_exist_under_app, ensure_not_active_deployment)
 from ._utils import ApiType
 
@@ -97,15 +97,29 @@ def load_arguments(self, _):
                    is_preview=True,
                    help='Only support in enterprise tier now. Enable Service Registry.')
         c.argument('enable_gateway',
+                   arg_group="Spring Cloud Gateway",
                    arg_type=get_three_state_flag(),
                    default=False,
                    is_preview=True,
                    help='Only support in enterprise tier now. Enable Spring Cloud Gateway.')
+        c.argument('gateway_instance_count',
+                   arg_group="Spring Cloud Gateway",
+                   type=int,
+                   validator=validate_gateway_instance_count,
+                   is_preview=True,
+                   help='Only support in enterprise tier now. Number of Spring Cloud Gateway instances.')
         c.argument('enable_api_portal',
+                   arg_group="API portal",
                    arg_type=get_three_state_flag(),
                    default=False,
                    is_preview=True,
                    help='Only support in enterprise tier now. Enable API portal.')
+        c.argument('api_portal_instance_count',
+                   arg_group="API portal",
+                   type=int,
+                   validator=validate_api_portal_instance_count,
+                   is_preview=True,
+                   help='Only support in enterprise tier now. Number of API portal instances.')
 
     with self.argument_context('spring-cloud update') as c:
         c.argument('sku', arg_type=get_enum_type(['Basic', 'Standard', 'Enterprise']), validator=validate_sku, help='Name of SKU.')
