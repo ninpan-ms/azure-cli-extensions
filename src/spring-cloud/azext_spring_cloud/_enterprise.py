@@ -10,6 +10,7 @@ from ._tanzu_component import (create_application_configuration_service,
                                create_service_registry,
                                create_gateway,
                                create_api_portal)
+from .buildpack_binding import create_default_buildpack_binding_for_application_insights
 from .custom import (app_get, _create_service)
 from azure.cli.core.commands.client_factory import get_subscription_id
 from azure.cli.core.util import sdk_no_wait
@@ -58,12 +59,14 @@ def spring_cloud_create(cmd, client, resource_group, name, location=None,
         create_application_configuration_service(cmd, client, resource_group, name, enable_application_configuration_service),
         create_service_registry(cmd, client, resource_group, name, enable_service_registry),
         create_gateway(cmd, client, resource_group, name, enable_gateway),
-        create_api_portal(cmd, client, resource_group, name, enable_api_portal)]
+        create_api_portal(cmd, client, resource_group, name, enable_api_portal),
+        create_default_buildpack_binding_for_application_insights(cmd, client, resource_group, name, location, app_insights_key,
+                                                                  app_insights, sampling_rate, disable_app_insights)
+    ]
     pollers = [x for x in pollers if x]
     if not no_wait:
         _wait_till_end(cmd, *pollers)
     return resource
-
 
 
 def app_create_enterprise(cmd, client, resource_group, service, name, 

@@ -82,7 +82,7 @@ def _is_valid_app_and_profile_name(pattern):
     return len(parts) == 2 and _is_valid_app_name(parts[0]) and _is_valid_profile_name(parts[1])
 
 
-def validate_buildpacks_binding_properties(namespace):
+def validate_buildpack_binding_properties(namespace):
     """ Extracts multiple space-separated properties in key[=value] format """
     if isinstance(namespace.properties, list):
         properties_dict = {}
@@ -91,7 +91,7 @@ def validate_buildpacks_binding_properties(namespace):
         namespace.properties = properties_dict
 
 
-def validate_buildpacks_binding_secrets(namespace):
+def validate_buildpack_binding_secrets(namespace):
     """ Extracts multiple space-separated secrets in key[=value] format """
     if isinstance(namespace.secrets, list):
         secrets_dict = {}
@@ -100,28 +100,29 @@ def validate_buildpacks_binding_secrets(namespace):
         namespace.secrets = secrets_dict
 
 
-def validate_buildpacks_binding_not_exist(cmd, namespace):
+def validate_buildpack_binding_not_exist(cmd, namespace):
     client = get_client(cmd)
     try:
-        binding_resource = client.buildpacks_binding.get(namespace.resource_group,
+        binding_resource = client.buildpack_binding.get(namespace.resource_group,
                                                          namespace.service,
                                                          DEFAULT_BUILD_SERVICE_NAME,
+                                                         namespace.builder_name,
                                                          namespace.name)
         if binding_resource is not None:
-            raise CLIError('Buildpacks Binding {} already exists '
+            raise CLIError('buildpack Binding {} in builder {} already exists '
                            'in resource group {}, service {}. You can edit it by set command.'
-                           .format(namespace.name, namespace.resource_group, namespace.service))
+                           .format(namespace.name, namespace.resource_group, namespace.service, namespace.builder_name))
     except ResourceNotFoundError:
         # Excepted case
         pass
 
-
-def validate_buildpacks_binding_exist(cmd, namespace):
+def validate_buildpack_binding_exist(cmd, namespace):
     client = get_client(cmd)
     # If not exists exception will be raised
-    client.buildpacks_binding.get(namespace.resource_group,
+    client.buildpack_binding.get(namespace.resource_group,
                                   namespace.service,
                                   DEFAULT_BUILD_SERVICE_NAME,
+                                  namespace.builder_name,
                                   namespace.name)
 
 

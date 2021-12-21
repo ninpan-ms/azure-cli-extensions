@@ -694,45 +694,53 @@ helps['spring-cloud build-service builder delete'] = """
 
 helps['spring-cloud build-service buildpacks-binding'] = """
     type: group
-    short-summary: (Enterprise Tier Only) Commands to manage Buildpacks Binding
+    short-summary: (Enterprise Tier Only) Commands to manage buildpack Binding
 """
 
-helps['spring-cloud build-service buildpacks-binding create'] = """
+helps['spring-cloud build-service builder buildpack-binding create'] = """
     type: command
-    short-summary: Create a buildpacks binding.
+    short-summary: Create a buildpack binding.
     examples:
-        - name: Create a buildpacks binding without properties or secrets.
-          text: az spring-cloud build-service buildpacks-binding create --name first-binding --type ApplicationInsights
-        - name: Create a buildpacks binding with only secrets.
-          text: az spring-cloud build-service buildpacks-binding create --name first-binding --type ApplicationInsights --secrets k1=v1 k2=v2
-        - name: Create a buildpacks binding with only properties.
-          text: az spring-cloud build-service buildpacks-binding create --name first-binding --type ApplicationInsights --properties a=b c=d
-        - name: Create a buildpacks binding with properties and secrets.
-          text: az spring-cloud build-service buildpacks-binding create --name first-binding --type ApplicationInsights --properties a=b c=d --secrets k1=v1 k2=v2
+        - name: Create a buildpack binding without properties or secrets.
+          text: az spring-cloud build-service builder buildpack-binding create --name first-binding --builder-name first-builder --type ApplicationInsights
+        - name: Create a buildpack binding with only secrets.
+          text: az spring-cloud build-service builder buildpack-binding create --name first-binding --builder-name first-builder --type ApplicationInsights --secrets k1=v1 k2=v2
+        - name: Create a buildpack binding with only properties.
+          text: az spring-cloud build-service builder buildpack-binding create --name first-binding --builder-name first-builder --type ApplicationInsights --properties a=b c=d
+        - name: Create a buildpack binding with properties and secrets.
+          text: az spring-cloud build-service builder buildpack-binding create --name first-binding --builder-name first-builder --type ApplicationInsights --properties a=b c=d --secrets k1=v1 k2=v2
 """
 
-helps['spring-cloud build-service buildpacks-binding set'] = """
+helps['spring-cloud build-service builder buildpack-binding set'] = """
     type: command
-    short-summary: Set a buildpacks binding.
+    short-summary: Set a buildpack binding.
     examples:
-        - name: Set a buildpacks binding with properties and secrets.
-          text: az spring-cloud build-service buildpacks-binding set --name first-binding --type ApplicationInsights --properties a=b c=d --secrets k1=v1 k2=v2
+        - name: Set a buildpack binding with properties and secrets.
+          text: az spring-cloud build-service builder buildpack-binding set --name first-binding --builder-name first-builder --type ApplicationInsights --properties a=b c=d --secrets k1=v1 k2=v2
 """
 
-helps['spring-cloud build-service buildpacks-binding show'] = """
+helps['spring-cloud build-service builder buildpack-binding show'] = """
     type: command
-    short-summary: Show a buildpacks binding. The secrets will be masked.
+    short-summary: Show a buildpack binding. The secrets will be masked.
     examples:
-        - name: Show a buildpacks binding.
-          text: az spring-cloud build-service buildpacks-binding show --name first-binding
+        - name: Show a buildpack binding.
+          text: az spring-cloud build-service builder buildpack-binding show --name first-binding --builder-name first-builder
 """
 
-helps['spring-cloud build-service buildpacks-binding delete'] = """
+helps['spring-cloud build-service builder buildpack-binding list'] = """
     type: command
-    short-summary: Delete a buildpacks binding.
+    short-summary: List all buildpack binding in a builder. The secrets will be masked.
     examples:
-        - name: Delete a buildpacks binding.
-          text: az spring-cloud build-service buildpacks-binding delete --name first-binding
+        - name: Show a buildpack binding.
+          text: az spring-cloud build-service builder buildpack-binding list --builder-name first-builder
+"""
+
+helps['spring-cloud build-service builder buildpack-binding delete'] = """
+    type: command
+    short-summary: Delete a buildpack binding.
+    examples:
+        - name: Delete a buildpack binding.
+          text: az spring-cloud build-service builder buildpack-binding delete --name first-binding --builder-name first-builder
 """
 
 helps['spring-cloud gateway'] = """

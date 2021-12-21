@@ -80,8 +80,8 @@ def load_command_table(self, _):
         client_factory=cf_spring_cloud_enterprise
     )
 
-    buildpacks_binding_cmd_group = CliCommandType(
-        operations_tmpl="azext_spring_cloud.buildpacks_binding#{}",
+    buildpack_binding_cmd_group = CliCommandType(
+        operations_tmpl="azext_spring_cloud.buildpack_binding#{}",
         client_factory=cf_spring_cloud_enterprise
     )
 
@@ -298,14 +298,16 @@ def load_command_table(self, _):
         g.custom_command('show', 'builder_show')
         g.custom_command('delete', 'builder_delete')
 
-    with self.command_group('spring-cloud build-service buildpacks-binding',
-                            custom_command_type=buildpacks_binding_cmd_group,
-                            exception_handler=handle_asc_exception) as g:
+
+    with self.command_group('spring-cloud build-service builder buildpack-binding',
+                            custom_command_type=buildpack_binding_cmd_group,
+                            exception_handler=handle_asc_exception, is_preview=True) as g:
         # create and set commands are differentiate by their parameter validators
-        g.custom_command('create', 'create_or_update_buildpacks_binding')
-        g.custom_command('set', 'create_or_update_buildpacks_binding')
-        g.custom_command('show', 'buildpacks_binding_show')
-        g.custom_command('delete', 'buildpacks_binding_delete')
+        g.custom_command('create', 'create_or_update_buildpack_binding')
+        g.custom_command('set', 'create_or_update_buildpack_binding')
+        g.custom_command('show', 'buildpack_binding_show')
+        g.custom_command('list', 'buildpack_binding_list')
+        g.custom_command('delete', 'buildpack_binding_delete')
 
     with self.command_group('spring-cloud', exception_handler=handle_asc_exception):
         pass
