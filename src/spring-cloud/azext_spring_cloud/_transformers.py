@@ -17,6 +17,7 @@ def transform_spring_cloud_table_output(result):
     for item in result:
         item['State'] = item['properties']['provisioningState']
         item['tags'] = item['tags']
+        item['tier'] = item['sku']['tier']
 
     return result if is_list else result[0]
 
