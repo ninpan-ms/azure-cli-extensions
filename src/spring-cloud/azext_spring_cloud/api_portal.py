@@ -3,10 +3,10 @@
 # Licensed under the MIT License. See License.txt in the project root for license information.
 # --------------------------------------------------------------------------------------------
 
+from knack.util import CLIError
 from .vendored_sdks.appplatform.v2022_01_01_preview import models as models
 
 DEFAULT_NAME = "default"
-
 
 def api_portal_show(cmd, client, resource_group, service):
     return client.api_portals.get(resource_group, service, DEFAULT_NAME)
@@ -40,6 +40,9 @@ def api_portal_update(cmd, client, resource_group, service,
 
     sku = models.Sku(name=api_portal.sku.name, tier=api_portal.sku.tier,
                      capacity=instance_count or api_portal.sku.capacity)
+
+    if sku.capacity > 1 and properties.sso_properties:
+        raise CLIError("API Portal doesn't support to configure SSO with multiple replicas for now.")
 
     api_portal_resource = models.ApiPortalResource(
         properties=properties, sku=sku)
