@@ -5,9 +5,13 @@
 
 import json
 from .vendored_sdks.appplatform.v2022_01_01_preview import models
-from ._resource_quantity import validate_cpu, validate_memory
 from knack.util import CLIError
+from knack.log import get_logger
+from azure.cli.core.util import sdk_no_wait
+from .custom import LOG_RUNNING_PROMPT
 
+
+logger = get_logger(__name__)
 DEFAULT_NAME = "default"
 
 def gateway_update(cmd, client, resource_group, service,
@@ -30,7 +34,8 @@ def gateway_update(cmd, client, resource_group, service,
                    allowed_headers=None,
                    max_age=None,
                    allow_credentials=None,
-                   exposed_headers=None
+                   exposed_headers=None,
+                   no_wait=False
                    ):
     gateway = client.gateways.get(resource_group, service, DEFAULT_NAME)
 
@@ -66,7 +71,10 @@ def gateway_update(cmd, client, resource_group, service,
                      capacity=instance_count or gateway.sku.capacity)
 
     gateway_resource = models.GatewayResource(properties=properties, sku=sku)
-    return client.gateways.begin_create_or_update(resource_group, service, DEFAULT_NAME, gateway_resource)
+
+    logger.warning(LOG_RUNNING_PROMPT)
+    return sdk_no_wait(no_wait, client.gateways.begin_create_or_update,
+                       resource_group, service, DEFAULT_NAME, gateway_resource)
 
 
 def gateway_show(cmd, client, resource_group, service):
