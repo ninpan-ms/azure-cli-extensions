@@ -70,7 +70,7 @@ def api_portal_custom_domain_update(cmd, client, resource_group, service,
                                     certificate=None):
     properties = models.ApiPortalCustomDomainProperties()
     if certificate is not None:
-        certificate_response = client.api_portals.certificates.get(
+        certificate_response = client.certificates.get(
             resource_group, service, certificate)
         properties = models.ApiPortalCustomDomainProperties(
             thumbprint=certificate_response.properties.thumbprint

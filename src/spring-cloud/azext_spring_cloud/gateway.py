@@ -94,7 +94,7 @@ def gateway_custom_domain_update(cmd, client, resource_group, service,
                                  certificate=None):
     properties = models.GatewayCustomDomainProperties()
     if certificate is not None:
-        certificate_response = client.gateways.certificates.get(
+        certificate_response = client.certificates.get(
             resource_group, service, certificate)
         properties.thumbprint = certificate_response.properties.thumbprint
 
