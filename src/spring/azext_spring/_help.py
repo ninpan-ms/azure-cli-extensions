@@ -1593,3 +1593,74 @@ helps['spring component instance list'] = """
         - name: List instances for spring-cloud-gateway-operator of Spring Cloud Gateway
           text: az spring component instance list --component spring-cloud-gateway-operator --service MyAzureSpringAppsInstance --resource-group MyResourceGroup
 """
+
+helps['spring job'] = """
+    type: group
+    short-summary: (Enterprise Tier Only) Commands to manage job of Azure Spring Apps service.
+"""
+
+helps['spring job create'] = """
+    type: command
+    short-summary: Create a new job in Azure Spring Apps service.
+    examples:
+    - name: Create a job with the default configuration.
+      text: az spring job create -n MyJob -s MyCluster -g MyResourceGroup
+"""
+
+helps['spring job update'] = """
+    type: command
+    short-summary: Update configurations of a job.
+    examples:
+    - name: Add an environment variable for the job.
+      text: az spring job update -n MyJob -s MyCluster -g MyResourceGroup --env foo=bar
+"""
+
+helps['spring job delete'] = """
+    type: command
+    short-summary: Delete a job in the Azure Spring Apps.
+"""
+
+helps['spring job list'] = """
+    type: command
+    short-summary: List all jobs in the Azure Spring Apps.
+"""
+
+helps['spring job show'] = """
+    type: command
+    short-summary: Show the details of a job in the Azure Spring Apps.
+"""
+
+helps['spring job start'] = """
+    type: command
+    short-summary: Start an execution of the job.
+"""
+
+helps['spring job execution'] = """
+    type: group
+    short-summary: (Enterprise Tier Only) Commands to manage job executions of Azure Spring Apps service.
+"""
+
+helps['spring job execution cancel'] = """
+    type: command
+    short-summary: Cancel an execution of the job.
+"""
+
+helps['spring job execution show'] = """
+    type: command
+    short-summary: Show status and results of an execution of the job.
+"""
+
+helps['spring job execution list'] = """
+    type: command
+    short-summary: List all executions of the job.
+"""
+
+helps['spring job deploy'] = """
+    type: command
+    short-summary: Deploy artifact to a job and update related configurations.
+    examples:
+    - name: Deploy a pre-built jar to a job with jvm options and environment variables.
+      text: az spring job deploy -n MyJob -s MyCluster -g MyResourceGroup --artifact-path app.jar --jvm-options="-XX:+UseG1GC -XX:+UseStringDeduplication" --env foo=bar
+    - name: Deploy a pre-built jar to a job with build env.
+      text: az spring job deploy -n MyJob -s MyCluster -g MyResourceGroup --artifact-path app.jar --build-env BP_JVM_VERSION=11.*
+"""

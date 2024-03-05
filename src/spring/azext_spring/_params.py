@@ -34,7 +34,8 @@ from ._validators_enterprise import (only_support_enterprise, validate_builder_r
                                      validate_apm_not_exist, validate_apm_update, validate_apm_reference,
                                      validate_apm_reference_and_enterprise_tier, validate_cert_reference,
                                      validate_build_cert_reference, validate_acs_create, not_support_enterprise,
-                                     validate_create_app_binding_default_application_configuration_service, validate_create_app_binding_default_service_registry)
+                                     validate_create_app_binding_default_application_configuration_service, validate_create_app_binding_default_service_registry,
+                                     validate_envs, validate_secret_envs)
 from ._app_validator import (fulfill_deployment_param, active_deployment_exist,
                              ensure_not_active_deployment, validate_deloy_path, validate_deloyment_create_path,
                              validate_cpu, validate_build_cpu, validate_memory, validate_build_memory,
@@ -1143,3 +1144,32 @@ def load_arguments(self, _):
     with self.argument_context('spring component instance') as c:
         c.argument('component', options_list=['--component', '-c'],
                    help="Name of the component. Find components from command `az spring component list`")
+
+    with self.argument_context('spring job list') as c:
+        c.argument('service', service_name_type, validator=only_support_enterprise)
+
+    for scope in ['spring job create', 'spring job update', 'spring job deploy', 'spring job start', 'spring job show', 'spring job delete', 'spring job execution list', 'spring job execution show', 'spring job execution cancel']:
+        with self.argument_context(scope) as c:
+            c.argument('service', service_name_type, validator=only_support_enterprise)
+            c.argument('name', name_type, help='The name of job running in the specified Azure Spring Apps instance.')
+
+    with self.argument_context('spring job deploy') as c:
+        c.argument('builder', help='(Enterprise Tier Only) Build service builder used to build the executable.', default='default')
+        c.argument('build_env', build_env_type)
+        c.argument('build_cpu', arg_type=build_cpu_type, default="1")
+        c.argument('build_memory', arg_type=build_memory_type, default="2Gi")
+        c.argument('artifact_path', help='Deploy the specified pre-built artifact (jar or netcore zip).', validator=validate_artifact_path)
+        c.argument('disable_validation', arg_type=get_three_state_flag(), help='If true, disable jar validation.')
+
+    for scope in ['job update', 'job deploy', 'job start']:
+        with self.argument_context('spring {}'.format(scope)) as c:
+            c.argument('envs', nargs='*',
+                   help='Non-sensitive properties for environment variables. Format "key[=value]" and separated by space.', validator=validate_envs)
+            c.argument('secret_envs', nargs='*',
+                   help='Sensitive properties for environment variables. Once put, it will be encrypted and not returned.'
+                        'Format "key[=value]" and separated by space.', validator=validate_secret_envs)
+            c.argument('args', help='The arguments of the job execution.')
+
+    with self.argument_context('spring job start') as c:
+        c.argument('cpu', type=str, help='CPU resource quantity. Should be 500m or number of CPU cores.', validator=validate_cpu)
+        c.argument('memory', type=str, help='Memory resource quantity. Should be 512Mi or #Gi, e.g., 1Gi, 3Gi.', validator=validate_memory)

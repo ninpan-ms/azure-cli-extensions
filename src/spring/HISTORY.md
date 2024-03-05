@@ -1,5 +1,9 @@
 Release History
 ===============
+1.21.0
+---
+* Add Job support.
+
 1.20.1
 ---
 * Add command to show the configurations pulled by Application Configuration Service from upstream Git repositories. `az spring application-configuration-service config show`.

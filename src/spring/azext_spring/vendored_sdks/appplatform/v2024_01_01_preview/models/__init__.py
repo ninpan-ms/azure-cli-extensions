@@ -171,12 +171,22 @@ from ._models_py3 import IngressConfig
 from ._models_py3 import IngressSettings
 from ._models_py3 import IngressSettingsClientAuth
 from ._models_py3 import JarUploadedUserSourceInfo
+from ._models_py3 import JobExecution
+from ._models_py3 import JobExecutionCollection
+from ._models_py3 import JobExecutionProperties
+from ._models_py3 import JobExecutionTemplate
+from ._models_py3 import JobExecutionTemplateEnvironmentVariables
+from ._models_py3 import JobResource
+from ._models_py3 import JobResourceCollection
+from ._models_py3 import JobResourceProperties
+from ._models_py3 import JobTriggerConfig
 from ._models_py3 import KeyVaultCertificateProperties
 from ._models_py3 import LoadedCertificate
 from ._models_py3 import LogFileUrlResponse
 from ._models_py3 import LogSpecification
 from ._models_py3 import MaintenanceScheduleConfiguration
 from ._models_py3 import ManagedIdentityProperties
+from ._models_py3 import ManualJobTriggerConfig
 from ._models_py3 import MarketplaceResource
 from ._models_py3 import MetricDimension
 from ._models_py3 import MetricSpecification
@@ -298,6 +308,8 @@ from ._app_platform_management_client_enums import GatewayProvisioningState
 from ._app_platform_management_client_enums import GatewayRouteConfigProtocol
 from ._app_platform_management_client_enums import GitImplementation
 from ._app_platform_management_client_enums import HTTPSchemeType
+from ._app_platform_management_client_enums import JobExecutionRunningState
+from ._app_platform_management_client_enums import JobResourceProvisioningState
 from ._app_platform_management_client_enums import KPackBuildStageProvisioningState
 from ._app_platform_management_client_enums import KeyVaultCertificateAutoSync
 from ._app_platform_management_client_enums import LastModifiedByType
@@ -492,12 +504,22 @@ __all__ = [
     "IngressSettings",
     "IngressSettingsClientAuth",
     "JarUploadedUserSourceInfo",
+    "JobExecution",
+    "JobExecutionCollection",
+    "JobExecutionProperties",
+    "JobExecutionTemplate",
+    "JobExecutionTemplateEnvironmentVariables",
+    "JobResource",
+    "JobResourceCollection",
+    "JobResourceProperties",
+    "JobTriggerConfig",
     "KeyVaultCertificateProperties",
     "LoadedCertificate",
     "LogFileUrlResponse",
     "LogSpecification",
     "MaintenanceScheduleConfiguration",
     "ManagedIdentityProperties",
+    "ManualJobTriggerConfig",
     "MarketplaceResource",
     "MetricDimension",
     "MetricSpecification",
@@ -618,6 +640,8 @@ __all__ = [
     "GatewayRouteConfigProtocol",
     "GitImplementation",
     "HTTPSchemeType",
+    "JobExecutionRunningState",
+    "JobResourceProvisioningState",
     "KPackBuildStageProvisioningState",
     "KeyVaultCertificateAutoSync",
     "LastModifiedByType",

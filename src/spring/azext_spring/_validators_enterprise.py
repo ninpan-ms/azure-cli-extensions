@@ -687,6 +687,24 @@ def validate_create_app_binding_default_service_registry(cmd, namespace):
                                                                                        namespace.service)
 
 
+def validate_envs(namespace):
+    """ Extracts multiple space-separated properties in key[=value] format """
+    if isinstance(namespace.envs, list):
+        properties_dict = {}
+        for item in namespace.envs:
+            properties_dict.update(validate_tag(item))
+        namespace.envs = properties_dict
+
+
+def validate_secret_envs(namespace):
+    """ Extracts multiple space-separated secrets in key[=value] format """
+    if isinstance(namespace.secret_envs, list):
+        secrets_dict = {}
+        for item in namespace.secret_envs:
+            secrets_dict.update(validate_tag(item))
+        namespace.secret_envs = secrets_dict
+
+
 def _get_eactly_one_service_registry_resource_id(cmd, resource_group, service):
     client = get_client(cmd)
     service_registry_resources = list(client.service_registries.list(resource_group, service))
