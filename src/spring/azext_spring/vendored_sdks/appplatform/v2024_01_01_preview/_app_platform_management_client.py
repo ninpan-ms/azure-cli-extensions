@@ -39,6 +39,10 @@ from .operations import (
     GatewayCustomDomainsOperations,
     GatewayRouteConfigsOperations,
     GatewaysOperations,
+    JobExecutionOperations,
+    JobExecutionsOperations,
+    JobOperations,
+    JobsOperations,
     MonitoringSettingsOperations,
     Operations,
     PredefinedAcceleratorsOperations,
@@ -142,6 +146,16 @@ class AppPlatformManagementClient:  # pylint: disable=client-accepts-api-version
     :ivar predefined_accelerators: PredefinedAcceleratorsOperations operations
     :vartype predefined_accelerators:
      azure.mgmt.appplatform.v2024_01_01_preview.operations.PredefinedAcceleratorsOperations
+    :ivar jobs: JobsOperations operations
+    :vartype jobs: azure.mgmt.appplatform.v2024_01_01_preview.operations.JobsOperations
+    :ivar job: JobOperations operations
+    :vartype job: azure.mgmt.appplatform.v2024_01_01_preview.operations.JobOperations
+    :ivar job_execution: JobExecutionOperations operations
+    :vartype job_execution:
+     azure.mgmt.appplatform.v2024_01_01_preview.operations.JobExecutionOperations
+    :ivar job_executions: JobExecutionsOperations operations
+    :vartype job_executions:
+     azure.mgmt.appplatform.v2024_01_01_preview.operations.JobExecutionsOperations
     :param credential: Credential needed for the client to connect to Azure. Required.
     :type credential: ~azure.core.credentials.TokenCredential
     :param subscription_id: Gets subscription ID which uniquely identify the Microsoft Azure
@@ -257,6 +271,14 @@ class AppPlatformManagementClient:  # pylint: disable=client-accepts-api-version
             self._client, self._config, self._serialize, self._deserialize, "2024-01-01-preview"
         )
         self.predefined_accelerators = PredefinedAcceleratorsOperations(
+            self._client, self._config, self._serialize, self._deserialize, "2024-01-01-preview"
+        )
+        self.jobs = JobsOperations(self._client, self._config, self._serialize, self._deserialize, "2024-01-01-preview")
+        self.job = JobOperations(self._client, self._config, self._serialize, self._deserialize, "2024-01-01-preview")
+        self.job_execution = JobExecutionOperations(
+            self._client, self._config, self._serialize, self._deserialize, "2024-01-01-preview"
+        )
+        self.job_executions = JobExecutionsOperations(
             self._client, self._config, self._serialize, self._deserialize, "2024-01-01-preview"
         )
 

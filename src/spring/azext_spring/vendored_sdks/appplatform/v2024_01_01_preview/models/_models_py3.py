@@ -2607,7 +2607,7 @@ class BuildResultProperties(_serialization.Model):
 
 
 class UserSourceInfo(_serialization.Model):
-    """Source information for a deployment.
+    """Source information for a deployment or a job.
 
     You probably want to use the sub-classes and not this class directly. Known sub-classes are:
     BuildResultUserSourceInfo, CustomContainerUserSourceInfo, UploadedUserSourceInfo
@@ -7444,6 +7444,382 @@ class JarUploadedUserSourceInfo(UploadedUserSourceInfo):
         self.jvm_options = jvm_options
 
 
+class JobExecution(_serialization.Model):
+    """Azure Spring Apps Job execution.
+
+    Variables are only populated by the server, and will be ignored when sending a request.
+
+    :ivar name: Job execution Name.
+    :vartype name: str
+    :ivar status: Current state of the job execution. Known values are: "Running", "Pending",
+     "Canceled", "Failed", and "Completed".
+    :vartype status: str or
+     ~azure.mgmt.appplatform.v2024_01_01_preview.models.JobExecutionRunningState
+    :ivar start_time: Job execution start time.
+    :vartype start_time: ~datetime.datetime
+    :ivar end_time: Job execution end time.
+    :vartype end_time: ~datetime.datetime
+    :ivar properties: Job's execution properties.
+    :vartype properties: ~azure.mgmt.appplatform.v2024_01_01_preview.models.JobExecutionProperties
+    """
+
+    _validation = {
+        "status": {"readonly": True},
+    }
+
+    _attribute_map = {
+        "name": {"key": "name", "type": "str"},
+        "status": {"key": "status", "type": "str"},
+        "start_time": {"key": "startTime", "type": "iso-8601"},
+        "end_time": {"key": "endTime", "type": "iso-8601"},
+        "properties": {"key": "properties", "type": "JobExecutionProperties"},
+    }
+
+    def __init__(
+        self,
+        *,
+        name: Optional[str] = None,
+        start_time: Optional[datetime.datetime] = None,
+        end_time: Optional[datetime.datetime] = None,
+        properties: Optional["_models.JobExecutionProperties"] = None,
+        **kwargs: Any
+    ) -> None:
+        """
+        :keyword name: Job execution Name.
+        :paramtype name: str
+        :keyword start_time: Job execution start time.
+        :paramtype start_time: ~datetime.datetime
+        :keyword end_time: Job execution end time.
+        :paramtype end_time: ~datetime.datetime
+        :keyword properties: Job's execution properties.
+        :paramtype properties:
+         ~azure.mgmt.appplatform.v2024_01_01_preview.models.JobExecutionProperties
+        """
+        super().__init__(**kwargs)
+        self.name = name
+        self.status = None
+        self.start_time = start_time
+        self.end_time = end_time
+        self.properties = properties
+
+
+class JobExecutionCollection(_serialization.Model):
+    """Azure Spring App Job executions collection.
+
+    All required parameters must be populated in order to send to Azure.
+
+    :ivar value: Collection of Job executions. Required.
+    :vartype value: list[~azure.mgmt.appplatform.v2024_01_01_preview.models.JobExecution]
+    :ivar next_link: Link to next page of resources.
+    :vartype next_link: str
+    """
+
+    _validation = {
+        "value": {"required": True},
+    }
+
+    _attribute_map = {
+        "value": {"key": "value", "type": "[JobExecution]"},
+        "next_link": {"key": "nextLink", "type": "str"},
+    }
+
+    def __init__(self, *, value: List["_models.JobExecution"], next_link: Optional[str] = None, **kwargs: Any) -> None:
+        """
+        :keyword value: Collection of Job executions. Required.
+        :paramtype value: list[~azure.mgmt.appplatform.v2024_01_01_preview.models.JobExecution]
+        :keyword next_link: Link to next page of resources.
+        :paramtype next_link: str
+        """
+        super().__init__(**kwargs)
+        self.value = value
+        self.next_link = next_link
+
+
+class JobExecutionProperties(_serialization.Model):
+    """Job's execution template, containing configuration for an execution.
+
+    :ivar template: The template which is applied for the execution of the Job.
+    :vartype template: ~azure.mgmt.appplatform.v2024_01_01_preview.models.JobExecutionTemplate
+    :ivar resource_requests: The requested resource quantity for required CPU and Memory.
+    :vartype resource_requests: ~azure.mgmt.appplatform.v2024_01_01_preview.models.ResourceRequests
+    """
+
+    _attribute_map = {
+        "template": {"key": "template", "type": "JobExecutionTemplate"},
+        "resource_requests": {"key": "resourceRequests", "type": "ResourceRequests"},
+    }
+
+    def __init__(
+        self,
+        *,
+        template: Optional["_models.JobExecutionTemplate"] = None,
+        resource_requests: Optional["_models.ResourceRequests"] = None,
+        **kwargs: Any
+    ) -> None:
+        """
+        :keyword template: The template which is applied for the execution of the Job.
+        :paramtype template: ~azure.mgmt.appplatform.v2024_01_01_preview.models.JobExecutionTemplate
+        :keyword resource_requests: The requested resource quantity for required CPU and Memory.
+        :paramtype resource_requests:
+         ~azure.mgmt.appplatform.v2024_01_01_preview.models.ResourceRequests
+        """
+        super().__init__(**kwargs)
+        self.template = template
+        self.resource_requests = resource_requests
+
+
+class JobExecutionTemplate(_serialization.Model):
+    """Job's execution template, containing configuration for an execution.
+
+    :ivar environment_variables: Environment variables of Job execution.
+    :vartype environment_variables:
+     ~azure.mgmt.appplatform.v2024_01_01_preview.models.JobExecutionTemplateEnvironmentVariables
+    :ivar replica_timeout: Maximum number of seconds a replica is allowed to run.
+    :vartype replica_timeout: int
+    :ivar replica_retry_limit: Maximum number of retries before failing the job.
+    :vartype replica_retry_limit: int
+    :ivar replica_completion_count: Minimum number of successful replica completions before overall
+     job completion.
+    :vartype replica_completion_count: int
+    :ivar parallelism: Number of parallel replicas of a job that can run at a given time.
+    :vartype parallelism: int
+    :ivar args: Arguments for the Job executioin.
+    :vartype args: list[str]
+    """
+
+    _attribute_map = {
+        "environment_variables": {"key": "environmentVariables", "type": "JobExecutionTemplateEnvironmentVariables"},
+        "replica_timeout": {"key": "replicaTimeout", "type": "int"},
+        "replica_retry_limit": {"key": "replicaRetryLimit", "type": "int"},
+        "replica_completion_count": {"key": "replicaCompletionCount", "type": "int"},
+        "parallelism": {"key": "parallelism", "type": "int"},
+        "args": {"key": "args", "type": "[str]"},
+    }
+
+    def __init__(
+        self,
+        *,
+        environment_variables: Optional["_models.JobExecutionTemplateEnvironmentVariables"] = None,
+        replica_timeout: Optional[int] = None,
+        replica_retry_limit: Optional[int] = None,
+        replica_completion_count: Optional[int] = None,
+        parallelism: Optional[int] = None,
+        args: Optional[List[str]] = None,
+        **kwargs: Any
+    ) -> None:
+        """
+        :keyword environment_variables: Environment variables of Job execution.
+        :paramtype environment_variables:
+         ~azure.mgmt.appplatform.v2024_01_01_preview.models.JobExecutionTemplateEnvironmentVariables
+        :keyword replica_timeout: Maximum number of seconds a replica is allowed to run.
+        :paramtype replica_timeout: int
+        :keyword replica_retry_limit: Maximum number of retries before failing the job.
+        :paramtype replica_retry_limit: int
+        :keyword replica_completion_count: Minimum number of successful replica completions before
+         overall job completion.
+        :paramtype replica_completion_count: int
+        :keyword parallelism: Number of parallel replicas of a job that can run at a given time.
+        :paramtype parallelism: int
+        :keyword args: Arguments for the Job executioin.
+        :paramtype args: list[str]
+        """
+        super().__init__(**kwargs)
+        self.environment_variables = environment_variables
+        self.replica_timeout = replica_timeout
+        self.replica_retry_limit = replica_retry_limit
+        self.replica_completion_count = replica_completion_count
+        self.parallelism = parallelism
+        self.args = args
+
+
+class JobExecutionTemplateEnvironmentVariables(_serialization.Model):
+    """Environment variables of Job execution.
+
+    :ivar properties: Non-sensitive properties.
+    :vartype properties: dict[str, str]
+    :ivar secrets: Sensitive properties.
+    :vartype secrets: dict[str, str]
+    """
+
+    _attribute_map = {
+        "properties": {"key": "properties", "type": "{str}"},
+        "secrets": {"key": "secrets", "type": "{str}"},
+    }
+
+    def __init__(
+        self, *, properties: Optional[Dict[str, str]] = None, secrets: Optional[Dict[str, str]] = None, **kwargs: Any
+    ) -> None:
+        """
+        :keyword properties: Non-sensitive properties.
+        :paramtype properties: dict[str, str]
+        :keyword secrets: Sensitive properties.
+        :paramtype secrets: dict[str, str]
+        """
+        super().__init__(**kwargs)
+        self.properties = properties
+        self.secrets = secrets
+
+
+class JobResource(ProxyResource):
+    """Job resource payload.
+
+    Variables are only populated by the server, and will be ignored when sending a request.
+
+    :ivar id: Fully qualified resource Id for the resource.
+    :vartype id: str
+    :ivar name: The name of the resource.
+    :vartype name: str
+    :ivar type: The type of the resource.
+    :vartype type: str
+    :ivar system_data: Metadata pertaining to creation and last modification of the resource.
+    :vartype system_data: ~azure.mgmt.appplatform.v2024_01_01_preview.models.SystemData
+    :ivar properties: Properties of the Job resource.
+    :vartype properties: ~azure.mgmt.appplatform.v2024_01_01_preview.models.JobResourceProperties
+    """
+
+    _validation = {
+        "id": {"readonly": True},
+        "name": {"readonly": True},
+        "type": {"readonly": True},
+        "system_data": {"readonly": True},
+    }
+
+    _attribute_map = {
+        "id": {"key": "id", "type": "str"},
+        "name": {"key": "name", "type": "str"},
+        "type": {"key": "type", "type": "str"},
+        "system_data": {"key": "systemData", "type": "SystemData"},
+        "properties": {"key": "properties", "type": "JobResourceProperties"},
+    }
+
+    def __init__(self, *, properties: Optional["_models.JobResourceProperties"] = None, **kwargs: Any) -> None:
+        """
+        :keyword properties: Properties of the Job resource.
+        :paramtype properties: ~azure.mgmt.appplatform.v2024_01_01_preview.models.JobResourceProperties
+        """
+        super().__init__(**kwargs)
+        self.properties = properties
+
+
+class JobResourceCollection(_serialization.Model):
+    """List of Azure Spring Apps Jobs and a possible link for next set.
+
+    Variables are only populated by the server, and will be ignored when sending a request.
+
+    All required parameters must be populated in order to send to Azure.
+
+    :ivar value: Collection of Job resources. Required.
+    :vartype value: list[~azure.mgmt.appplatform.v2024_01_01_preview.models.JobResource]
+    :ivar next_link: Link to next page of resources.
+    :vartype next_link: str
+    """
+
+    _validation = {
+        "value": {"required": True},
+        "next_link": {"readonly": True},
+    }
+
+    _attribute_map = {
+        "value": {"key": "value", "type": "[JobResource]"},
+        "next_link": {"key": "nextLink", "type": "str"},
+    }
+
+    def __init__(self, *, value: List["_models.JobResource"], **kwargs: Any) -> None:
+        """
+        :keyword value: Collection of Job resources. Required.
+        :paramtype value: list[~azure.mgmt.appplatform.v2024_01_01_preview.models.JobResource]
+        """
+        super().__init__(**kwargs)
+        self.value = value
+        self.next_link = None
+
+
+class JobResourceProperties(_serialization.Model):
+    """Job resource properties payload.
+
+    Variables are only populated by the server, and will be ignored when sending a request.
+
+    :ivar provisioning_state: Provisioning state of the Job. Known values are: "Succeeded",
+     "Failed", "Creating", "Updating", "Deleting", and "Canceled".
+    :vartype provisioning_state: str or
+     ~azure.mgmt.appplatform.v2024_01_01_preview.models.JobResourceProvisioningState
+    :ivar template: The template which is applied for all executions of the Job.
+    :vartype template: ~azure.mgmt.appplatform.v2024_01_01_preview.models.JobExecutionTemplate
+    :ivar addon_configs: Collection of addons.
+    :vartype addon_configs: dict[str, JSON]
+    :ivar source: Uploaded source information of the Job.
+    :vartype source: ~azure.mgmt.appplatform.v2024_01_01_preview.models.UserSourceInfo
+    :ivar trigger_config: The Job trigger related configuration.
+    :vartype trigger_config: ~azure.mgmt.appplatform.v2024_01_01_preview.models.JobTriggerConfig
+    """
+
+    _validation = {
+        "provisioning_state": {"readonly": True},
+    }
+
+    _attribute_map = {
+        "provisioning_state": {"key": "provisioningState", "type": "str"},
+        "template": {"key": "template", "type": "JobExecutionTemplate"},
+        "addon_configs": {"key": "addonConfigs", "type": "{object}"},
+        "source": {"key": "source", "type": "UserSourceInfo"},
+        "trigger_config": {"key": "triggerConfig", "type": "JobTriggerConfig"},
+    }
+
+    def __init__(
+        self,
+        *,
+        template: Optional["_models.JobExecutionTemplate"] = None,
+        addon_configs: Optional[Dict[str, JSON]] = None,
+        source: Optional["_models.UserSourceInfo"] = None,
+        trigger_config: Optional["_models.JobTriggerConfig"] = None,
+        **kwargs: Any
+    ) -> None:
+        """
+        :keyword template: The template which is applied for all executions of the Job.
+        :paramtype template: ~azure.mgmt.appplatform.v2024_01_01_preview.models.JobExecutionTemplate
+        :keyword addon_configs: Collection of addons.
+        :paramtype addon_configs: dict[str, JSON]
+        :keyword source: Uploaded source information of the Job.
+        :paramtype source: ~azure.mgmt.appplatform.v2024_01_01_preview.models.UserSourceInfo
+        :keyword trigger_config: The Job trigger related configuration.
+        :paramtype trigger_config: ~azure.mgmt.appplatform.v2024_01_01_preview.models.JobTriggerConfig
+        """
+        super().__init__(**kwargs)
+        self.provisioning_state = None
+        self.template = template
+        self.addon_configs = addon_configs
+        self.source = source
+        self.trigger_config = trigger_config
+
+
+class JobTriggerConfig(_serialization.Model):
+    """Configuration for different trigger types.
+
+    You probably want to use the sub-classes and not this class directly. Known sub-classes are:
+    ManualJobTriggerConfig
+
+    All required parameters must be populated in order to send to Azure.
+
+    :ivar trigger_type: Type of job trigger. Required.
+    :vartype trigger_type: str
+    """
+
+    _validation = {
+        "trigger_type": {"required": True},
+    }
+
+    _attribute_map = {
+        "trigger_type": {"key": "triggerType", "type": "str"},
+    }
+
+    _subtype_map = {"trigger_type": {"Manual": "ManualJobTriggerConfig"}}
+
+    def __init__(self, **kwargs: Any) -> None:
+        """ """
+        super().__init__(**kwargs)
+        self.trigger_type: Optional[str] = None
+
+
 class KeyVaultCertificateProperties(CertificateProperties):  # pylint: disable=too-many-instance-attributes
     """Properties of certificate imported from key vault.
 
@@ -7726,6 +8102,29 @@ class ManagedIdentityProperties(_serialization.Model):
         self.principal_id = principal_id
         self.tenant_id = tenant_id
         self.user_assigned_identities = user_assigned_identities
+
+
+class ManualJobTriggerConfig(JobTriggerConfig):
+    """Configuration for manual triggered job.
+
+    All required parameters must be populated in order to send to Azure.
+
+    :ivar trigger_type: Type of job trigger. Required.
+    :vartype trigger_type: str
+    """
+
+    _validation = {
+        "trigger_type": {"required": True},
+    }
+
+    _attribute_map = {
+        "trigger_type": {"key": "triggerType", "type": "str"},
+    }
+
+    def __init__(self, **kwargs: Any) -> None:
+        """ """
+        super().__init__(**kwargs)
+        self.trigger_type: str = "Manual"
 
 
 class MarketplaceResource(_serialization.Model):
@@ -8822,7 +9221,7 @@ class RequiredTraffic(_serialization.Model):
 
 
 class ResourceRequests(_serialization.Model):
-    """Deployment resource request payload.
+    """Deployment/Job resource request payload.
 
     :ivar cpu: Required CPU. 1 core can be represented by 1 or 1000m. This should be 500m or 1 for
      Basic tier, and {500m, 1, 2, 3, 4} for Standard tier.

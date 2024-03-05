@@ -124,6 +124,11 @@ def load_command_table(self, _):
         client_factory=cf_spring
     )
 
+    job_cmd_group = CliCommandType(
+        operations_tmpl='azext_spring.job#{}',
+        client_factory=cf_spring
+    )
+
     with self.command_group('spring', custom_command_type=spring_routing_util,
                             exception_handler=handle_asc_exception) as g:
         g.custom_command('create', 'spring_create', supports_no_wait=True)
@@ -475,6 +480,22 @@ def load_command_table(self, _):
                             custom_command_type=managed_component_cmd_group,
                             exception_handler=handle_asc_exception) as g:
         g.custom_command('list', 'managed_component_instance_list', validator=validate_instance_list)
+
+    with self.command_group('spring job', custom_command_type=job_cmd_group,
+                            exception_handler=handle_asc_exception) as g:
+        g.custom_command('create', 'job_create')
+        g.custom_command('update', 'job_update')
+        g.custom_command('delete', 'job_delete')
+        g.custom_command('show', 'job_get', supports_no_wait=True)
+        g.custom_command('list', 'job_list', supports_no_wait=True)
+        g.custom_command('deploy', 'job_deploy', supports_no_wait=True)
+        g.custom_command('start', 'job_start', supports_no_wait=True)
+
+    with self.command_group('spring job execution', custom_command_type=job_cmd_group,
+                            exception_handler=handle_asc_exception) as g:
+        g.custom_command('cancel', 'job_execution_cancel', supports_no_wait=True)
+        g.custom_command('show', 'job_execution_get')
+        g.custom_command('list', 'job_execution_list')
 
     with self.command_group('spring', exception_handler=handle_asc_exception):
         pass

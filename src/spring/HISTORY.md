@@ -1,5 +1,7 @@
-Release History
-===============
+1.20.1
+---
+* Add Job support.
+
 1.20.0
 ---
 * Change default Application Configuration Service generation value to Gen2.

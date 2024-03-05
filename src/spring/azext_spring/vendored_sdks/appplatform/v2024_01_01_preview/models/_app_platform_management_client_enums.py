@@ -368,6 +368,27 @@ class HTTPSchemeType(str, Enum, metaclass=CaseInsensitiveEnumMeta):
     HTTPS = "HTTPS"
 
 
+class JobExecutionRunningState(str, Enum, metaclass=CaseInsensitiveEnumMeta):
+    """Current state of the job execution."""
+
+    RUNNING = "Running"
+    PENDING = "Pending"
+    CANCELED = "Canceled"
+    FAILED = "Failed"
+    COMPLETED = "Completed"
+
+
+class JobResourceProvisioningState(str, Enum, metaclass=CaseInsensitiveEnumMeta):
+    """Provisioning state of the Job."""
+
+    SUCCEEDED = "Succeeded"
+    FAILED = "Failed"
+    CREATING = "Creating"
+    UPDATING = "Updating"
+    DELETING = "Deleting"
+    CANCELED = "Canceled"
+
+
 class KeyVaultCertificateAutoSync(str, Enum, metaclass=CaseInsensitiveEnumMeta):
     """Indicates whether to automatically synchronize certificate from key vault or not."""
 

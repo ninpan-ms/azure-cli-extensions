@@ -37,6 +37,10 @@ from ._api_portal_custom_domains_operations import ApiPortalCustomDomainsOperati
 from ._application_accelerators_operations import ApplicationAcceleratorsOperations
 from ._customized_accelerators_operations import CustomizedAcceleratorsOperations
 from ._predefined_accelerators_operations import PredefinedAcceleratorsOperations
+from ._jobs_operations import JobsOperations
+from ._job_operations import JobOperations
+from ._job_execution_operations import JobExecutionOperations
+from ._job_executions_operations import JobExecutionsOperations
 
 from ._patch import __all__ as _patch_all
 from ._patch import *  # pylint: disable=unused-wildcard-import
@@ -74,6 +78,10 @@ __all__ = [
     "ApplicationAcceleratorsOperations",
     "CustomizedAcceleratorsOperations",
     "PredefinedAcceleratorsOperations",
+    "JobsOperations",
+    "JobOperations",
+    "JobExecutionOperations",
+    "JobExecutionsOperations",
 ]
 __all__.extend([p for p in _patch_all if p not in __all__])
 _patch_sdk()
