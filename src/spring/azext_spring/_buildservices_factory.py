@@ -41,7 +41,7 @@ class BuildService:
         uploader_selector(cli_ctx=self.cmd.cli_ctx, upload_url=upload_info.upload_url, **kwargs).upload_and_build(**kwargs)
         if 'app' in kwargs:
             build_name = kwargs['app']
-        if 'job' in kwargs:
+        elif 'job' in kwargs:
             build_name = kwargs['job']
         else:
             build_name = kwargs['build_name']
