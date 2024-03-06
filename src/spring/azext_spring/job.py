@@ -101,6 +101,12 @@ def job_deploy(cmd, client, resource_group, service, name,
                no_wait=False):
     logger.warning(LOG_RUNNING_PROMPT)
 
+    job_resource = client.job.get(resource_group, service, name)
+    existing_secrets = client.job.list_env_secrets(resource_group, service, name)
+    if existing_secrets is not None:
+        job_resource.properties.template.environment_variables.secrets = existing_secrets
+    job_resource.properties = _update_job_properties(job_resource.properties, envs, secret_envs, args)
+
     kwargs = {
         'cmd': cmd,
         'client': client,
@@ -119,6 +125,8 @@ def job_deploy(cmd, client, resource_group, service, name,
     kwargs['source_type'] = deployable.get_source_type(**kwargs)
     kwargs['total_steps'] = deployable.get_total_deploy_steps(**kwargs)
     deployable_path = deployable.build_deployable_path(**kwargs)
+
+    job_resource.properties = _update_source(job_resource.properties, deployable_path, version)
 
     job_resource = models.JobResource(
         properties = models.JobResourceProperties(
@@ -196,6 +204,16 @@ def _update_job_properties(properties, envs, secret_envs, args):
     if properties is None:
         properties = models.JobResourceProperties()
     properties.template = _update_job_properties_template(properties.template, envs, secret_envs, args)
+    return properties
+
+
+def _update_source(properties, deployable_path, version):
+    if properties is None:
+        properties = models.JobResourceProperties()
+    properties.source = models.BuildResultUserSourceInfo(
+        build_result_id = deployable_path,
+        version = version
+    )
     return properties
 
 
