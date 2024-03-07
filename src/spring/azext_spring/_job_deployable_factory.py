@@ -54,9 +54,10 @@ class BuildServiceDeployableBuilder(EmptyDeployableBuilder):
 
 
 def deployable_selector(**kwargs):
+    source_path = kwargs.get('source_path')
     artifact_path = kwargs.get('artifact_path')
 
-    if all(x is None for x in [artifact_path]):
+    if all(x is None for x in [source_path, artifact_path]):
         # Nothing will be deployed, just return the original deployable path
         return EmptyDeployableBuilder(**kwargs)
 

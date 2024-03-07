@@ -1148,6 +1148,7 @@ def load_arguments(self, _):
         c.argument('build_env', build_env_type)
         c.argument('build_cpu', arg_type=build_cpu_type, default="1")
         c.argument('build_memory', arg_type=build_memory_type, default="2Gi")
+        c.argument('source_path', arg_type=source_path_type, validator=validate_source_path)
         c.argument('artifact_path', help='Deploy the specified pre-built artifact (jar or netcore zip).', validator=validate_artifact_path)
         c.argument('disable_validation', arg_type=get_three_state_flag(), help='If true, disable jar validation.')
 
