@@ -91,6 +91,7 @@ def job_deploy(cmd, client, resource_group, service, name,
                builder=None,
                build_cpu=None,
                build_memory=None,
+               source_path=None,
                artifact_path=None,
                version=None,
                envs=None,
@@ -113,6 +114,7 @@ def job_deploy(cmd, client, resource_group, service, name,
         'resource_group': resource_group,
         'service': service,
         'job': name,
+        'source_path': source_path,
         'artifact_path': artifact_path,
         'build_env': build_env,
         'build_cpu': build_cpu,
@@ -128,21 +130,6 @@ def job_deploy(cmd, client, resource_group, service, name,
 
     job_resource.properties = _update_source(job_resource.properties, deployable_path, version)
 
-    job_resource = models.JobResource(
-        properties = models.JobResourceProperties(
-            trigger_config = models.ManualJobTriggerConfig(
-                trigger_type = "Manual"
-            ),
-            source = models.BuildResultUserSourceInfo(
-                build_result_id = deployable_path,
-                version = version
-            ),
-            template= models.JobExecutionTemplate(
-                environment_variables=_update_envs(None, envs, secret_envs),
-                args=_convert_args(args)
-            )
-        )
-    )
     poller = sdk_no_wait(no_wait, client.job.begin_create_or_update,
                          resource_group, service, name, job_resource)
     if "succeeded" != poller.status().lower():
