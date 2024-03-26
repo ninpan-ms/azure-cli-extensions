@@ -13,6 +13,7 @@ from ._utils import wait_till_end
 from .vendored_sdks.appplatform.v2024_01_01_preview import models
 import shlex
 from json import JSONEncoder
+import time
 
 logger = get_logger(__name__)
 
@@ -143,6 +144,7 @@ def job_start(cmd, client, resource_group, service, name,
               cpu=None,
               memory=None,
               args=None,
+              wait_until_finished=False
               ):
     properties = models.JobExecutionProperties(
         template = models.JobExecutionTemplate(
@@ -152,7 +154,14 @@ def job_start(cmd, client, resource_group, service, name,
         resource_requests = _update_resource_requests(None, cpu, memory)
     )
     logger.warning("Successfully triggered the action 'start' for the job '{}'.".format(name))
-    return client.job.begin_start(resource_group, service, name, properties)
+
+    if wait_until_finished == False:
+        return client.job.begin_start(resource_group, service, name, properties)
+    else:
+        poller = sdk_no_wait(False, client.job.begin_start,
+                             resource_group, service, name, properties)
+        execution_name = poller.result().name
+        return _poll_until_job_end(cmd, client, resource_group, service, name, execution_name)
 
 
 def job_execution_cancel(cmd, client,
@@ -242,3 +251,15 @@ def _convert_args(args):
     if args is not None:
         return shlex.split(args)
     return args
+
+
+def _poll_until_job_end(cmd, client, resource_group, service, job_name, job_execution_name):
+    while True:
+        execution = client.job_execution.get(resource_group, service, job_name, job_execution_name)
+        status = execution.status
+        if status == "Completed" or status == "Failed" or status == "Cancelled":
+            logger.warning("Job execution '{}' is in final status '{}'. Exiting polling loop.".format(job_execution_name, status))
+            return execution
+        else:
+            logger.warning("Job execution '{}' is in status '{}'. Polling again in 10 second...".format(job_execution_name, status))
+        time.sleep(10)
