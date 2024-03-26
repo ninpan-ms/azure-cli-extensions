@@ -1174,3 +1174,4 @@ def load_arguments(self, _):
     with self.argument_context('spring job start') as c:
         c.argument('cpu', type=str, help='CPU resource quantity. Should be 500m or number of CPU cores.', validator=validate_cpu)
         c.argument('memory', type=str, help='Memory resource quantity. Should be 512Mi or #Gi, e.g., 1Gi, 3Gi.', validator=validate_memory)
+        c.argument('wait_until_finished', help='If true, wait until the job execution is finished.', arg_type=get_three_state_flag(), default=False)
