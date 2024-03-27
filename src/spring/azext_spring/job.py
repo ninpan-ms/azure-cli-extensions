@@ -153,7 +153,6 @@ def job_start(cmd, client, resource_group, service, name,
         ),
         resource_requests = _update_resource_requests(None, cpu, memory)
     )
-    logger.warning("Successfully triggered the action 'start' for the job '{}'.".format(name))
 
     if wait_until_finished == False:
         return client.job.begin_start(resource_group, service, name, properties)
@@ -170,7 +169,6 @@ def job_execution_cancel(cmd, client,
              job_name,
              job_execution_name,
              no_wait=False):
-    logger.warning("Successfully triggered the action 'cancel' for the job execution '{}'".format(job_execution_name))
     return sdk_no_wait(no_wait, client.job_execution.begin_cancel,
                        resource_group, service, job_name, job_execution_name)
 

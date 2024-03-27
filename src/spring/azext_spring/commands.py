@@ -483,19 +483,19 @@ def load_command_table(self, _):
 
     with self.command_group('spring job', custom_command_type=job_cmd_group,
                             exception_handler=handle_asc_exception) as g:
-        g.custom_command('create', 'job_create')
-        g.custom_command('update', 'job_update')
-        g.custom_command('delete', 'job_delete')
-        g.custom_command('show', 'job_get', supports_no_wait=True)
-        g.custom_command('list', 'job_list', supports_no_wait=True)
-        g.custom_command('deploy', 'job_deploy', supports_no_wait=True)
-        g.custom_command('start', 'job_start', supports_no_wait=True)
+        g.custom_command('create', 'job_create', is_preview=True)
+        g.custom_command('update', 'job_update', is_preview=True)
+        g.custom_command('delete', 'job_delete', is_preview=True)
+        g.custom_command('show', 'job_get', supports_no_wait=True, is_preview=True)
+        g.custom_command('list', 'job_list', supports_no_wait=True, is_preview=True)
+        g.custom_command('deploy', 'job_deploy', supports_no_wait=True, is_preview=True)
+        g.custom_command('start', 'job_start', supports_no_wait=True, is_preview=True)
 
     with self.command_group('spring job execution', custom_command_type=job_cmd_group,
                             exception_handler=handle_asc_exception) as g:
-        g.custom_command('cancel', 'job_execution_cancel', supports_no_wait=True)
-        g.custom_command('show', 'job_execution_get')
-        g.custom_command('list', 'job_execution_list')
+        g.custom_command('cancel', 'job_execution_cancel', supports_no_wait=True, is_preview=True)
+        g.custom_command('show', 'job_execution_get', is_preview=True)
+        g.custom_command('list', 'job_execution_list', is_preview=True)
 
     with self.command_group('spring', exception_handler=handle_asc_exception):
         pass
